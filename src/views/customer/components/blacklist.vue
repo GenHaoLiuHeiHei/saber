@@ -1,0 +1,189 @@
+<template>
+  <basic-container>
+    <avue-crud
+      :option="option"
+      :table-loading="loading"
+      :data="data"
+      :page="page"
+      :permission="permissionList"
+      v-model="form"
+      ref="crud"
+      @search-change="searchChange"
+      @search-reset="searchReset"
+      @selection-change="selectionChange"
+      @current-change="currentChange"
+      @size-change="sizeChange"
+      @on-load="onLoad"
+    >
+      <template slot-scope="scope" slot="menu">
+        <el-button
+          type="button"
+          size="small"
+          class="el-button--text"
+          icon="el-icon-edit"
+          @click="relieve(scope.row, 'userRelieve')"
+        >解除封停</el-button>
+      </template>
+    </avue-crud>
+    <el-dialog :title="title" :visible.sync="modalInfoNoSearch" @close="closeDialogAddgsVisible">
+      <div v-if="modalInfoNoSearch">
+        <indexNoSearch
+          :modalInfoType="modalInfoType"
+          :formDatas="formDatas"
+          @closeDialogAddgsVisible="closeDialogAddgsVisible"
+        ></indexNoSearch>
+      </div>
+    </el-dialog>
+  </basic-container>
+</template>
+
+<script>
+import { getList } from "@/api/customer/blacklist";
+import { mapGetters } from "vuex";
+import indexNoSearch from '@/components/infoModal/isNoSearch/index';
+import infoModal from '@/components/infoModal/isSearch/index';
+export default {
+  data() {
+    return {
+      modalInfoNoSearch: false,
+      title: "",
+      form: {},
+      query: {},
+      loading: true,
+      page: {
+        pageSize: 10,
+        currentPage: 1,
+        total: 0
+      },
+      selectionList: [],
+      option: {
+        tip: false,
+        border: true,
+        viewBtn: true,
+        align: "center",
+        column: [
+          {
+            label: "",
+            prop: "id",
+            hide: true
+          },
+          {
+            label: "ID",
+            prop: "customerNumber",
+            search: true
+          },
+          {
+            label: "昵称",
+            prop: "customerName",
+            search: true
+          },
+          {
+            label: "绑定手机",
+            prop: "customerPhoneNumber",
+            search: true
+          },
+          {
+            label: "注册时间",
+            prop: "createTime"
+          },
+          {
+            label: "封停时间",
+            prop: "blockTime"
+          },
+          {
+            label: "剩余时间",
+            prop: "residueTime"
+          },
+          {
+            label: "原因",
+            width: 250,
+            prop: "blockReason"
+          },
+          {
+            label: "操作人员",
+            prop: "createUser"
+          }
+        ]
+      },
+      data: []
+    };
+  },
+  components: {
+    infoModal,
+    indexNoSearch
+  },
+  computed: {
+    ...mapGetters(["permission"]),
+    permissionList() {
+      return {
+        addBtn: this.vaildData(this.permission.blacklist_add, false),
+        viewBtn: this.vaildData(this.permission.blacklist_view, false),
+        delBtn: this.vaildData(this.permission.blacklist_delete, false),
+        editBtn: this.vaildData(this.permission.blacklist_edit, false)
+      };
+    },
+    ids() {
+      let ids = [];
+      this.selectionList.forEach(ele => {
+        ids.push(ele.id);
+      });
+      return ids.join(",");
+    }
+  },
+  methods: {
+    // 解除
+    relieve(row, type) {
+      this.modalInfoType = type;
+      this.modalInfoNoSearch = true;
+      this.formDatas = row;
+      this.title = "解除停封";
+    },
+    
+    closeDialogAddgsVisible(res) {
+      console.log(res);
+      this.modalInfoNoSearch = false;
+      if (res) this.onLoad(this.page);
+    },
+
+
+    searchReset() {
+      this.query = {};
+      this.onLoad(this.page);
+    },
+    searchChange(params) {
+      this.query = params;
+      this.onLoad(this.page, params);
+    },
+    selectionChange(list) {
+      this.selectionList = list;
+    },
+    selectionClear() {
+      this.selectionList = [];
+      this.$refs.crud.toggleSelection();
+    },
+    currentChange(currentPage) {
+      this.page.currentPage = currentPage;
+    },
+    sizeChange(pageSize) {
+      this.page.pageSize = pageSize;
+    },
+    onLoad(page, params = {}) {
+      this.loading = false;
+      getList(
+        page.currentPage,
+        page.pageSize,
+        Object.assign(params, this.query)
+      ).then(res => {
+        const data = res.data.data;
+        this.page.total = data.total;
+        this.data = data.records;
+        this.loading = false;
+        this.selectionClear();
+      });
+    }
+  }
+};
+</script>
+
+<style>
+</style>
