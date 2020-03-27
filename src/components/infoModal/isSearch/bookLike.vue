@@ -4,29 +4,44 @@
       <ul
         class="list"
         v-infinite-scroll="load"
-        infinite-scroll-disabled="disabled"
+        :infinite-scroll-disabled="disabled"
         v-loading.fullscreen.lock="loading"
       >
-        <li v-for="(item, index) in dataList" :key="index" class="list-item p-b15">
-          <div class="font-18 color-B05E07">你的名字（ID: 10086）</div>
-          <div class="p-tb05">评论的内容</div>
-          <div class="bg-e1 p-tb10 p-lr10">我是内容我是内容</div>
+        <li v-for="(item, index) in data" :key="index" class="list-item p-b15">
+          <div class="font-18 color-blue" v-if="item.praiseState == '1'">{{item.customerNickName}}（ID: {{item.customerId}}）赞了你</div>
+          <div class="font-18 color-B05E07" v-else>你赞了 {{item.customerNickName}}（ID: {{item.customerId}}）</div>
+          <div class="p-tb05 p-tb05 p-lr10 bg-e1">{{item.content}}</div>
+          <div class="flex" style="justify-content: space-between;align-items: flex-end;">
+            <div class="p-tb05">&lt;&lt;{{item.bookName}}&gt;&gt;</div>
+            <div class="font-16 p-tb05">{{item.praiseTime}}</div>
+          </div>
         </li>
       </ul>
       <p v-if="loading" class="text-center">加载中...</p>
-      <p v-if="noMore" class="text-center">没有更多了</p>
+      <div v-if="noMore" class="text-center">
+        <div v-if="data && data.length">没有更多了</div>
+        <div v-else>
+          <avue-empty></avue-empty>
+        </div>
+      </div>
     </div>
   </basic-container>
 </template>
 <script>
 // 收藏
-import { getChapTerList } from "@/api/book/library";
+import { getLikeList } from "@/api/customer/customer";
 export default {
   name: "bookLike",
   props: {
     formDatas: {
       type: Object,
       required: true
+    },
+    seachForm: {
+      type: Object,
+      default() {
+        return {};
+      }
     },
     isSeach: {
       type: Boolean,
@@ -38,10 +53,14 @@ export default {
   watch: {
     isSeach: {
       handler(newValue) {
-        console.log(newValue);
         if (newValue) {
+          this.page.currentPage = 1;
+          Object.assign(this.query, this.seachForm);
           this.onLoad(this.page);
+        } else {
+          this.query = {};
         }
+        this.$emit("changeIsSeach", false);
       }
     }
   },
@@ -49,108 +68,56 @@ export default {
     return {
       query: {},
       loading: false,
+      noMore: false,
       page: {
         pageSize: 10,
-        currentPage: 1,
-        total: 30
+        currentPage: 0,
+        total: 0
       },
-      dataList: [
-        {
-          title: "1111"
-        },
-        {
-          title: "1111"
-        },
-        {
-          title: "1111"
-        },
-        {
-          title: "1111"
-        },
-        {
-          title: "1111"
-        },
-        {
-          title: "1111"
-        },
-        {
-          title: "1111"
-        },
-        {
-          title: "1111"
-        },
-        {
-          title: "1111"
-        },
-        {
-          title: "1111"
-        },
-        {
-          title: "1111"
-        },
-        {
-          title: "1111"
-        },
-        {
-          title: "1111"
-        },
-        {
-          title: "1111"
-        },
-        {
-          title: "1111"
-        },
-        {
-          title: "1111"
-        },
-        {
-          title: "1111"
-        },
-        {
-          title: "1111"
-        },
-        {
-          title: "1111"
-        },
-        {
-          title: "1111"
-        }
-      ]
+      data: []
     };
   },
   computed: {
-    noMore() {
-      return this.dataList.length >= this.page.total;
-    },
     disabled() {
       return this.loading || this.noMore;
     }
   },
   methods: {
     load() {
-      this.loading = true;
-      setTimeout(() => {
-        this.dataList.push({
-          title: "222"
-        });
-        this.loading = false;
-      }, 2000);
+      if (this.disabled) return;
+      this.page.currentPage++;
+      this.onLoad(this.page);
     },
     onLoad(page, params = {}) {
-      this.loading = true;
-      console.log("点赞");
-      getChapTerList(
+      let this_ = this;
+      if (this_.loading) return;
+      this_.loading = true;
+      getLikeList(
         page.currentPage,
         page.pageSize,
-        this.formDatas.id,
-        Object.assign(params, this.query)
-      ).then(res => {
-        const data = res.data.data;
-        this.page.total = data.total;
-        this.data = data.records;
-        this.loading = false;
-        this.$emit("changeIsSeach", false);
-      });
+        this_.formDatas.id,
+        Object.assign(params, this_.query)
+      )
+        .then(res => {
+          const data = res.data.data;
+          this_.page.total = data.total;
+          this_.loading = false;
+          if (data.records.length !== 0) {
+            if (this_.page.currentPage === 1) {
+              this_.data = data.records;
+              if (this_.data.length < this_.page.pageSize) this_.noMore = true;
+            } else {
+              this_.data = this_.data.concat(data.records);
+            }
+            this_.$emit("changeIsSeach", false);
+          } else {
+            this_.noMore = true;
+          }
+        })
+        .catch(err => {
+          console.log(err);
+          this_.loading = false;
+        });
     }
   }
 };

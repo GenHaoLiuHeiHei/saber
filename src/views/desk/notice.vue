@@ -127,7 +127,6 @@
     },
     methods: {
       rowSave(row, loading, done) {
-        debugger
         add(row).then(() => {
           loading();
           this.onLoad(this.page);
@@ -141,7 +140,6 @@
         });
       },
       rowUpdate(row, index, loading, done) {
-        debugger
         update(row).then(() => {
           loading();
           this.onLoad(this.page);

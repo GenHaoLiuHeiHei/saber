@@ -94,7 +94,7 @@ export default {
   created() {
     this.tabsType = this.optionTabs.column[0];
     this.modalInfoTypeModel = this.modalInfoType;
-    console.log(this.modalInfoTypeModel);
+    // console.log(this.modalInfoTypeModel);
   },
   methods: {
     handleChange(column) {
@@ -113,28 +113,10 @@ export default {
       this.isSeach = false;
     },
     onSubmit() {
-      if (this.seachForm.startTime !== "" || this.seachForm.endTime !== "") {
         this.isSeach = true;
-        console.log(this.modalInfoTypeModel);
-        console.log(this.seachForm);
-      }
-      // switch (this.modalInfoTypeModel) {
-      //   case 'bookHoard':
-      //     this.title = '收藏列表'
-      //     break
-      //   case 'bookLike':
-      //     this.title = '点赞列表'
-      //     break
-      //   case 'bookComment':
-      //     this.title = '评论列表'
-      //     break
-      //   case 'bookBrowse':
-      //     this.title = '浏览列表'
-      //     break
-      //   case 'bookChapter':
-      //     this.title = '章节列表'
-      //     break
-      // }
+      // if (this.seachForm.startTime !== "" || this.seachForm.endTime !== "") {
+      //   console.log(this.seachForm);
+      // } 
     }
   }
 };

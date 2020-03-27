@@ -24,6 +24,12 @@ export default {
       type: Object,
       required: true
     },
+    seachForm: {
+      type: Object,
+      default () {
+        return {}
+      }
+    },
     isSeach: {
       type: Boolean,
       default() {
@@ -34,10 +40,14 @@ export default {
   watch: {
     isSeach: {
       handler(newValue) {
-        console.log(newValue);
         if (newValue) {
+          this.page.currentPage = 1;
+          Object.assign(this.query, this.seachForm);
           this.onLoad(this.page);
+        } else {
+          this.query = {};
         }
+        this.$emit("changeIsSeach", false);
       }
     }
   },
@@ -107,7 +117,6 @@ export default {
         this.page.total = data.total;
         this.data = data.records;
         this.loading = false;
-        this.$emit("changeIsSeach", false);
       });
     }
   }

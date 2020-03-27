@@ -457,3 +457,6 @@ body {
     color: blue;
     cursor: pointer;
   }
+  .hand {
+    cursor: pointer;
+  }

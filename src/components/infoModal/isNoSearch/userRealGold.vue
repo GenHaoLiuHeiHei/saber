@@ -5,7 +5,7 @@
 </template>
 
 <script>
-  import {remove_customer} from "@/api/customer/customer";
+  import {userUpdate} from "@/api/customer/customer";
   export default {
     props:{
       formDatas: {
@@ -22,45 +22,18 @@
           align:'center',
           column: [
             {
-              label: "用户昵称",
-              prop: "customerName",
-              labelWidth: 120,
-              disabled: true
-            },
-            {
-              label: "用户ID",
-              labelWidth: 120,
-              prop: "customerNumber",
-              disabled: true
-            },
-            {
-              label: "停封时间(小时)",
-              labelWidth: 120,
-              prop: "surplusTime",
-              type: 'number',
-              rules: [
-              {
-                required: true,
-                message: "请输入停封时间",
-                trigger: "blur"
-              }
-            ]
-            },
-            {
-              label: "停封原因",
-              prop: "blockReason",
-              type: 'textarea',
-              labelWidth: 120,
+              label: "金币剩余(修改)",
               span: 24,
+              labelWidth: 120,
+              prop: "realGold",
               rules: [
               {
                 required: true,
-                message: "请输入解封原因",
+                message: "请输入修改后的金额",
                 trigger: "blur"
               }
             ]
             },
-          
             {
               label: "管理员密码",
               prop: "password",
@@ -70,7 +43,7 @@
                 trigger: "blur"
               }],
               span: 24,
-              labelWidth: 120
+              labelWidth: 120,
             },
           ]
         },
@@ -98,7 +71,7 @@
             console.log(this.formData)
             this.$refs[formName].validate((valid) => {
                 if (valid) {
-                  remove_customer(this.formData).then(() => {
+                  userUpdate(this.formData).then(() => {
                     this.$message({
                       type: "success",
                       message: "操作成功!"

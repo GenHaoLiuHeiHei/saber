@@ -31,14 +31,14 @@
         <!-- 赞 -->
         <div
           class="isColorShow"
-          @click="showModalInfo(scope.row, 'bookLike')"
+          @click="showModalInfo(scope.row, 'userLike')"
         >{{scope.row.bookLikeSum}}</div>
       </template>
       <template slot="bookCommentSum" slot-scope="scope">
         <!-- 评论 -->
         <div
           class="isColorShow"
-          @click="showModalInfo(scope.row, 'bookComment')"
+          @click="showModalInfo(scope.row, 'userComment')"
         >{{scope.row.bookCommentSum}}</div>
       </template>
       <template slot="bookBrowse" slot-scope="scope">
@@ -82,21 +82,15 @@
         >上架</el-button>
       </template>
     </avue-crud>
-    <el-dialog :title="title" :visible.sync="isShowDialog" @close="closeDialogAddgsVisible">
-      <div v-if="!isNotTbale">
-        <infoModal
-          :modalInfoType="modalInfoType"
-          :formDatas="formDatas"
-          :optionTabs="optionTabs"
-          toForm="user"
-          @close="closeDialogAddgsVisible"
-        ></infoModal>
+    <el-dialog :title="title" :visible.sync="isShowDialog" :modal="false" :close-on-click-modal="false" @close="closeDialogAddgsVisible">
+      <div v-if='!isNotTbale'>
+        <infoModal :modalInfoType="modalInfoType" v-if="isShowDialog" :formDatas="formDatas" :optionTabs="optionTabs"  @close="closeDialogAddgsVisible"></infoModal>
       </div>
       <div v-else>
         <indexNoSearch
-          toForm="user"
           :modalInfoType="modalInfoType"
           :formDatas="formDatas"
+          v-if="isShowDialog"
           @closeDialogAddgsVisible="closeDialogAddgsVisible"
         ></indexNoSearch>
       </div>

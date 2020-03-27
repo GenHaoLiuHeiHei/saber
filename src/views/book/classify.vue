@@ -10,7 +10,6 @@
                ref="crud"
                @row-update="rowUpdate"
                @row-save="rowSave"
-               @row-del="rowDel"
                @search-change="searchChange"
                @search-reset="searchReset"
                @selection-change="selectionChange"
@@ -22,9 +21,12 @@
                    size="small"
                    icon="el-icon-delete"
                    plain
-                   v-if="permission.booktype_delete"
                    @click="handleDelete">删 除
         </el-button>
+      </template>
+      <template slot-scope="scope" slot="menu">
+        <el-button type="button" size="small" class="el-button--text" v-if="scope.row.classifyState === 1">默 认</el-button>
+        <el-button type="button" size="small" class="el-button--text" v-else icon="el-icon-delete" @click="rowDel(scope.row)">删 除</el-button>
       </template>
     </avue-crud>
   </basic-container>
@@ -50,6 +52,8 @@
           tip: false,
           border: true,
           viewBtn: false,
+          delBtn: false,
+          selection: true,
           column: [
             {
               label: "",
@@ -65,6 +69,7 @@
             },
             {
               label: "分类名称",
+              labelWidth: 100,
               prop: "classifyName",
               rules: [{
                 required: true,
@@ -93,6 +98,7 @@
                 value: "dictKey"
               },
               prop: "orderAscs",
+              labelWidth: 100,
               rules: [{
                 required: true,
                 message: "请输入",

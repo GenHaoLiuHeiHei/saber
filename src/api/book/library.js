@@ -15,7 +15,20 @@ export const getPromote = () => {
     method: 'get'
   })
 }
-
+// 字典---违规
+export const getViolation = () => {
+  return request({
+    url: '/api/blade-system/dict/dictionary?code=violation',
+    method: 'get'
+  })
+}
+// 字典---不友善
+export const getUnfriendly = () => {
+  return request({
+    url: '/api/blade-system/dict/dictionary?code=unfriendly',
+    method: 'get'
+  })
+}
 // 字典---收费模式
 export const getTollMode = () => {
   return request({

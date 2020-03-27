@@ -172,16 +172,17 @@ export default {
     },
     submitForm(formName, oldGeneralizId) {
       let this_ = this;
-      let submitForm = this.formData;
+      let submitFormData = this.formData;
       if (oldGeneralizId) {
-        submitForm.oldGeneralizId = oldGeneralizId;
+        submitFormData.oldGeneralizId = oldGeneralizId;
       }
       this.$refs[formName].validate(valid => {
         if (valid) {
-          if (submitForm.oldGeneralizId) {
-            forceinstall(submitForm);
+          debugger
+          if (oldGeneralizId) {
+            forceinstall(submitFormData);
           } else {
-            bookInstall(submitForm).then(res => {
+            bookInstall(submitFormData).then(res => {
               if (res) {
                 console.log(res);
                 if (res.data.msg === '1') {

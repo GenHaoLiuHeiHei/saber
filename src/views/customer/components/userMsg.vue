@@ -26,6 +26,17 @@
         <!-- 评论 -->
         <div class="isColorShow" @click="showModalInfo(scope.row, 'bookComment')">{{scope.row.bookConmmentSum}}</div>
       </template>
+      <template slot="violationSum" slot-scope="scope">
+        <!-- 违规 -->
+        <div class="isColorShow" style="color:red !important" @click="showModalInfo(scope.row, 'userViolation')">{{scope.row.violationSum}}</div>
+      </template>
+      <template slot="realGold" slot-scope="scope">
+        <!-- 余额 -->
+        <div class="isColorShow" @click="showModalInfo(scope.row, 'userRealGold', true)">
+          {{scope.row.realGold}}
+          <div>修改</div>
+        </div>
+      </template>
       <template slot="bookChapterSum" slot-scope="scope">
         <!-- 章节 -->
         <div class="isColorShow">{{scope.row.bookChapterSum}}</div>
@@ -38,9 +49,9 @@
         <el-button type="button" size="small" class="el-button--text" icon="el-icon-edit" @click="showModalInfo(scope.row, 'userRelieve', true)" v-else>解封</el-button>
       </template>
     </avue-crud>
-    <el-dialog :title="title" :visible.sync="isShowDialog" @close="closeDialogAddgsVisible">
+    <el-dialog :title="title" :visible.sync="isShowDialog" :modal="false" :close-on-click-modal="false" @close="closeDialogAddgsVisible">
       <div v-if='!isNotTbale'>
-        <infoModal :modalInfoType="modalInfoType" v-if="isShowDialog" :formDatas="formDatas" :optionTabs="optionTabs" toForm='user' @close="closeDialogAddgsVisible"></infoModal>
+        <infoModal :modalInfoType="modalInfoType"  v-if="isShowDialog" :formDatas="formDatas" :optionTabs="optionTabs" toForm='user' @close="closeDialogAddgsVisible"></infoModal>
       </div>
       <div v-else>
         <indexNoSearch
@@ -111,27 +122,6 @@
               prop: "createTime"
             },
             {
-              label: "博文",
-              prop: "articleSum"
-            },
-            {
-              label: "文章",
-              prop: "bookChapterSum",
-              slot: true
-            },
-            {
-              label: "图片",
-              prop: "pictureSum"
-            },
-            {
-              label: "视频",
-              prop: "videoSum"
-            },
-            {
-              label: "书籍",
-              prop: "bookSum"
-            },
-            {
               label: "收藏",
               prop: "bookHoardSum",
               slot: true
@@ -148,11 +138,13 @@
             },
              {
               label: "违规",
-              prop: "violationSum"
+              prop: "violationSum",
+              slot: true
             },
             {
               label: "余额",
               prop: "realGold",
+              slot: true
             },
             {
               label: "历史充值",
@@ -231,6 +223,9 @@
             break
           case 'userRelieve': 
             this.title = '解封用户'
+            break
+          case 'userViolation': 
+            this.title = '违规用户'
             break
         }
         this.isNotTbale = isNotTbale ? isNotTbale : false;

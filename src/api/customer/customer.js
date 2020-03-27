@@ -59,43 +59,78 @@ export const update = (row) => {
   })
 }
 
-export const getHoardList = (current, size, id, params) => {
+// 收藏书籍
+export const getHoardList = (current, size, customerId, params) => {
   return request({
-    url: '/api/blade-customer/hoard/get_Page',
+    url: '/api/blade-book/bookhoard/getcustomerhoard',
     method: 'get',
     params: {
       ...params,
       current,
       size,
-      id,
+      customerId,
       hoardType: 1
     }
   })
 }
 
-export const getLikeList = (current, size, id, params) => {
+// 点赞书籍
+export const getLikeList = (current, size, customerId, params) => {
   return request({
-    url: '/api/blade-customer/likein/get_Page',
+    url: '/api/blade-book/bookpraise/getcustomerpraise',
     method: 'get',
     params: {
       ...params,
       current,
       size,
-      id
+      customerId
     }
   })
 }
 
-export const getCommentList = (current, size, id, params) => {
+// 点赞评论
+export const getCommentList = (current, size, customerId, params) => {
   return request({
-    url: '/api/blade-customer/comment/get_Page',
+    url: '/api/blade-book/bookcomment/getcustomercomment',
     method: 'get',
     params: {
       ...params,
       current,
       size,
-      id
+      customerId
     }
+  })
+}
+
+// 违规用户
+export const get_violation_list = (current, size, customerId, params) => {
+  return request({
+    url: '/api/blade-customer/violation/get_violation_list',
+    method: 'get',
+    params: {
+      ...params,
+      current,
+      size,
+      customerId
+    }
+  })
+}
+
+// 修改客户表（金币等）
+export const userUpdate = (row) => {
+  return request({
+    url: '/api/blade-customer/customer/update',
+    method: 'post',
+    data: row
+  })
+}
+
+// 屏蔽评论
+export const update_comment = (row) => {
+  return request({
+    url: '/api/blade-customer/customer/update_comment',
+    method: 'post',
+    data: row
   })
 }
 

@@ -88,7 +88,6 @@
 
       submitForm(formName) {
             console.log(this.formData)
-            debugger
             this.$refs[formName].validate((valid) => {
                 if (valid) {
                   removeban(this.formData).then(() => {

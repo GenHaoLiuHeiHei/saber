@@ -15,21 +15,29 @@
       @size-change="sizeChange"
       @on-load="onLoad"
     >
+     <template slot="blockReason" slot-scope="scope">
+        <!-- 原因 -->
+        <div class="isColorShow">
+          {{scope.row.blockReason}}
+          <div>
+            <el-button type="button" size="small" class="el-button--text" @click="showModalInfo(scope.row, 'userRelieve', true)">详情</el-button>
+          </div>
+        </div>
+      </template>
       <template slot-scope="scope" slot="menu">
-        <el-button
-          type="button"
-          size="small"
-          class="el-button--text"
-          icon="el-icon-edit"
-          @click="relieve(scope.row, 'userRelieve')"
-        >解除封停</el-button>
+        <el-button type="button" size="small" class="el-button--text" icon="el-icon-edit" @click="showModalInfo(scope.row, 'userRelieve', true)">解除封停</el-button>
       </template>
     </avue-crud>
-    <el-dialog :title="title" :visible.sync="modalInfoNoSearch" @close="closeDialogAddgsVisible">
-      <div v-if="modalInfoNoSearch">
+    <el-dialog :title="title" :visible.sync="isShowDialog" @close="closeDialogAddgsVisible">
+      <div v-if='!isNotTbale'>
+        <infoModal :modalInfoType="modalInfoType" v-if="isShowDialog" :formDatas="formDatas" :optionTabs="optionTabs" toForm='user' @close="closeDialogAddgsVisible"></infoModal>
+      </div>
+      <div v-else>
         <indexNoSearch
+          toForm='user'
           :modalInfoType="modalInfoType"
           :formDatas="formDatas"
+          v-if="isShowDialog"
           @closeDialogAddgsVisible="closeDialogAddgsVisible"
         ></indexNoSearch>
       </div>
@@ -45,6 +53,10 @@ import infoModal from '@/components/infoModal/isSearch/index';
 export default {
   data() {
     return {
+      formDatas: {},
+      isNotTbale: false,
+      isShowDialog: false,
+      modalInfoType: "",
       modalInfoNoSearch: false,
       title: "",
       form: {},
@@ -92,12 +104,13 @@ export default {
           },
           {
             label: "剩余时间",
-            prop: "residueTime"
+            prop: "surplusTime"
           },
           {
             label: "原因",
             width: 250,
-            prop: "blockReason"
+            prop: "blockReason",
+            slot: true
           },
           {
             label: "操作人员",
@@ -131,20 +144,25 @@ export default {
     }
   },
   methods: {
-    // 解除
-    relieve(row, type) {
-      this.modalInfoType = type;
-      this.modalInfoNoSearch = true;
+
+     // 列表点开模态框
+    showModalInfo (row, type, isNotTbale) {
       this.formDatas = row;
-      this.title = "解除停封";
-    },
-    
-    closeDialogAddgsVisible(res) {
-      console.log(res);
-      this.modalInfoNoSearch = false;
-      if (res) this.onLoad(this.page);
+      this.modalInfoType = type;
+      switch (type) {
+        case 'userRelieve': 
+          this.title = '解除停封'
+          break
+      }
+      this.isNotTbale = isNotTbale ? isNotTbale : false;
+      this.isShowDialog = true;
     },
 
+    //关闭模态框
+    closeDialogAddgsVisible(res){
+      this.isShowDialog = false;
+      if (res) this.onLoad(this.page)
+    },
 
     searchReset() {
       this.query = {};

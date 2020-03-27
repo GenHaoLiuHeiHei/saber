@@ -22,39 +22,44 @@
         <!-- 赞 -->
         <div class="isColorShow" @click="showModalInfo(scope.row, 'bookLike')">{{scope.row.bookLikeSum}}</div>
       </template>
-      <template slot="bookComment" slot-scope="scope">
+      <template slot="bookConmmentSum" slot-scope="scope">
         <!-- 评论 -->
-        <div class="isColorShow" @click="showModalInfo(scope.row, 'bookComment')">{{scope.row.bookComment}}</div>
+        <div class="isColorShow" @click="showModalInfo(scope.row, 'bookComment')">{{scope.row.bookConmmentSum}}</div>
       </template>
-      <template slot="bookBrowse" slot-scope="scope">
-        <!-- 浏览 -->
-        <div class="isColorShow">{{scope.row.bookBrowse}}</div>
+      <template slot="violationSum" slot-scope="scope">
+        <!-- 违规 -->
+        <div class="isColorShow" style="color:red !important" @click="showModalInfo(scope.row, 'userViolation')">{{scope.row.violationSum}}</div>
+      </template>
+      <template slot="realGold" slot-scope="scope">
+        <!-- 余额 -->
+        <div class="isColorShow" @click="showModalInfo(scope.row, 'userRealGold', true)">
+          {{scope.row.realGold}}
+          <div>修改</div>
+        </div>
       </template>
       <template slot="bookChapterSum" slot-scope="scope">
         <!-- 章节 -->
         <div class="isColorShow">{{scope.row.bookChapterSum}}</div>
       </template>
       <template slot-scope="scope" slot="menu">
-        <el-button type="button" size="small" class="el-button--text" icon="el-icon-edit">通知</el-button>
-        <el-button type="button" size="small" class="el-button--text" icon="el-icon-edit">取消博主</el-button>
-        <el-button type="button" size="small" class="el-button--text" icon="el-icon-edit">编辑章节</el-button>
+        <el-button type="button" size="small" class="el-button--text" icon="el-icon-edit" @click="showModalInfo(scope.row, 'userNotice', true)">通知</el-button>
+        <el-button type="button" size="small" class="el-button--text" icon="el-icon-edit" @click="showModalInfo(scope.row, 'userSetUpBlogger', true)"  v-if="scope.row.isBlogger == '0'">设置博主</el-button>
+        <el-button type="button" size="small" class="el-button--text color-red" icon="el-icon-edit" @click="showModalInfo(scope.row, 'userCancelBlogger', true)" v-else>取消博主</el-button>
+        <el-button type="button" size="small" class="el-button--text color-red" icon="el-icon-edit" @click="showModalInfo(scope.row, 'userBlocked', true)" v-if="scope.row.status == '0'">停封</el-button>
+        <el-button type="button" size="small" class="el-button--text" icon="el-icon-edit" @click="showModalInfo(scope.row, 'userRelieve', true)" v-else>解封</el-button>
       </template>
     </avue-crud>
-    <el-dialog :title="title" :visible.sync="modalInfo" @close="closeDialogAddgsVisible">
-      <div v-if="modalInfo">
-        <infoModal
-          :modalInfoType="modalInfoType"
-          :bookFormDatas="bookFormDatas"
-          :optionTabs="optionTabs"
-        ></infoModal>
+    <el-dialog :title="title" :visible.sync="isShowDialog" :modal="false" :close-on-click-modal="false" @close="closeDialogAddgsVisible">
+      <div v-if='!isNotTbale'>
+        <infoModal :modalInfoType="modalInfoType" v-if="isShowDialog" :formDatas="formDatas" :optionTabs="optionTabs" toForm='user' @close="closeDialogAddgsVisible"></infoModal>
       </div>
-    </el-dialog>
-    <el-dialog :title="title" :visible.sync="modalInfoNoSearch" @close="closeDialogNoSearch">
-      <div v-if="modalInfoNoSearch">
+      <div v-else>
         <indexNoSearch
+          toForm='user'
           :modalInfoType="modalInfoType"
           :formDatas="formDatas"
-          @closeDialogNoSearch="closeDialogNoSearch"
+          v-if="isShowDialog"
+          @closeDialogAddgsVisible="closeDialogAddgsVisible"
         ></indexNoSearch>
       </div>
     </el-dialog>
@@ -63,8 +68,9 @@
 <script>
   import {get_blogger_list} from "@/api/customer/customer";
   import {mapGetters} from "vuex";
-  import infoModal from '@/components/infoModal/isNoSearch/index';
-  import indexNoSearch from '@/components/infoModal/isSearch/index';
+  import indexNoSearch from '@/components/infoModal/isNoSearch/index';
+  import infoModal from '@/components/infoModal/isSearch/index';
+
   export default {
     components: {
       infoModal,
@@ -73,15 +79,12 @@
     data() {
       return {
         formDatas: {},
-        modalInfoNoSearch: false,
+        isNotTbale: false,
+        isShowDialog: false,
         modalInfoType: "",
         bookNoId: '',
         form: {},
-        formDataType: 'add',
-        title: '书籍',
-        dialogAddgsVisible: false,
-        modalInfo: false,
-        bookFormDatas: {},
+        title: '',
         query: {},
         loading: true,
         page: {
@@ -98,7 +101,6 @@
           addBtn: false,
           delBtn: false,
           align:'center',
-          menuWidth: 100,
           column: [
             {
               label: "ID",
@@ -125,7 +127,8 @@
             },
             {
               label: "文章",
-              prop: "articleSum"
+              prop: "bookChapterSum",
+              slot: true
             },
             {
               label: "图片",
@@ -141,23 +144,28 @@
             },
             {
               label: "收藏",
-              prop: "hoardSum"
+              prop: "bookHoardSum",
+              slot: true
             },
             {
               label: "赞",
-              prop: "likeSum"
+              prop: "bookLikeSum",
+              slot: true
             },
             {
               label: "评论",
-              prop: "conmmentSum"
+              prop: "bookConmmentSum",
+              slot: true
             },
              {
               label: "违规",
-              prop: "violationSum"
+              prop: "violationSum",
+              slot: true
             },
             {
               label: "余额",
               prop: "realGold",
+              slot: true
             },
             {
               label: "历史充值",
@@ -206,11 +214,11 @@
     methods: {
 
       // 列表点开模态框
-      showModalInfo (row, type) {
-        this.bookNoId = row.bookNoId;
+      showModalInfo (row, type, isNotTbale) {
+        this.formDatas = row;
         this.modalInfoType = type;
         switch (type) {
-          case 'bookHoard': 
+          case 'bookHoard':
             this.title = '收藏列表'
             break
           case 'bookLike': 
@@ -219,36 +227,38 @@
           case 'bookComment': 
             this.title = '评论列表'
             break
-          case 'bookBrowse': 
-            this.title = '浏览列表'
-            break
           case 'bookChapter': 
             this.title = '章节列表'
             break
+          case 'userNotice': 
+            this.title = '通知'
+            break
+          case 'userSetUpBlogger': 
+            this.title = '设置博主'
+            break
+          case 'userCancelBlogger': 
+            this.title = '取消博主'
+            break
+          case 'userBlocked': 
+            this.title = '停封用户'
+            break
+          case 'userRelieve': 
+            this.title = '解封用户'
+            break
+          case 'userViolation': 
+            this.title = '违规用户'
+            break
         }
-        this.modalInfo = true;
+        this.isNotTbale = isNotTbale ? isNotTbale : false;
+        this.isShowDialog = true;
       },
 
       //关闭模态框
       closeDialogAddgsVisible(res){
-        this.dialogAddgsVisible = false;
-        this.formDataType = '';
+        this.isShowDialog = false;
         if (res) this.onLoad(this.page)
       },
-      closeDialogNoSearch(res) {
-        console.log(res);
-        this.modalInfoNoSearch = false;
-        if (res) this.onLoad(this.page);
-      },
 
-      // 点击设置
-      rowSetUp(row) {
-        this.dialogAddgsVisible = true;
-        this.bookFormDatas = row;
-        this.title = '书籍设置';
-        this.formDataType = 'setUp';
-      },
-      
       // 表单重置搜索
       searchReset() {
         this.query = {};
@@ -286,7 +296,8 @@
       // 初始化
       onLoad(page, params = {}) {
         this.loading = false;
-        get_blogger_list(page.currentPage, page.pageSize, Object.assign(params, this.query)).then(res => {
+        let isPutaway = null;
+        get_blogger_list(page.currentPage, page.pageSize, isPutaway, Object.assign(params, this.query)).then(res => {
           const data = res.data.data;
           this.page.total = data.total;
           this.data = data.records;
