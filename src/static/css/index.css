@@ -375,7 +375,7 @@ body {
     color: orange;
   }
   .color-blue{
-    color: blue;
+    color: #409EFF;
   }
   .color-B05E07 {
     color: #B05E07;
@@ -395,7 +395,7 @@ body {
   }
   
   .bg-red{
-    background: red;
+    background: red !important;
   }
   
   .bg-green{
@@ -454,7 +454,7 @@ body {
   }
 
   .isColorShow {
-    color: blue;
+    color: #409EFF;
     cursor: pointer;
   }
   .hand {

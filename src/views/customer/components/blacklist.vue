@@ -19,9 +19,9 @@
         <!-- 原因 -->
         <div class="isColorShow">
           {{scope.row.blockReason}}
-          <div>
+          <!-- <div>
             <el-button type="button" size="small" class="el-button--text" @click="showModalInfo(scope.row, 'userRelieve', true)">详情</el-button>
-          </div>
+          </div> -->
         </div>
       </template>
       <template slot-scope="scope" slot="menu">
@@ -48,8 +48,8 @@
 <script>
 import { getList } from "@/api/customer/blacklist";
 import { mapGetters } from "vuex";
-import indexNoSearch from '@/components/infoModal/isNoSearch/index';
-import infoModal from '@/components/infoModal/isSearch/index';
+import indexNoSearch from '@/components/infoModal/isNoTab/index';
+import infoModal from '@/components/infoModal/isTab/index';
 export default {
   data() {
     return {
@@ -86,7 +86,7 @@ export default {
           },
           {
             label: "昵称",
-            prop: "customerName",
+            prop: "customerNickname",
             search: true
           },
           {

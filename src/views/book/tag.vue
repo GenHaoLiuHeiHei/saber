@@ -68,6 +68,8 @@ export default {
           {
             label: "标签名称",
             prop: "tagName",
+            labelWidth: 100,
+            span: 13,
             rules: [
               {
                 required: true,
@@ -79,6 +81,8 @@ export default {
           {
             label: "关联",
             type: "select",
+            labelWidth: 100,
+            span: 13,
             dicUrl: "/api/blade-system/dict/dictionary?code=bookRelated",
             props: {
               label: "dictValue",
@@ -96,6 +100,8 @@ export default {
           {
             label: "时间",
             prop: "tagTime",
+            labelWidth: 100,
+            span: 13,
             // placeholder: "单位为天",
             type: "number",
             rules: [
@@ -110,6 +116,8 @@ export default {
           {
             label: "标签颜色",
             prop: "tagColor",
+            labelWidth: 100,
+            span: 13,
             type: "color",
             colorFormat: "hex",
             rules: [
@@ -126,6 +134,8 @@ export default {
           {
             hide: true,
             label: "",
+            labelWidth: 100,
+            span: 13,
             prop: "tagState",
             addDisplay: false,
             editDisplay: false,
@@ -140,7 +150,7 @@ export default {
           {
             label: "管理员密码",
             labelWidth: 100,
-            span: 24,
+            span: 13,
             prop: "password",
             hide: true,
             rules: [

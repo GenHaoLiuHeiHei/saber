@@ -24,7 +24,7 @@
         <!-- 收藏 -->
         <div
           class="isColorShow"
-          @click="showModalInfo(scope.row, 'bookHoard')"
+          @click="showModalInfo(scope.row, 'userHoard')"
         >{{scope.row.bookHoardSum}}</div>
       </template>
       <template slot="bookLikeSum" slot-scope="scope">
@@ -38,16 +38,18 @@
         <!-- 评论 -->
         <div
           class="isColorShow"
-          @click="showModalInfo(scope.row, 'userComment')"
+          @click="showModalInfo(scope.row, 'bookComment')"
         >{{scope.row.bookCommentSum}}</div>
       </template>
-      <template slot="bookBrowse" slot-scope="scope">
-        <!-- 浏览 -->
+      <!-- <template slot="bookBrowse" slot-scope="scope">
         <div class="isColorShow">{{scope.row.bookBrowse}}</div>
       </template>
       <template slot="bookChapterSum" slot-scope="scope">
-        <!-- 章节 -->
         <div class="isColorShow">{{scope.row.bookChapterSum}}</div>
+      </template> -->
+      <template slot="violationSum" slot-scope="scope">
+        <!-- 违规 -->
+        <div class="isColorShow" style="color:red !important" @click="showModalInfo(scope.row, 'userViolation')">{{scope.row.violationSum}}</div>
       </template>
       <template slot-scope="scope" slot="menu">
         <el-button
@@ -84,7 +86,7 @@
     </avue-crud>
     <el-dialog :title="title" :visible.sync="isShowDialog" :modal="false" :close-on-click-modal="false" @close="closeDialogAddgsVisible">
       <div v-if='!isNotTbale'>
-        <infoModal :modalInfoType="modalInfoType" v-if="isShowDialog" :formDatas="formDatas" :optionTabs="optionTabs"  @close="closeDialogAddgsVisible"></infoModal>
+        <infoModal :modalInfoType="modalInfoType" v-if="isShowDialog" :formDatas="formDatas" tofrom="book" :optionTabs="optionTabs"  @close="closeDialogAddgsVisible"></infoModal>
       </div>
       <div v-else>
         <indexNoSearch
@@ -101,8 +103,8 @@
 import { getList, add, update, remove } from "@/api/book/library";
 import { baseUrl } from "@/config/env";
 import { mapGetters } from "vuex";
-import indexNoSearch from "@/components/infoModal/isNoSearch/index";
-import infoModal from "@/components/infoModal/isSearch/index";
+import indexNoSearch from "@/components/infoModal/isNoTab/index";
+import infoModal from "@/components/infoModal/isTab/index";
 
 export default {
   props: {
@@ -119,7 +121,6 @@ export default {
     },
     title: {
       handler(newValue) {
-        console.log(newValue, this.isShowDialog);
         if (newValue === "bookChapterList" && !this.isShowDialog) {
           this.closeDialogAddgsVisible(true);
         }
@@ -226,18 +227,23 @@ export default {
             slot: true
           },
           {
+              label: "违规",
+              prop: "violationSum",
+              slot: true,
+              addDisplay: false,
+              editDisplay: false,
+          },
+          {
             label: "浏览",
             prop: "bookBrowse",
             addDisplay: false,
             editDisplay: false,
-            slot: true
           },
           {
             label: "章节",
             prop: "bookChapterSum",
             addDisplay: false,
             editDisplay: false,
-            slot: true
           },
           {
             label: "字数",
@@ -334,7 +340,7 @@ export default {
       optionTabs: {
         column: [
           {
-            label: "收藏人",
+            label: "用户",
             prop: "book"
           },
           {
@@ -373,15 +379,24 @@ export default {
         case "bookSetUp":
           this.title = "书籍设置";
           break;
-        case "bookComment":
-          this.title = "评论列表";
-          break;
         case "bookTakeOff":
           this.title = "书籍下架";
           break;
         case "bookShelves":
           this.title = "书籍上架";
           break;
+        case "userHoard":
+          this.title = "收藏用户";
+          break;
+        case 'bookComment': 
+          this.title = '评论列表'
+          break
+        case 'userLike': 
+          this.title = '点赞列表'
+          break
+        case 'userViolation': 
+          this.title = '违规列表'
+          break
       }
       this.isNotTbale = isNotTbale ? isNotTbale : false;
       this.isShowDialog = true;

@@ -19,6 +19,8 @@ import './static/css/index.css'
 import basicContainer from './components/basic-container/main'
 import AvueUeditor from 'avue-plugin-ueditor'
 import infiniteScroll from 'vue-infinite-scroll'
+let echarts = require('echarts/lib/echarts');
+Vue.prototype.$echarts = echarts
 Vue.use(router)
 
 Vue.use(VueAxios, axios)

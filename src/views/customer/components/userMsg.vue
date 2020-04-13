@@ -68,8 +68,8 @@
 <script>
   import {getList} from "@/api/customer/customer";
   import {mapGetters} from "vuex";
-  import indexNoSearch from '@/components/infoModal/isNoSearch/index';
-  import infoModal from '@/components/infoModal/isSearch/index';
+  import indexNoSearch from '@/components/infoModal/isNoTab/index';
+  import infoModal from '@/components/infoModal/isTab/index';
 
   export default {
     components: {
@@ -105,6 +105,11 @@
             {
               label: "ID",
               prop: "id",
+              hide: true
+            },
+            {
+              label: "ID",
+              prop: "customerNumber",
               search: true
             },
             {
@@ -275,8 +280,7 @@
       // 初始化
       onLoad(page, params = {}) {
         this.loading = false;
-        let isPutaway = null;
-        getList(page.currentPage, page.pageSize, isPutaway, Object.assign(params, this.query)).then(res => {
+        getList(page.currentPage, page.pageSize, Object.assign(params, this.query)).then(res => {
           const data = res.data.data;
           this.page.total = data.total;
           this.data = data.records;

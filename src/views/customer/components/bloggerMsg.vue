@@ -14,6 +14,10 @@
       @current-change="currentChange"
       @size-change="sizeChange"
       @on-load="onLoad">
+      <template slot="articleSum" slot-scope="scope">
+        <!-- 博文 -->
+        <div class="isColorShow" @click="showModalInfo(scope.row, 'bookArticle', true)">{{scope.row.bookHoardSum}}</div>
+      </template>
       <template slot="bookHoardSum" slot-scope="scope">
         <!-- 收藏 -->
         <div class="isColorShow" @click="showModalInfo(scope.row, 'bookHoard')">{{scope.row.bookHoardSum}}</div>
@@ -68,8 +72,8 @@
 <script>
   import {get_blogger_list} from "@/api/customer/customer";
   import {mapGetters} from "vuex";
-  import indexNoSearch from '@/components/infoModal/isNoSearch/index';
-  import infoModal from '@/components/infoModal/isSearch/index';
+  import indexNoSearch from '@/components/infoModal/isNoTab/index';
+  import infoModal from '@/components/infoModal/isTab/index';
 
   export default {
     components: {
@@ -103,8 +107,13 @@
           align:'center',
           column: [
             {
-              label: "ID",
+              label: "",
               prop: "id",
+              hide: true
+            },
+            {
+              label: "ID",
+              prop: "customerNumber",
               search: true
             },
             {
@@ -123,7 +132,8 @@
             },
             {
               label: "博文",
-              prop: "articleSum"
+              prop: "articleSum",
+              slot: true
             },
             {
               label: "文章",
@@ -248,6 +258,9 @@
           case 'userViolation': 
             this.title = '违规用户'
             break
+          case 'bookArticle':
+            this.title = '博文列表'
+            break
         }
         this.isNotTbale = isNotTbale ? isNotTbale : false;
         this.isShowDialog = true;
@@ -296,8 +309,7 @@
       // 初始化
       onLoad(page, params = {}) {
         this.loading = false;
-        let isPutaway = null;
-        get_blogger_list(page.currentPage, page.pageSize, isPutaway, Object.assign(params, this.query)).then(res => {
+        get_blogger_list(page.currentPage, page.pageSize, Object.assign(params, this.query)).then(res => {
           const data = res.data.data;
           this.page.total = data.total;
           this.data = data.records;

@@ -173,5 +173,45 @@ export const chapTerUpdate = (row) => {
   })
 }
 
+// 收藏用户
+export const get_book_hoard = (current, size, id, params) => {
+  return request({
+    url: '/api/blade-book/bookhoard/get_book_hoard',
+    method: 'get',
+    params: {
+      ...params,
+      current,
+      size,
+      id
+    }
+  })
+}
 
+// 点赞用户
+export const get_book_praise = (current, size, id, params) => {
+  return request({
+    url: '/api/blade-book/bookpraise/get_book_praise',
+    method: 'get',
+    params: {
+      ...params,
+      current,
+      size,
+      id
+    }
+  })
+}
+
+// 评论用户
+export const get_book_comment = (current, size, id, params) => {
+  return request({
+    url: '/api/blade-book/bookcomment/get_book_comment',
+    method: 'get',
+    params: {
+      ...params,
+      current,
+      size,
+      id
+    }
+  })
+}
 
