@@ -21,14 +21,14 @@
           size="small"
           class="el-button--text"
           icon="el-icon-edit"
-          @click="showModalInfo(scope.row, 'operationWithdraw', false , 2)"
+          @click="showModalInfo(scope.row, 'operationWithdraw', false, false, 2)"
         >提现</el-button>
         <el-button
           type="button"
           size="small"
           class="el-button--text color-red"
           icon="el-icon-edit"
-          @click="showModalInfo(scope.row, 'operationWithdraw', false , 3)"
+          @click="showModalInfo(scope.row, 'operationWithdraw', false, false, 3)"
         >拒绝</el-button>
       </template>
     </avue-crud>
@@ -39,47 +39,31 @@
       :close-on-click-modal="false"
       @close="closeDialogAddgsVisible"
     >
-      <div v-if="!isNotTbale">
-        <infoModal
-          :modalInfoType="modalInfoType"
-          v-if="isShowDialog"
-          :formDatas="formDatas"
-          tofrom="book"
-          :optionTabs="optionTabs"
-          @close="closeDialogAddgsVisible"
-        ></infoModal>
-      </div>
-      <div v-else>
-        <indexNoSearch
-          :modalInfoType="modalInfoType"
-          :formDatas="formDatas"
-          v-if="isShowDialog"
-          @closeDialogAddgsVisible="closeDialogAddgsVisible"
-        ></indexNoSearch>
-      </div>
+     <infoModal 
+        :modalInfoType="modalInfoType" 
+        v-if="isShowDialog" 
+        :formDatas="formDatas" 
+        tofrom="book" 
+        :optionTabs="optionTabs"
+        :isOptionTab="isOptionTab"
+        :isShowSeach="isShowSeach"
+        @closeDialogAddgsVisible="closeDialogAddgsVisible">
+        </infoModal>
     </el-dialog>
   </basic-container>
 </template>
 
 <script>
 import {
-  getList,
-  getDetail,
-  add,
-  update,
-  remove
+  getList
 } from "@/api/customer/extractorder";
 import { mapGetters } from "vuex";
-import indexNoSearch from "@/components/infoModal/isNoTab/index";
-import infoModal from "@/components/infoModal/isTab/index";
+import {modalMixin} from "@/mixins/modalMixin";
+import infoModal from "@/components/infoModal/index";
 export default {
+  mixins: [modalMixin],
   data() {
     return {
-      formDatas: {},
-      modalInfoType: "",
-      title: "",
-      isShowDialog: false,
-      isNotTbale: false,
       form: {},
       query: {},
       loading: true,
@@ -150,18 +134,8 @@ export default {
       data: []
     };
   },
-  watch: {
-    title: {
-      handler(newValue) {
-        if (newValue === "bookChapterList" && !this.isShowDialog) {
-          this.closeDialogAddgsVisible(true);
-        }
-      }
-    }
-  },
   components: {
-    infoModal,
-    indexNoSearch
+    infoModal
   },
   computed: {
     ...mapGetters(["permission"]),
@@ -183,7 +157,7 @@ export default {
   },
   methods: {
     // 列表点开模态框
-    showModalInfo(row, type, isNotTbale, extractStatus) {
+    showModalInfo(row, type, isShowSeach, isOptionTab, extractStatus) {
       this.formDatas = row;
       this.formDatas.extractStatus = extractStatus;
       this.modalInfoType = type;
@@ -192,14 +166,9 @@ export default {
           this.title = "提现";
           break;
       }
-      this.isNotTbale = isNotTbale ? isNotTbale : false;
+      this.isShowSeach = isShowSeach ? isShowSeach : false;
+      this.isOptionTab = isOptionTab ? isOptionTab : false
       this.isShowDialog = true;
-    },
-    //关闭模态框
-    closeDialogAddgsVisible(res) {
-      this.title = "";
-      this.isShowDialog = false;
-      if (res) this.onLoad(this.page);
     },
 
     searchReset() {

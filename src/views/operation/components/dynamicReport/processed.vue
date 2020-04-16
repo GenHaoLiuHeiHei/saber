@@ -13,45 +13,14 @@
                @current-change="currentChange"
                @size-change="sizeChange"
                @on-load="onLoad">
-      <template slot-scope="scope" slot="menu">
-        <el-button
-          type="button"
-          size="small"
-          class="el-button--text"
-          icon="el-icon-edit"
-          @click="showModalInfo(scope.row, 'operationFeedbackReply')"
-        >回复</el-button>
-        <el-button
-          type="button"
-          size="small"
-          class="el-button--text"
-          icon="el-icon-edit"
-          @click="showModalInfo(scope.row, 'operationHaveRead')"
-        >标为已读</el-button>
-      </template>
     </avue-crud>
-    <el-dialog :title="title" :visible.sync="isShowDialog" :modal="false" :close-on-click-modal="false" @close="closeDialogAddgsVisible">
-       <infoModal 
-        :modalInfoType="modalInfoType" 
-        v-if="isShowDialog" 
-        :formDatas="formDatas" 
-        tofrom="book" 
-        :optionTabs="optionTabs"
-        :isOptionTab="isOptionTab"
-        :isShowSeach="isShowSeach"
-        @closeDialogAddgsVisible="closeDialogAddgsVisible">
-        </infoModal>
-    </el-dialog>
   </basic-container>
 </template>
 
 <script>
-  import {getList} from "@/api/report/feedback";
+  import {report_processed} from "@/api/report/report";
   import {mapGetters} from "vuex";
-  import {modalMixin} from "@/mixins/modalMixin";
-  import infoModal from "@/components/infoModal/index";
   export default {
-    mixins: [modalMixin],
     data() {
       return {
         form: {},
@@ -64,42 +33,60 @@
         },
         selectionList: [],
         option: {
-         align: "center",
+          align: "center",
           tip: false,
           border: true,
           index: false,
-          viewBtn: true,
+          viewBtn: false,
           selection: false,
+          menu: false,
           column: [
             {
-              label: "反馈人昵称",
-              prop: "feedbackUserName",
+              label: "用户昵称",
+              prop: "informeeNickName",
+              disabled: true,
+              span: 24,
+              labelWidth: 120
             },
             {
-              label: "反馈人ID",
-              prop: "feedbackUserId",
-            },
-            {
-              label: "反馈时间",
-              prop: "createTime",
-              renderHeader: (h, { column, $index }) => {
-                return h('div',[
-                  h('span', column.label),
-                  h('div ', '排序'),
-                ])
-              },
+              label: "用户ID",
+              prop: "informeeNumber",
+              disabled: true,
+              span: 24,
+              labelWidth: 120
             },
             {
               label: "内容",
-              prop: "feedbackContent",
-            }
+              prop: "content",
+              disabled: true,
+              span: 24,
+              labelWidth: 120
+            },
+            {
+              label: "处理时间",
+              prop: "handleTime",
+              disabled: true,
+              span: 24,
+              labelWidth: 120
+            },
+            {
+              label: "状态",
+              prop: "handleTime",
+              disabled: true,
+              span: 24,
+              labelWidth: 120
+            },
+            {
+              label: "管理员",
+              prop: "adminName",
+              disabled: true,
+              span: 24,
+              labelWidth: 120
+            },
           ]
         },
         data: []
       };
-    },
-    components: {
-      infoModal
     },
     computed: {
       ...mapGetters(["permission"]),
@@ -109,7 +96,6 @@
           viewBtn: false,
           delBtn: false,
           editBtn: false,
-          
         };
       },
       ids() {
@@ -121,7 +107,6 @@
       }
     },
     methods: {
-   
       searchReset() {
         this.query = {};
         this.onLoad(this.page);
@@ -145,8 +130,7 @@
       },
       onLoad(page, params = {}) {
         this.loading = true;
-        params.status = 0;
-        getList(page.currentPage, page.pageSize, Object.assign(params, this.query)).then(res => {
+        report_processed(page.currentPage, page.pageSize, Object.assign(params, this.query)).then(res => {
           const data = res.data.data;
           this.page.total = data.total;
           this.data = data.records;

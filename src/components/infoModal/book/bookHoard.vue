@@ -7,16 +7,18 @@
       :data="data"
       :page="page"
       v-model="form"
-      @size-change="sizeChange"
-      @current-change="currentChange"
+      @search-change="searchChange"
+      @search-reset="searchReset"
       @selection-change="selectionChange"
+      @current-change="currentChange"
+      @size-change="sizeChange"
       @on-load="onLoad"
     ></avue-crud>
   </basic-container>
 </template>
 <script>
-// 动态
-import { getChapTerList } from "@/api/book/library";
+// 收藏
+import { getHoardList } from "@/api/customer/customer";
 export default {
   name: "bookHoard",
   props: {
@@ -24,20 +26,10 @@ export default {
       type: Object,
       required: true
     },
-    isSeach: {
-      type: Boolean,
-      default() {
-        return false;
-      }
-    }
-  },
-  watch: {
-    isSeach: {
-      handler(newValue) {
-        console.log(newValue);
-        if (newValue) {
-          this.onLoad(this.page);
-        }
+    seachForm: {
+      type: Object,
+      default () {
+        return {}
       }
     }
   },
@@ -57,10 +49,12 @@ export default {
         border: true,
         menu: false,
         dialogClickModal: false,
+        addBtn: false,
+        emptyBtn: false,
         align: "center",
         column: [
           {
-            label: "我是动态",
+            label: "书籍名称",
             prop: "bookName"
           },
           {
@@ -78,6 +72,28 @@ export default {
           {
             label: "收藏时间",
             prop: "hoardTime"
+          },
+          {
+              label: "开始时间",
+              prop: "startTime",
+              type: "datetime",
+              format: "yyyy-MM-dd hh:mm:ss",
+              valueFormat: "yyyy-MM-dd hh:mm:ss",
+              search: true,
+              hide: true,
+              addDispaly: true,
+              editDispaly: true
+          },
+          {
+              label: "结束时间",
+              prop: "endTime",
+              type: "datetime",
+              format: "yyyy-MM-dd hh:mm:ss",
+              valueFormat: "yyyy-MM-dd hh:mm:ss",
+              search: true,
+              hide: true,
+              addDispaly: true,
+              editDispaly: true
           }
         ]
       },
@@ -85,19 +101,43 @@ export default {
     };
   },
   methods: {
-    currentChange(currentPage) {
-      this.page.currentPage = currentPage;
+        // 表单重置搜索
+    searchReset() {
+      this.query = {};
+      this.onLoad(this.page);
     },
+
+    // 表单input搜索
+    searchChange(params) {
+      this.query = params;
+      // console.log(this.query);
+      this.onLoad(this.page, params);
+    },
+
+    // 表单select搜索
     selectionChange(list) {
       this.selectionList = list;
     },
+
+    // 重置表单
+    selectionClear() {
+      this.selectionList = [];
+      this.$refs.crud.toggleSelection();
+    },
+
+    // 切换下一页
+    currentChange(currentPage) {
+      this.page.currentPage = currentPage;
+    },
+
+    // 改变表单请求页大小
     sizeChange(pageSize) {
       this.page.pageSize = pageSize;
     },
     onLoad(page, params = {}) {
       this.loading = true;
-      console.log("动态");
-      getChapTerList(
+      console.log("收藏");
+      getHoardList(
         page.currentPage,
         page.pageSize,
         this.formDatas.id,
@@ -107,7 +147,6 @@ export default {
         this.page.total = data.total;
         this.data = data.records;
         this.loading = false;
-        this.$emit("changeIsSeach", false);
       });
     }
   }

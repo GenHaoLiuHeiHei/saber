@@ -25,22 +25,20 @@
         </div>
       </template>
       <template slot-scope="scope" slot="menu">
-        <el-button type="button" size="small" class="el-button--text" icon="el-icon-edit" @click="showModalInfo(scope.row, 'userRelieve', true)">解除封停</el-button>
+        <el-button type="button" size="small" class="el-button--text" icon="el-icon-edit" @click="showModalInfo(scope.row, 'userRelieve')">解除封停</el-button>
       </template>
     </avue-crud>
     <el-dialog :title="title" :visible.sync="isShowDialog" @close="closeDialogAddgsVisible">
-      <div v-if='!isNotTbale'>
-        <infoModal :modalInfoType="modalInfoType" v-if="isShowDialog" :formDatas="formDatas" :optionTabs="optionTabs" toForm='user' @close="closeDialogAddgsVisible"></infoModal>
-      </div>
-      <div v-else>
-        <indexNoSearch
-          toForm='user'
-          :modalInfoType="modalInfoType"
-          :formDatas="formDatas"
-          v-if="isShowDialog"
-          @closeDialogAddgsVisible="closeDialogAddgsVisible"
-        ></indexNoSearch>
-      </div>
+      <infoModal 
+        :modalInfoType="modalInfoType" 
+        v-if="isShowDialog" 
+        :formDatas="formDatas" 
+        tofrom="user" 
+        :optionTabs="optionTabs"
+        :isOptionTab="isOptionTab"
+        :isShowSeach="isShowSeach"
+        @closeDialogAddgsVisible="closeDialogAddgsVisible">
+        </infoModal>
     </el-dialog>
   </basic-container>
 </template>
@@ -48,17 +46,12 @@
 <script>
 import { getList } from "@/api/customer/blacklist";
 import { mapGetters } from "vuex";
-import indexNoSearch from '@/components/infoModal/isNoTab/index';
-import infoModal from '@/components/infoModal/isTab/index';
+import {modalMixin} from "@/mixins/modalMixin";
+import infoModal from '@/components/infoModal/index';
 export default {
+  mixins: [modalMixin],
   data() {
     return {
-      formDatas: {},
-      isNotTbale: false,
-      isShowDialog: false,
-      modalInfoType: "",
-      modalInfoNoSearch: false,
-      title: "",
       form: {},
       query: {},
       loading: true,
@@ -122,8 +115,7 @@ export default {
     };
   },
   components: {
-    infoModal,
-    indexNoSearch
+    infoModal
   },
   computed: {
     ...mapGetters(["permission"]),
@@ -144,25 +136,6 @@ export default {
     }
   },
   methods: {
-
-     // 列表点开模态框
-    showModalInfo (row, type, isNotTbale) {
-      this.formDatas = row;
-      this.modalInfoType = type;
-      switch (type) {
-        case 'userRelieve': 
-          this.title = '解除停封'
-          break
-      }
-      this.isNotTbale = isNotTbale ? isNotTbale : false;
-      this.isShowDialog = true;
-    },
-
-    //关闭模态框
-    closeDialogAddgsVisible(res){
-      this.isShowDialog = false;
-      if (res) this.onLoad(this.page)
-    },
 
     searchReset() {
       this.query = {};

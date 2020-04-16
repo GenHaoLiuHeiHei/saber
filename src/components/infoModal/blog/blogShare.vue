@@ -15,8 +15,8 @@
   </basic-container>
 </template>
 <script>
-// 收藏
-import { getHoardList } from "@/api/customer/customer";
+// 分享
+import { getShareList } from "@/api/customer/blog";
 export default {
   name: "bookHoard",
   props: {
@@ -45,9 +45,6 @@ export default {
           Object.assign(this.query, this.seachForm);
           this.onLoad(this.page);
         } 
-        // else {
-        //   this.query = {};
-        // }
         this.$emit("changeIsSeach", false);
       }
     }
@@ -71,25 +68,23 @@ export default {
         align: "center",
         column: [
           {
-            label: "书籍名称",
-            prop: "bookName"
+            label: "分享人昵称",
+            prop: "customerName",
+            search: true
           },
           {
-            label: "书籍编号",
-            prop: "bookNoId"
+            label: "分享人ID",
+            prop: "customerId",
+            search: true
           },
           {
-            label: "作者名称",
+            label: "分享时间",
+            prop: "forwardTime"
+          },
+          {
+            label: "分享平台",
             prop: "authorName"
           },
-          {
-            label: "作者ID",
-            prop: "authorId"
-          },
-          {
-            label: "收藏时间",
-            prop: "hoardTime"
-          }
         ]
       },
       data: []
@@ -107,8 +102,8 @@ export default {
     },
     onLoad(page, params = {}) {
       this.loading = true;
-      console.log("收藏");
-      getHoardList(
+      console.log("分享");
+      getShareList(
         page.currentPage,
         page.pageSize,
         this.formDatas.id,

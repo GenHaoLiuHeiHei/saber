@@ -7,9 +7,11 @@
       :data="data"
       :page="page"
       v-model="form"
-      @size-change="sizeChange"
-      @current-change="currentChange"
+      @search-change="searchChange"
+      @search-reset="searchReset"
       @selection-change="selectionChange"
+      @current-change="currentChange"
+      @size-change="sizeChange"
       @on-load="onLoad"
     ></avue-crud>
   </basic-container>
@@ -30,27 +32,6 @@ export default {
         return {}
       }
     },
-    isSeach: {
-      type: Boolean,
-      default() {
-        return false;
-      }
-    }
-  },
-  watch: {
-    isSeach: {
-      handler(newValue) {
-        if (newValue) {
-          this.page.currentPage = 1;
-          Object.assign(this.query, this.seachForm);
-          this.onLoad(this.page);
-        } 
-        // else {
-        //   this.query = {};
-        // }
-        this.$emit("changeIsSeach", false);
-      }
-    }
   },
   data() {
     return {
@@ -66,6 +47,8 @@ export default {
       option: {
         tip: false,
         border: true,
+        addBtn: false,
+        emptyBtn: false,
         menu: false,
         dialogClickModal: false,
         align: "center",
@@ -81,6 +64,28 @@ export default {
           {
             label: "点赞时间",
             prop: "praiseTime"
+          },
+          {
+              label: "开始时间",
+              prop: "startTime",
+              type: "datetime",
+              format: "yyyy-MM-dd hh:mm:ss",
+              valueFormat: "yyyy-MM-dd hh:mm:ss",
+              search: true,
+              hide: true,
+              addDispaly: true,
+              editDispaly: true
+          },
+          {
+              label: "结束时间",
+              prop: "endTime",
+              type: "datetime",
+              format: "yyyy-MM-dd hh:mm:ss",
+              valueFormat: "yyyy-MM-dd hh:mm:ss",
+              search: true,
+              hide: true,
+              addDispaly: true,
+              editDispaly: true
           }
         ]
       },
@@ -88,12 +93,36 @@ export default {
     };
   },
   methods: {
-    currentChange(currentPage) {
-      this.page.currentPage = currentPage;
+    // 表单重置搜索
+    searchReset() {
+      this.query = {};
+      this.onLoad(this.page);
     },
+
+    // 表单input搜索
+    searchChange(params) {
+      this.query = params;
+      // console.log(this.query);
+      this.onLoad(this.page, params);
+    },
+
+    // 表单select搜索
     selectionChange(list) {
       this.selectionList = list;
     },
+
+    // 重置表单
+    selectionClear() {
+      this.selectionList = [];
+      this.$refs.crud.toggleSelection();
+    },
+
+    // 切换下一页
+    currentChange(currentPage) {
+      this.page.currentPage = currentPage;
+    },
+
+    // 改变表单请求页大小
     sizeChange(pageSize) {
       this.page.pageSize = pageSize;
     },
@@ -115,8 +144,3 @@ export default {
   }
 };
 </script>
-<style scoped>
-#bookHoard /deep/ .avue-crud__menu {
-  display: none;
-}
-</style>

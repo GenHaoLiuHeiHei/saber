@@ -1,17 +1,17 @@
 <template>
   <basic-container>
     <el-form
-      :model="formData"
-      ref="formData"
+      :model="commentFormData"
+      ref="commentFormData"
       :rules="formDataRules"
-      id="formData"
+      id="commentFormData"
       label-width="100px"
     >
       <el-row>
         <el-col :span="16">
           <el-form-item label="违规">
-            <el-checkbox-group v-model="formData.violation">
-              <el-checkbox :label="item.dictKey" v-for="(item, index) in violationList" :checked="checked" :disabled="true" @change="checked=!checked" :key="index">{{item.dictValue}}</el-checkbox>
+            <el-checkbox-group v-model="commentFormData.violation" >
+              <el-checkbox :label="item.dictKey" v-for="(item, index) in violationList" :checked="checked" @change="checked=!checked" :key="index">{{item.dictValue}}</el-checkbox>
             </el-checkbox-group>
           </el-form-item>
         </el-col>
@@ -19,8 +19,8 @@
       <el-row>
         <el-col :span="16">
           <el-form-item label="不友善">
-            <el-checkbox-group v-model="formData.unfriendly" >
-              <el-checkbox :label="item.dictKey" v-for="(item, index) in unfriendlytList" :checked="checked" :disabled="true" @change="checked=!checked" :key="index">{{item.dictValue}}</el-checkbox>
+            <el-checkbox-group v-model="commentFormData.unfriendly" >
+              <el-checkbox :label="item.dictKey" v-for="(item, index) in unfriendlytList" :checked="checked" @change="checked=!checked" :key="index">{{item.dictValue}}</el-checkbox>
             </el-checkbox-group>
           </el-form-item>
         </el-col>
@@ -28,12 +28,12 @@
       <el-row>
         <el-col :span="16">
           <el-form-item label="管理员密码" prop="password">
-            <el-input v-model="formData.password" placeholder="请输入管理员密码"></el-input>
+            <el-input v-model="commentFormData.password" placeholder="请输入管理员密码"></el-input>
           </el-form-item>
         </el-col>
       </el-row>
       <div class="dialog-footer p-t text-center">
-        <el-button type="primary" @click="submitForm('formData')">确 定 1</el-button>
+        <el-button type="primary" @click="submitForm('commentFormData')">确 定</el-button>
       </div>
     </el-form>
   </basic-container>
@@ -58,6 +58,10 @@ import {
       return {
         checked: false,
         formData: {},
+        commentFormData: {
+          violation: [],
+          unfriendly: []
+        },
         formDataRules: {
           password: [
             { required: true, message: '请输入管理员密码', trigger: 'blur' },
@@ -74,16 +78,12 @@ import {
       this_.formData = this.formDatas;
       getViolation().then(res => {
         this_.violationList = res.data.data;
-      }).then(() => {
-         return getUnfriendly()
-      }).then(res => {
+      });
+      getUnfriendly().then(res => {
         this_.unfriendlytList = res.data.data;
-        JSON.parse(this_.formData.reasons).map(v => {
-            this_.formData[v.code] = v.dictKey;
-        })
       });
     },
-
+    
     methods: {
       // 关闭模态框
       closeDialogAddgsVisible() {
@@ -118,7 +118,6 @@ import {
         });
       },
     }
-
   };
 </script>
 <style scoped lang="scss">

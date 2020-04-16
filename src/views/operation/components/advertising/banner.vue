@@ -248,7 +248,7 @@ export default {
               arr[s] = o;
           }
         }
-        })
+      })
 
       let formData = {};
       formData.pictureType = 2;

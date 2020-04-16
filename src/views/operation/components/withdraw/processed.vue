@@ -21,7 +21,7 @@
           size="small"
           class="el-button--text"
           icon="el-icon-edit"
-          @click="showModalInfo(scope.row, 'operationWithdraw', false)"
+          @click="showModalInfo(scope.row, 'operationWithdraw', false, true)"
         >详情</el-button>
       </template>
     </avue-crud>
@@ -32,24 +32,16 @@
       :close-on-click-modal="false"
       @close="closeDialogAddgsVisible"
     >
-      <div v-if="!isNotTbale">
-        <infoModal
-          :modalInfoType="modalInfoType"
-          v-if="isShowDialog"
-          :formDatas="formDatas"
-          tofrom="book"
-          :optionTabs="optionTabs"
-          @close="closeDialogAddgsVisible"
-        ></infoModal>
-      </div>
-      <div v-else>
-        <indexNoSearch
-          :modalInfoType="modalInfoType"
-          :formDatas="formDatas"
-          v-if="isShowDialog"
-          @closeDialogAddgsVisible="closeDialogAddgsVisible"
-        ></indexNoSearch>
-      </div>
+       <infoModal 
+        :modalInfoType="modalInfoType" 
+        v-if="isShowDialog" 
+        :formDatas="formDatas" 
+        tofrom="book" 
+        :optionTabs="optionTabs"
+        :isOptionTab="isOptionTab"
+        :isShowSeach="isShowSeach"
+        @closeDialogAddgsVisible="closeDialogAddgsVisible">
+        </infoModal>
     </el-dialog>
   </basic-container>
 </template>
@@ -57,22 +49,14 @@
 <script>
 import {
   getList,
-  getDetail,
-  add,
-  update,
-  remove
 } from "@/api/customer/extractorder";
+import { modalMixin } from "@/mixins/modalMixin";
 import { mapGetters } from "vuex";
-import indexNoSearch from "@/components/infoModal/isNoTab/index";
-import infoModal from "@/components/infoModal/isTab/index";
+import infoModal from "@/components/infoModal/index";
 export default {
+  mixins: [modalMixin],
   data() {
     return {
-      formDatas: {},
-      modalInfoType: "",
-      title: "",
-      isShowDialog: false,
-      isNotTbale: false,
       form: {},
       query: {},
       loading: true,
@@ -132,7 +116,7 @@ export default {
         column: [
           {
             label: "提现",
-            prop: "isNotShowSearch"
+            prop: "operationWithdraw"
           },
           {
             label: "明细",
@@ -143,18 +127,8 @@ export default {
       data: []
     };
   },
-  watch: {
-    title: {
-      handler(newValue) {
-        if (newValue === "bookChapterList" && !this.isShowDialog) {
-          this.closeDialogAddgsVisible(true);
-        }
-      }
-    }
-  },
   components: {
-    infoModal,
-    indexNoSearch
+    infoModal
   },
   computed: {
     ...mapGetters(["permission"]),
@@ -176,7 +150,7 @@ export default {
   },
   methods: {
     // 列表点开模态框
-    showModalInfo(row, type, isNotTbale) {
+    showModalInfo(row, type, isShowSeach, isOptionTab) {
       this.formDatas = row;
       this.formDatas.isDetails = true;
       this.modalInfoType = type;
@@ -185,16 +159,10 @@ export default {
           this.title = "提现";
           break;
       }
-      this.isNotTbale = isNotTbale ? isNotTbale : false;
+      this.isShowSeach = isShowSeach ? isShowSeach : false;
+      this.isOptionTab = isOptionTab ? isOptionTab : false
       this.isShowDialog = true;
     },
-    //关闭模态框
-    closeDialogAddgsVisible(res) {
-      this.title = "";
-      this.isShowDialog = false;
-      if (res) this.onLoad(this.page);
-    },
-
     searchReset() {
       this.query = {};
       this.onLoad(this.page);

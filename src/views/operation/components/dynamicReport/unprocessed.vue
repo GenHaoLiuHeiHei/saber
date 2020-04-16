@@ -19,15 +19,15 @@
           size="small"
           class="el-button--text"
           icon="el-icon-edit"
-          @click="showModalInfo(scope.row, 'operationFeedbackReply')"
-        >回复</el-button>
+          @click="showModalInfo(scope.row, 'operationNotBlockComments')"
+        >不违规</el-button>
         <el-button
           type="button"
           size="small"
-          class="el-button--text"
+          class="el-button--text color-red"
           icon="el-icon-edit"
-          @click="showModalInfo(scope.row, 'operationHaveRead')"
-        >标为已读</el-button>
+          @click="showModalInfo(scope.row, 'operationBlockComments')"
+        >屏蔽</el-button>
       </template>
     </avue-crud>
     <el-dialog :title="title" :visible.sync="isShowDialog" :modal="false" :close-on-click-modal="false" @close="closeDialogAddgsVisible">
@@ -46,7 +46,7 @@
 </template>
 
 <script>
-  import {getList} from "@/api/report/feedback";
+  import {outstanding_report} from "@/api/report/report";
   import {mapGetters} from "vuex";
   import {modalMixin} from "@/mixins/modalMixin";
   import infoModal from "@/components/infoModal/index";
@@ -64,7 +64,7 @@
         },
         selectionList: [],
         option: {
-         align: "center",
+          align: "center",
           tip: false,
           border: true,
           index: false,
@@ -72,27 +72,54 @@
           selection: false,
           column: [
             {
-              label: "反馈人昵称",
-              prop: "feedbackUserName",
+              label: "举报人昵称",
+              prop: "customerNickName",
+              disabled: true,
+              span: 24,
+              labelWidth: 120
             },
             {
-              label: "反馈人ID",
-              prop: "feedbackUserId",
+              label: "举报人ID",
+              prop: "customerNumber",
+              disabled: true,
+              span: 24,
+              labelWidth: 120
             },
             {
-              label: "反馈时间",
+              label: "举报时间",
               prop: "createTime",
-              renderHeader: (h, { column, $index }) => {
-                return h('div',[
-                  h('span', column.label),
-                  h('div ', '排序'),
-                ])
-              },
+              disabled: true,
+              span: 24,
+              labelWidth: 120
+            },
+            {
+              label: "被举报人昵称",
+              prop: "informeeNickName",
+              disabled: true,
+              span: 24,
+              labelWidth: 120
+            },
+            {
+              label: "被举报人ID",
+              prop: "informeeNumber",
+              disabled: true,
+              span: 24,
+              labelWidth: 120
             },
             {
               label: "内容",
-              prop: "feedbackContent",
-            }
+              prop: "content",
+              disabled: true,
+              span: 24,
+              labelWidth: 120
+            },
+             {
+              label: "此条内容被举报次数",
+              prop: "numberOfReports",
+              disabled: true,
+              span: 24,
+              labelWidth: 120
+            },
           ]
         },
         data: []
@@ -145,8 +172,7 @@
       },
       onLoad(page, params = {}) {
         this.loading = true;
-        params.status = 0;
-        getList(page.currentPage, page.pageSize, Object.assign(params, this.query)).then(res => {
+        outstanding_report(page.currentPage, page.pageSize, Object.assign(params, this.query)).then(res => {
           const data = res.data.data;
           this.page.total = data.total;
           this.data = data.records;

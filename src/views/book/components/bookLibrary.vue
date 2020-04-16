@@ -38,7 +38,7 @@
         <!-- 评论 -->
         <div
           class="isColorShow"
-          @click="showModalInfo(scope.row, 'bookComment')"
+          @click="showModalInfo(scope.row, 'bookComment', true)"
         >{{scope.row.bookCommentSum}}</div>
       </template>
       <!-- <template slot="bookBrowse" slot-scope="scope">
@@ -57,21 +57,21 @@
           size="small"
           class="el-button--text"
           icon="el-icon-edit"
-          @click="showModalInfo(scope.row, 'bookChapterList', true)"
+          @click="showModalInfo(scope.row, 'bookChapterList')"
         >编辑章节</el-button>
         <el-button
           type="button"
           size="small"
           class="el-button--text"
           icon="el-icon-edit"
-          @click="showModalInfo(scope.row, 'bookSetUp', true)"
+          @click="showModalInfo(scope.row, 'bookSetUp')"
         >设置</el-button>
         <el-button
           type="button"
           size="small"
           class="el-button--text"
           icon="el-icon-edit"
-          @click="showModalInfo(scope.row, 'bookTakeOff', true)"
+          @click="showModalInfo(scope.row, 'bookTakeOff')"
           v-if="tabsType === 'shelves'"
         >下架</el-button>
         <el-button
@@ -79,23 +79,22 @@
           size="small"
           class="el-button--text"
           icon="el-icon-edit"
-          @click="showModalInfo(scope.row, 'bookShelves', true)"
+          @click="showModalInfo(scope.row, 'bookShelves')"
           v-else
         >上架</el-button>
       </template>
     </avue-crud>
     <el-dialog :title="title" :visible.sync="isShowDialog" :modal="false" :close-on-click-modal="false" @close="closeDialogAddgsVisible">
-      <div v-if='!isNotTbale'>
-        <infoModal :modalInfoType="modalInfoType" v-if="isShowDialog" :formDatas="formDatas" tofrom="book" :optionTabs="optionTabs"  @close="closeDialogAddgsVisible"></infoModal>
-      </div>
-      <div v-else>
-        <indexNoSearch
-          :modalInfoType="modalInfoType"
-          :formDatas="formDatas"
-          v-if="isShowDialog"
-          @closeDialogAddgsVisible="closeDialogAddgsVisible"
-        ></indexNoSearch>
-      </div>
+        <infoModal 
+        :modalInfoType="modalInfoType" 
+        v-if="isShowDialog" 
+        :formDatas="formDatas" 
+        tofrom="book" 
+        :optionTabs="optionTabs"
+        :isOptionTab="isOptionTab"
+        :isShowSeach="isShowSeach"
+        @closeDialogAddgsVisible="closeDialogAddgsVisible">
+        </infoModal>
     </el-dialog>
   </basic-container>
 </template>
@@ -103,10 +102,10 @@
 import { getList, add, update, remove } from "@/api/book/library";
 import { baseUrl } from "@/config/env";
 import { mapGetters } from "vuex";
-import indexNoSearch from "@/components/infoModal/isNoTab/index";
-import infoModal from "@/components/infoModal/isTab/index";
-
+import {modalMixin} from "@/mixins/modalMixin";
+import infoModal from "@/components/infoModal/index";
 export default {
+  mixins: [modalMixin],
   props: {
     tabsType: {
       type: String,
@@ -128,17 +127,11 @@ export default {
     }
   },
   components: {
-    infoModal,
-    indexNoSearch
+    infoModal
   },
   data() {
     return {
-      modalInfoType: "",
       form: {},
-      title: "",
-      isShowDialog: false,
-      isNotTbale: false,
-      formDatas: {},
       query: {},
       loading: true,
       page: {
@@ -337,18 +330,6 @@ export default {
           }
         ]
       },
-      optionTabs: {
-        column: [
-          {
-            label: "用户",
-            prop: "book"
-          },
-          {
-            label: "动态",
-            prop: "dynamic"
-          }
-        ]
-      },
       data: []
     };
   },
@@ -367,40 +348,10 @@ export default {
       };
     }
   },
+  created () {
+    console.log(this.optionTabs);
+  },
   methods: {
-    // 列表点开模态框
-    showModalInfo(row, type, isNotTbale) {
-      this.formDatas = row;
-      this.modalInfoType = type;
-      switch (type) {
-        case "bookChapterList":
-          this.title = "章节列表";
-          break;
-        case "bookSetUp":
-          this.title = "书籍设置";
-          break;
-        case "bookTakeOff":
-          this.title = "书籍下架";
-          break;
-        case "bookShelves":
-          this.title = "书籍上架";
-          break;
-        case "userHoard":
-          this.title = "收藏用户";
-          break;
-        case 'bookComment': 
-          this.title = '评论列表'
-          break
-        case 'userLike': 
-          this.title = '点赞列表'
-          break
-        case 'userViolation': 
-          this.title = '违规列表'
-          break
-      }
-      this.isNotTbale = isNotTbale ? isNotTbale : false;
-      this.isShowDialog = true;
-    },
 
     // 图片上传前的方法
     uploadBefore(file, done) {
@@ -411,13 +362,6 @@ export default {
     uploadAfter(res, done) {
       if (res) this.option.column.bookPictureUrl = res.link;
       done();
-    },
-
-    //关闭模态框
-    closeDialogAddgsVisible(res) {
-      this.title = "";
-      this.isShowDialog = false;
-      if (res) this.onLoad(this.page);
     },
 
     // 新增方法保存按钮

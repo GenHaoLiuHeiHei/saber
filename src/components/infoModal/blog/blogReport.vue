@@ -15,8 +15,7 @@
   </basic-container>
 </template>
 <script>
-// 收藏
-import { get_book_hoard } from "@/api/book/library";
+import { getReportList } from "@/api/customer/blog";
 export default {
   name: "bookHoard",
   props: {
@@ -71,16 +70,13 @@ export default {
         align: "center",
         column: [
           {
-            label: "用户编号",
-            prop: "customerNumber"
+            label: "举报人",
+            prop: "customerName",
+            search: true
           },
           {
-            label: "用户名称",
-            prop: "customerNickName"
-          },
-          {
-            label: "收藏时间",
-            prop: "hoardTime"
+            label: "举报原因",
+            prop: "reasons"
           }
         ]
       },
@@ -99,8 +95,7 @@ export default {
     },
     onLoad(page, params = {}) {
       this.loading = true;
-      console.log("收藏");
-      get_book_hoard(
+      getReportList(
         page.currentPage,
         page.pageSize,
         this.formDatas.id,

@@ -12,6 +12,18 @@ export const getList = (current, size, params) => {
   })
 }
 
+export const getLogList = (current, size, params) => {
+  return request({
+    url: '/api/blade-system/quartzlog/list',
+    method: 'get',
+    params: {
+      ...params,
+      current,
+      size,
+    }
+  })
+}
+
 export const getDetail = (id) => {
   return request({
     url: '/api/blade-system/quartzjob/detail',
@@ -47,4 +59,21 @@ export const update = (row) => {
     data: row
   })
 }
+
+export const updateIsPause = (row) => {
+  return request({
+    url: '/api/blade-system/quartzjob/updateIsPause',
+    method: 'post',
+    data: row
+  })
+}
+
+export const execution = (row) => {
+  return request({
+    url: '/api/blade-system/quartzjob/execution',
+    method: 'post',
+    data: row
+  })
+}
+
 

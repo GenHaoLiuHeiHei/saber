@@ -364,7 +364,7 @@ body {
   }
   
   .color-red{
-    color: red;
+    color: red !important;
   }
   
   .color-green{

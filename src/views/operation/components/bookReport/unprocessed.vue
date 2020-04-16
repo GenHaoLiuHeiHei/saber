@@ -19,29 +19,28 @@
           size="small"
           class="el-button--text"
           icon="el-icon-edit"
-          @click="showModalInfo(scope.row, 'operationNotBlockComments', true)"
+          @click="showModalInfo(scope.row, 'operationNotBlockComments')"
         >不违规</el-button>
         <el-button
           type="button"
           size="small"
           class="el-button--text color-red"
           icon="el-icon-edit"
-          @click="showModalInfo(scope.row, 'operationBlockComments', true)"
+          @click="showModalInfo(scope.row, 'operationBlockComments')"
         >屏蔽</el-button>
       </template>
     </avue-crud>
     <el-dialog :title="title" :visible.sync="isShowDialog" :modal="false" :close-on-click-modal="false" @close="closeDialogAddgsVisible">
-      <div v-if='!isNotTbale'>
-        <infoModal :modalInfoType="modalInfoType" v-if="isShowDialog" :formDatas="formDatas" tofrom="book" :optionTabs="optionTabs"  @close="closeDialogAddgsVisible"></infoModal>
-      </div>
-      <div v-else>
-        <indexNoSearch
-          :modalInfoType="modalInfoType"
-          :formDatas="formDatas"
-          v-if="isShowDialog"
-          @closeDialogAddgsVisible="closeDialogAddgsVisible"
-        ></indexNoSearch>
-      </div>
+       <infoModal 
+        :modalInfoType="modalInfoType" 
+        v-if="isShowDialog" 
+        :formDatas="formDatas" 
+        tofrom="book" 
+        :optionTabs="optionTabs"
+        :isOptionTab="isOptionTab"
+        :isShowSeach="isShowSeach"
+        @closeDialogAddgsVisible="closeDialogAddgsVisible">
+        </infoModal>
     </el-dialog>
   </basic-container>
 </template>
@@ -49,16 +48,12 @@
 <script>
   import {outstanding_report} from "@/api/report/report";
   import {mapGetters} from "vuex";
-  import indexNoSearch from "@/components/infoModal/isNoTab/index";
-  import infoModal from "@/components/infoModal/isTab/index";
+  import {modalMixin} from "@/mixins/modalMixin";
+  import infoModal from "@/components/infoModal/index";
   export default {
+    mixins: [modalMixin],
     data() {
       return {
-        formDatas: {},
-        modalInfoType: "",
-        title: "",
-        isShowDialog: false,
-        isNotTbale: false,
         form: {},
         query: {},
         loading: true,
@@ -130,18 +125,8 @@
         data: []
       };
     },
-    watch: {
-      title: {
-      handler(newValue) {
-          if (newValue === "bookChapterList" && !this.isShowDialog) {
-            this.closeDialogAddgsVisible(true);
-          }
-        }
-      }
-    },
     components: {
-      infoModal,
-      indexNoSearch
+      infoModal
     },
     computed: {
       ...mapGetters(["permission"]),
@@ -163,27 +148,6 @@
       }
     },
     methods: {
-      // 列表点开模态框
-      showModalInfo(row, type, isNotTbale) {
-        this.formDatas = row;
-        this.modalInfoType = type;
-        switch (type) {
-          case "operationBlockComments":
-            this.title = "屏蔽";
-            break;
-          case "operationNotBlockComments":
-            this.title = "不违规";
-            break;
-        }
-        this.isNotTbale = isNotTbale ? isNotTbale : false;
-        this.isShowDialog = true;
-      },
-      //关闭模态框
-      closeDialogAddgsVisible(res) {
-        this.title = "";
-        this.isShowDialog = false;
-        if (res) this.onLoad(this.page);
-      },
    
       searchReset() {
         this.query = {};

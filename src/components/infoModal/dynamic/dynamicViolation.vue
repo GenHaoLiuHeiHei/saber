@@ -1,26 +1,32 @@
 <template>
-  <basic-container class="p-t0" id="bookComment">
-    <div class="infinite-list-wrapper" calss="bookComment">
+  <basic-container class="p-t0">
+    <div class="infinite-list-wrapper" id="userViolation">
       <ul
         class="list"
         v-infinite-scroll="load"
         :infinite-scroll-disabled="disabled"
         v-loading.fullscreen.lock="loading"
       >
-        <li v-for="(item, index) in data" :key="index" class="list-item p-t10 p-b15 ub-pre">
-          <el-button
-            size="mini"
-            type="primary"
-            class="ub-pab"
-            @click="commentManagement(item)"
-            style="right:0;top:10px;"
-          >管理</el-button>
-          <div class="font-18 color-B05E07">{{item.customerNickName}}（ID: {{item.customerNumber}}）</div>
-          <div class="p-tb05">评论的内容</div>
-          <div class="p-tb05 p-tb05 p-lr10 bg-e1">{{item.comment}}</div>
+        <li v-for="(item, index) in data" :key="index" class="list-item p-b15">
+          <div class="flex" style="justify-content: space-between;align-items: center;">
+            <div class="font-18 color-B05E07">{{item.authorName}}（ID: {{item.customerNumber || '暂无'}}）</div>
+            <div>
+              <span class="m-r15">管理员 : {{item.updateUser}}</span>
+
+              <span class="m-r15">
+                状态 : 
+                <span class="color-blue" v-if="item.violationStatus == '0'">未屏蔽</span>
+                <span class="color-red" v-else>已屏蔽</span>
+                <span class='color-blue m-l05 hand' @click="changeViolationStatus(item)">修改</span>
+              </span>
+              <span v-if="item.status == '0'">创建时间 : {{item.createTime}}</span>
+              <span v-else>处理时间 : {{item.dealTime}}</span>
+            </div>
+          </div>
+          <div class="p-tb05 p-tb05 p-lr10 bg-e1">{{item.violationContent}}</div>
           <div class="flex" style="justify-content: space-between;align-items: flex-end;">
-            <div class="p-tb05">&lt;&lt;{{item.bookName || formDatas.bookName}}&gt;&gt;</div>
-            <div class="font-16 p-tb05">{{item.createTime}}</div>
+            <div class="p-tb05">&lt;&lt;{{item.bookName}}&gt;&gt;</div>
+            <div class="font-16 p-tb05">{{item.violationTime}}</div>
           </div>
         </li>
       </ul>
@@ -33,7 +39,7 @@
       </div>
     </div>
     <el-dialog
-      title="评论管理"
+      title="修改评论状态"
       :visible.sync="isShowComment"
       class="dialogComment"
       :modal-append-to-body="false"
@@ -41,40 +47,33 @@
     >
       <basic-container v-if="isShowComment">
         <el-form
-          :model="commentFormData"
-          ref="commentFormData"
-          :rules="commentFormDataRules"
-          id="commentFormData"
+          :model="changeFormData"
+          ref="changeFormData"
+          :rules="changeFormDataRules"
+          id="changeFormData"
           label-width="100px"
         >
+
           <el-row>
-            <el-col :span="16">
-              <el-form-item label="违规">
-                <el-checkbox-group v-model="commentFormData.violation" >
-                  <el-checkbox :label="item.dictKey" v-for="(item, index) in violationList" :checked="checked" @change="checked=!checked" :key="index">{{item.dictValue}}</el-checkbox>
-                </el-checkbox-group>
+             <el-col :span="16">
+              <el-form-item label="评论人">
+                <el-input v-model="changeFormData.authorId" :disabled="true"></el-input>
               </el-form-item>
             </el-col>
-          </el-row>
-          <el-row>
-            <el-col :span="16">
-              <el-form-item label="不友善">
-                <el-checkbox-group v-model="commentFormData.unfriendly" >
-                  <el-checkbox :label="item.dictKey" v-for="(item, index) in unfriendlytList" :checked="checked" @change="checked=!checked" :key="index">{{item.dictValue}}</el-checkbox>
-                </el-checkbox-group>
+             <el-col :span="16">
+              <el-form-item label="评论编号">
+                <el-input v-model="changeFormData.commentId" :disabled="true"></el-input>
               </el-form-item>
             </el-col>
-          </el-row>
-          <el-row>
             <el-col :span="16">
               <el-form-item label="管理员密码" prop="password">
-                <el-input v-model="commentFormData.password" placeholder="请输入管理员密码"></el-input>
+                <el-input v-model="changeFormData.password" placeholder="请输入管理员密码"></el-input>
               </el-form-item>
             </el-col>
           </el-row>
           <div class="dialog-footer p-t text-center">
             <el-button @click="closeIsShowComment">取 消</el-button>
-            <el-button type="primary" @click="submitForm('commentFormData')">确 定</el-button>
+            <el-button type="primary" @click="submitForm('changeFormData')">确 定</el-button>
           </div>
         </el-form>
       </basic-container>
@@ -82,15 +81,10 @@
   </basic-container>
 </template>
 <script>
-// 收藏
-import { getCommentList, update_comment } from "@/api/customer/customer";
-import { get_book_comment } from "@/api/book/library";
-import {
-  getViolation,
-  getUnfriendly
-} from "@/api/book/library";
+// 违规
+import { get_dynamic_violation_list, update_comment } from "@/api/customer/customer";
 export default {
-  name: "bookComment",
+  name: "userViolation",
   props: {
     formDatas: {
       type: Object,
@@ -120,32 +114,25 @@ export default {
           this.page.currentPage = 1;
           Object.assign(this.query, this.seachForm);
           this.onLoad(this.page);
-        }
+        } 
         this.$emit("changeIsSeach", false);
       }
     }
   },
   data() {
     return {
-      checked: false,
-      listItem: {},
-      violationList:[],
-      unfriendlytList: [],
+      isShowComment: false,
       query: {},
       loading: false,
       noMore: false,
-      isShowComment: false,
       page: {
         pageSize: 10,
         currentPage: 0,
         total: 0
       },
       data: [],
-      commentFormData: {
-        violation: [],
-        unfriendly: []
-      },
-      commentFormDataRules: {
+      changeFormData: {},
+      changeFormDataRules: {
         password: [
           { required: true, message: "请输入管理员密码", trigger: "blur" }
         ],
@@ -157,49 +144,39 @@ export default {
       return this.loading || this.noMore;
     },
     getAjaxData () {
-      return this.tofrom === 'book' ? get_book_comment : getCommentList /* 判断是用户列表进入还是书库列表进入*/
+      return get_dynamic_violation_list
     }
   },
-  created () {
-    let this_ = this;
-    getViolation().then(res => {
-      this_.violationList = res.data.data;
-    });
-    getUnfriendly().then(res => {
-      this_.unfriendlytList = res.data.data;
-    });
-  },
   methods: {
-    closeIsShowComment() {
+
+    // 关闭模态框
+    closeIsShowComment () {
       this.isShowComment = false;
-      this.commentFormData = {
-        violation: [],
-        unfriendly: []
-      }
     },
-    commentManagement(item) {
-      this.listItem = item;
+
+    // 点击屏蔽
+    changeViolationStatus (item) {
       this.isShowComment = true;
+      this.changeFormData = item;
     },
+
+    // 下拉加载
     load() {
       if (this.disabled) return;
       this.page.currentPage++;
       this.onLoad(this.page);
     },
+
+    // 提交修改评论状态
     submitForm (formName) {
       let obj = {}, this_ = this;
-      obj.status = 2;
-      obj.authorId = this_.listItem.customerId;
-      obj.commentId = this_.listItem.id;
-      obj.violation = this_.commentFormData.violation.join(',');
-      obj.unfriendly = this_.commentFormData.unfriendly.join(',');
-      obj.password = this_.commentFormData.password;
-      if (this.commentFormData.violation.length === 0 && this.commentFormData.unfriendly.lenght === 0) {
-        this_.$message.error('请选择违规或者不友善原因');
-      }
-      this_.$refs[formName].validate(valid => {
+      obj.authorId = this.changeFormData.authorId;
+      obj.commentId = this.changeFormData.commentId;
+      obj.password = this.changeFormData.password;
+      obj.status = 1;
+      this.$refs[formName].validate(valid => {
         if (valid) {
-         update_comment(obj).then(res => {
+          update_comment(obj).then(res => {
             if (res.data.code === 200) {
               this_.$message({
                 type: "success",
@@ -221,13 +198,12 @@ export default {
         }
       });
     },
+
+    // 初始化获取数据
     onLoad(page, params = {}) {
       let this_ = this;
       if (this_.loading) return;
       this_.loading = true;
-      if (this_.getAjaxData === get_book_comment) {
-        params.status = 1;
-      }
       this_.getAjaxData(
         page.currentPage,
         page.pageSize,
@@ -260,15 +236,8 @@ export default {
 };
 </script>
 <style scoped>
-.bookComment {
+#userViolation {
   max-height: 500px;
   overflow: auto;
-}
-#bookComment .dialogComment {
-  z-index: 3000 !important;
-}
-
-.list-item {
-  border-bottom: 1px solid #ccc;
 }
 </style>

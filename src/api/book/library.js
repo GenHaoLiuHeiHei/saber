@@ -7,8 +7,14 @@ export const getIsOver = () => {
     method: 'get'
   })
 }
-
-// 字典---排序
+// 字典---博文排序
+export const getBlogSort = () => {
+  return request({
+    url: '/api/blade-system/dict/dictionary?code=blogSort',
+    method: 'get'
+  })
+}
+// 字典---书籍排序
 export const getPromote = () => {
   return request({
     url: '/api/blade-system/dict/dictionary?code=bookPromote',

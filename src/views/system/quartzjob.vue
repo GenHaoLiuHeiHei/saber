@@ -6,7 +6,6 @@
       :data="data"
       :page="page"
       :permission="permissionList"
-      :before-open="beforeOpen"
       v-model="form"
       ref="crud"
       @row-update="rowUpdate"
@@ -19,7 +18,7 @@
       @size-change="sizeChange"
       @on-load="onLoad"
     >
-      <template slot="menuLeft">
+      <template slot="menuLeft" slot-scope="scope">
         <el-button type="danger"
                    size="small"
                    icon="el-icon-delete"
@@ -30,17 +29,41 @@
                    size="small"
                    icon="el-icon-edit"
                    plain
-                   @click="handleDelete">日 志
+                   @click="showModalInfo(scope.row, 'quartzjobLog')">日 志
         </el-button>
       </template>
+      <template slot-scope="scope" slot="isPause">
+        <span v-if="scope.row.isPause === 1" class="color-green">运行中</span>
+        <span v-else class="color-orange">已暂停</span>
+      </template>
       <template slot-scope="scope" slot="menu">
+        <el-button
+          v-if="scope.row.isPause === 1"
+          type="button"
+          size="small"
+          class="el-button--text"
+          icon="el-icon-edit"
+          @click="updateIsPauses(scope.row, 2)"
+        >
+        暂停
+        </el-button>
+         <el-button
+          v-else
+          type="button"
+          size="small"
+          class="el-button--text"
+          icon="el-icon-edit"
+          @click="updateIsPauses(scope.row, 1)"
+        >
+        恢复
+        </el-button>
         <el-button
           type="button"
           size="small"
           class="el-button--text"
           icon="el-icon-edit"
-          @click="showModalInfo(scope.row, 'operationWithdraw', false)"
-        >详情</el-button>
+          @click="executions(scope.row)"
+        >执行</el-button>
       </template>
     </avue-crud>
     <el-dialog
@@ -50,40 +73,28 @@
       :close-on-click-modal="false"
       @close="closeDialogAddgsVisible"
     >
-      <div v-if="!isNotTbale">
-        <infoModal
-          :modalInfoType="modalInfoType"
-          v-if="isShowDialog"
-          :formDatas="formDatas"
-          tofrom="book"
-          :optionTabs="optionTabs"
-          @close="closeDialogAddgsVisible"
-        ></infoModal>
-      </div>
-      <div v-else>
-        <indexNoSearch
-          :modalInfoType="modalInfoType"
-          :formDatas="formDatas"
-          v-if="isShowDialog"
-          @closeDialogAddgsVisible="closeDialogAddgsVisible"
-        ></indexNoSearch>
-      </div>
+      <infoModal 
+        :modalInfoType="modalInfoType" 
+        v-if="isShowDialog" 
+        :formDatas="formDatas" 
+        tofrom="book" 
+        :optionTabs="optionTabs"
+        :isOptionTab="isOptionTab"
+        :isShowSeach="isShowSeach"
+        @closeDialogAddgsVisible="closeDialogAddgsVisible">
+        </infoModal>
     </el-dialog>
   </basic-container>
 </template>
 <script>
-import {getList, getDetail, add, update, remove} from "@/api/system/quartzjob";
+import {getList, add, update, remove, updateIsPause, execution} from "@/api/system/quartzjob";
 import { mapGetters } from "vuex";
-import indexNoSearch from "@/components/infoModal/isNoTab/index";
-import infoModal from "@/components/infoModal/isTab/index";
+import {modalMixin} from "@/mixins/modalMixin";
+import infoModal from "@/components/infoModal/index";
 export default {
+  mixins: [modalMixin],
   data() {
     return {
-      formDatas: {},
-      modalInfoType: "",
-      title: "",
-      isShowDialog: false,
-      isNotTbale: false,
       form: {},
       query: {},
       loading: true,
@@ -141,11 +152,6 @@ export default {
               prop: "params",
               span: 24,
               labelWidth: 120,
-              rules: [{
-                required: true,
-                message: "请输入参数",
-                trigger: "blur"
-              }]
             },
             {
               label: "cron表达式",
@@ -169,6 +175,7 @@ export default {
               },
               span: 24,
               labelWidth: 120,
+              slot: true, 
               rules: [{
                 required: true,
                 message: "请选择状态",
@@ -180,11 +187,6 @@ export default {
               prop: "remark",
               span: 24,
               labelWidth: 120,
-              rules: [{
-                required: true,
-                message: "请输入备注",
-                trigger: "blur"
-              }],
               type: 'textarea'
             },
             {
@@ -222,25 +224,15 @@ export default {
       data: []
     };
   },
-  watch: {
-    title: {
-      handler(newValue) {
-        if (newValue === "bookChapterList" && !this.isShowDialog) {
-          this.closeDialogAddgsVisible(true);
-        }
-      }
-    }
-  },
   components: {
-    infoModal,
-    indexNoSearch
+    infoModal
   },
   computed: {
     ...mapGetters(["permission"]),
     permissionList() {
       return {
         addBtn: true,
-        viewBtn: true,
+        viewBtn: false,
         delBtn: true,
         editBtn: true,
         // addBtn: this.vaildData(this.permission.quartzjob_add, false),
@@ -258,25 +250,6 @@ export default {
     }
   },
   methods: {
-    // 列表点开模态框
-    showModalInfo(row, type, isNotTbale) {
-      this.formDatas = row;
-      this.formDatas.isDetails = true;
-      this.modalInfoType = type;
-      switch (type) {
-        case "operationWithdraw":
-          this.title = "提现";
-          break;
-      }
-      this.isNotTbale = isNotTbale ? isNotTbale : false;
-      this.isShowDialog = true;
-    },
-    //关闭模态框
-    closeDialogAddgsVisible(res) {
-      this.title = "";
-      this.isShowDialog = false;
-      if (res) this.onLoad(this.page);
-    },
     rowSave(row, loading, done) {
       add(row).then(() => {
         loading();
@@ -287,6 +260,31 @@ export default {
         });
       }, error => {
         done();
+        console.log(error);
+      });
+    },
+    // 更改定时任务状态
+    updateIsPauses(row, isPause) {
+      row.isPause = isPause;
+      updateIsPause(row).then(() => {
+        this.onLoad(this.page);
+        this.$message({
+          type: "success",
+          message: "操作成功!"
+        });
+      }, error => {
+        console.log(error);
+      });
+    },
+    //执行定时任务
+    executions(row) {
+      execution(row).then(() => {
+        this.onLoad(this.page);
+        this.$message({
+          type: "success",
+          message: "操作成功!"
+        });
+      }, error => {
         console.log(error);
       });
     },
@@ -341,14 +339,6 @@ export default {
           });
           this.$refs.crud.toggleSelection();
         });
-    },
-    beforeOpen(done, type) {
-      if (["edit", "view"].includes(type)) {
-        getDetail(this.form.id).then(res => {
-          this.form = res.data.data;
-        });
-      }
-      done();
     },
     searchReset() {
       this.query = {};

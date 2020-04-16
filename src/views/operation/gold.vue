@@ -1,29 +1,51 @@
 <template>
-  <div>
-    <avue-form :option="option" v-model="form" @submit="handleSubmit"></avue-form>
-  </div>
+  <basic-container id="library">
+    <avue-tabs :option="optionTabs" @change="handleChange"></avue-tabs>
+    <div v-if="tabsType.prop === 'android'">
+      <android></android>
+    </div>
+    <div v-if="tabsType.prop === 'ios'">
+      <ios></ios>
+    </div>
+  </basic-container>
 </template>
 <script>
+import android from './components/gold/android';
+import ios from './components/gold/ios';
 export default {
-  data(){
+  components: {
+      android,
+      ios
+  },
+  data () {
     return {
-       form:{
-          text:['动态内容1','动态内容2'],
-       },
-       option:{
-          column: [{
-            span:24,
-            label: '内容',
-            prop: 'text',
-            type:'dynamic'
-          }]
-       }
+      tabsType:{},
+      optionTabs: {
+        column: [
+         {
+            label: '安卓用户',
+            prop: 'android',
+          },
+          {
+            label: 'IOS设置',
+            prop: 'ios',
+          }
+        ]
+      }
     }
   },
-  methods:{
-    handleSubmit(form){
-       this.$message.success(JSON.stringify(this.form))
-    }
+  created(){
+    this.tabsType = this.optionTabs.column[0];
+  },
+  methods: {
+    handleChange(column) {
+      this.tabsType = column
+    },
   }
 }
 </script>
+<style scoped>
+#library /deep/ .avue-tabs{
+  padding-top: 0 !important;
+}
+</style>

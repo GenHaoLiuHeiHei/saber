@@ -7,12 +7,14 @@
         :infinite-scroll-disabled="disabled"
         v-loading.fullscreen.lock="loading"
       >
-        <li v-for="(item, index) in data" :key="index" class="list-item p-b15">
-          <div class="m-b10">{{item.content}}</div>
-          <el-row>
-            <el-col :span="4" class="m-r10 bookArticleImg">
-              <img class="w100" @click="showBigDialog('isImg', index)" src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1585213171260&di=0ddb022c4d097a881c769a62f44f8bfb&imgtype=0&src=http%3A%2F%2Fpic1.win4000.com%2Fwallpaper%2F0%2F582d1d1458e84.jpg" alt="">
+        <li v-for="(item, index) in data" :key="index" class="list-item p-b15 m-b20">
+          <div class="m-b15">{{item.blogContent}}</div>
+          <el-row v-if="item.contentType === 1">
+            <el-col :span="4" v-for="(itemSrc, itemSrcIndex) in item.showList" :key="itemSrcIndex" class="m-r10 bookArticleImg" style="max-height: 80px;overflow: hidden;">
+              <img class="w100" @click="showBigDialog('isImg', index, itemSrcIndex)" :src="itemSrc.url" alt="" >
             </el-col>
+          </el-row>
+          <el-row v-else-if="item.contentType === 2">
             <el-col :span="4" class="m-r10 bookArticleImg">
                <div class="videoImg" @click="showBigDialog('isVideo')">
                  <i class="el-icon-caret-right color-white"></i>
@@ -20,29 +22,32 @@
               <img class="w100" src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1585213171260&di=0ddb022c4d097a881c769a62f44f8bfb&imgtype=0&src=http%3A%2F%2Fpic1.win4000.com%2Fwallpaper%2F0%2F582d1d1458e84.jpg" alt="">
             </el-col>
           </el-row>
-          <div class="flex" style="justify-content: space-between;flex-wrap:wrap">
-            <div class="m-r10 isColorShow">
-              展示次数：1
+          <div class="flex m-t10" style="justify-content: space-between;flex-wrap:wrap">
+            <div class="m-r10">
+              展示次数：{{item.blogBrowse}}
             </div>
-             <div class="m-r10 isColorShow">
-              分享次数：1
+            <!-- <div class="m-r10 isColorShow" @click="showBigDialog('blogShare', index)">
+              分享次数：{{item.blogForwardSum}}
+            </div> -->
+             <div class="m-r10 isColorShow" @click="showBigDialog('dynamicComment', index)">
+              评论数量：{{item.blogCommentSum}}
             </div>
-             <div class="m-r10 isColorShow" @click="showBigDialog('bookComment', index)">
-              评论数量：1
+             <div class="m-r10 isColorShow" @click="showBigDialog('dynamicLike', index)">
+              点赞数量：{{item.blogPraiseSum}}
             </div>
-             <div class="m-r10 isColorShow">
-              点赞数量：1
-            </div>
-             <div class="color-blue">
-              发布时间：2020-11-11 11:11:11
+             <div>
+              发布时间：{{item.createTime}}
             </div>
           </div>
-          <div class="flex m-t05" style="justify-content: space-between;flex-wrap:wrap">
-            <div class="m-r10 isColorShow color-red"  >
-              举报次数：1
+          <div class="flex m-t10" style="justify-content: space-between;flex-wrap:wrap">
+            <div class="m-r10 isColorShow color-red" @click="showBigDialog('blogReport', index)">
+              举报次数：{{item.informNum || 0}}
             </div>
-             <div class="m-r10 isColorShow color-red">
-              判定违规：屏蔽
+            <div class="isColorShow" @click="showBigDialog('blogBlockComments', index)" v-if="item.blogStatus === 2">
+              不违规
+            </div>
+            <div class="isColorShow color-red" @click="showBigDialog('blogBlockComments', index)"  v-else>
+              违规
             </div>
           </div>
         </li>
@@ -66,13 +71,25 @@
         <!-- bigDialogType:isVideo -->
         <div v-if="bigDialogType === 'isVideo'">
           <video class="w100" height="400" controls>
-            <source src="../../../../static/659a8f0fcdba06a78cd69693529903ca.mp4" type="video/mp4">
-            <source src="../../../../static/659a8f0fcdba06a78cd69693529903ca.mp4" type="video/ogg">
+            <source src="./../../../static/659a8f0fcdba06a78cd69693529903ca.mp4" type="video/mp4">
+            <source src="./../../../static/659a8f0fcdba06a78cd69693529903ca.mp4" type="video/ogg">
             您的浏览器不支持 video 标签。
           </video>
         </div>
-        <div v-else-if="bigDialogType === 'bookComment'">
-          <bookComment :formDatas="bigDialogForm"></bookComment>
+        <div v-else-if="bigDialogType === 'dynamicComment'">
+          <dynamicComment :formDatas="bigDialogForm" tofrom="article"></dynamicComment>
+        </div>
+        <div v-else-if="bigDialogType === 'blogShare'">
+          <blogShare :formDatas="bigDialogForm"></blogShare>
+        </div>
+        <div v-else-if="bigDialogType === 'dynamicLike'">
+          <dynamicLike :formDatas="bigDialogForm" tofrom="article"></dynamicLike>
+        </div>
+        <div v-else-if="bigDialogType === 'blogReport'">
+          <blogReport :formDatas="bigDialogForm"></blogReport>
+        </div>
+        <div v-else-if="bigDialogType === 'blogBlockComments'">
+          <blogBlockComments :formDatas="bigDialogForm"></blogBlockComments>
         </div>
       </basic-container>
     </el-dialog>
@@ -80,12 +97,21 @@
 </template>
 <script>
 // 博文
-import { getLikeList } from "@/api/customer/customer";
-import bookComment from '@/components/infoModal/isTab/book/bookComment';
+import { getList } from "@/api/customer/blog";
+import dynamicComment from '@/components/infoModal/dynamic/dynamicComment';
+import blogShare from '@/components/infoModal/blog/blogShare';
+import dynamicLike from '@/components/infoModal/dynamic/dynamicLike';
+import blogReport from '@/components/infoModal/blog/blogReport';
+import blogBlockComments from '@/components/infoModal/blog/blogBlockComments';
+
 export default {
   name: "bookArticle",
   components : {
-    bookComment
+    blogBlockComments,
+    dynamicComment,
+    blogReport,
+    blogShare,
+    dynamicLike
   },
   props: {
     formDatas: {
@@ -108,6 +134,7 @@ export default {
   watch: {
     isSeach: {
       handler(newValue) {
+        console.log(this.seachForm);
         if (newValue) {
           this.page.currentPage = 1;
           Object.assign(this.query, this.seachForm);
@@ -132,14 +159,6 @@ export default {
         total: 0
       },
       data: [],
-      datas: [
-        {
-          url: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1585213171260&di=0ddb022c4d097a881c769a62f44f8bfb&imgtype=0&src=http%3A%2F%2Fpic1.win4000.com%2Fwallpaper%2F0%2F582d1d1458e84.jpg'
-        },
-        {
-          url: 'http://pic1.win4000.com/wallpaper/c/59a4d758ea359.jpg'
-        }
-      ]
     };
   },
   computed: {
@@ -152,21 +171,45 @@ export default {
     closeIsShowComment () {
       this.isShowComment = false;
     },
-    showBigDialog (bigDialogType, index = 0) {
+    showBigDialog (bigDialogType, index = 0, itemSrcIndex) {
       switch (bigDialogType) {
         case 'isVideo': 
           this.title = '视频预览';
           this.bigDialogType = bigDialogType;
           this.isShowComment = true;
           break
-        case 'bookComment': 
+        case 'dynamicComment': 
           this.title = '评论列表';
           this.bigDialogForm = this.data[index];
           this.bigDialogType = bigDialogType;
           this.isShowComment = true;
           break
+        case 'blogShare': 
+          this.title = '分享列表';
+          this.bigDialogForm = this.data[index];
+          this.bigDialogType = bigDialogType;
+          this.isShowComment = true;
+          break
+        case 'dynamicLike': 
+          this.title = '点赞列表';
+          this.bigDialogForm = this.data[index];
+          this.bigDialogType = bigDialogType;
+          this.isShowComment = true;
+          break
+        case 'blogReport': 
+          this.title = '举报列表';
+          this.bigDialogForm = this.data[index];
+          this.bigDialogType = bigDialogType;
+          this.isShowComment = true;
+          break
+        case 'blogBlockComments': 
+          this.title = '屏蔽';
+          this.bigDialogForm = this.data[index];
+          this.bigDialogType = bigDialogType;
+          this.isShowComment = true;
+          break
         case 'isImg': 
-          this.$ImagePreview(this.datas, index);
+          this.$ImagePreview(this.data[index].showList, itemSrcIndex);
           break
       }
       
@@ -178,9 +221,10 @@ export default {
     },
     onLoad(page, params = {}) {
       let this_ = this;
+      console.log(this_.formDatas);
       if (this_.loading) return;
       this_.loading = true;
-      getLikeList(
+      getList(
         page.currentPage,
         page.pageSize,
         this_.formDatas.id,
@@ -202,6 +246,16 @@ export default {
             if (data.total === 0) this_.data = [];
             this_.noMore = true;
           }
+          this_.data.map((v) => {
+            v.showList = [];
+            v.pictrueList.map(s => {
+              if (s && s.length) {
+                v.showList.push({
+                  url: s
+                })
+              }
+            })
+          })
         })
         .catch(err => {
           console.log(err);

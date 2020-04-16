@@ -88,6 +88,48 @@ export const getLikeList = (current, size, customerId, params) => {
   })
 }
 
+// 点赞博文
+export const getBlogLikeList = (current, size, customerId, params) => {
+  return request({
+    url: '/api/blade-blog/blogpraise/page-by-cutomer',
+    method: 'get',
+    params: {
+      ...params,
+      current,
+      size,
+      customerId
+    }
+  })
+}
+// 违规博文
+export const get_dynamic_violation_list = (current, size, customerId, params) => {
+  return request({
+    url: '/api/blade-blog/bloginform/page-by-relate_id',
+    method: 'get',
+    params: {
+      ...params,
+      current,
+      size,
+      customerId
+    }
+  })
+}
+
+// 评论博文
+export const getBlogCommentList = (current, size, customerId, params) => {
+  return request({
+    url: '/api/blade-blog/blogcomment/page-by-customer',
+    method: 'get',
+    params: {
+      ...params,
+      current,
+      size,
+      customerId
+    }
+  })
+}
+
+
 // 点赞评论
 export const getCommentList = (current, size, customerId, params) => {
   return request({

@@ -106,6 +106,7 @@
                       type: "success",
                       message: "操作成功!"
                     });
+                    debugger
                     this.closeDialog();
                   }, error => {
                     console.log(error);
