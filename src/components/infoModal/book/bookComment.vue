@@ -1,5 +1,5 @@
 <template>
-  <basic-container class="p-t0" id="bookComment">
+  <div class="p-t0" id="bookComment">
     <div class="infinite-list-wrapper" calss="bookComment">
       <ul
         class="list"
@@ -39,7 +39,7 @@
       :modal-append-to-body="false"
       @close="closeIsShowComment"
     >
-      <basic-container v-if="isShowComment">
+      <div v-if="isShowComment">
         <el-form
           :model="commentFormData"
           ref="commentFormData"
@@ -77,12 +77,12 @@
             <el-button type="primary" @click="submitForm('commentFormData')">确 定</el-button>
           </div>
         </el-form>
-      </basic-container>
+      </div>
     </el-dialog>
-  </basic-container>
+  </div>
 </template>
 <script>
-// 收藏
+// 评论
 import { getCommentList, update_comment } from "@/api/customer/customer";
 import { get_book_comment } from "@/api/book/library";
 import {
@@ -157,6 +157,7 @@ export default {
       return this.loading || this.noMore;
     },
     getAjaxData () {
+      console.log(this.tofrom)
       return this.tofrom === 'book' ? get_book_comment : getCommentList /* 判断是用户列表进入还是书库列表进入*/
     }
   },
@@ -194,8 +195,9 @@ export default {
       obj.violation = this_.commentFormData.violation.join(',');
       obj.unfriendly = this_.commentFormData.unfriendly.join(',');
       obj.password = this_.commentFormData.password;
-      if (this.commentFormData.violation.length === 0 && this.commentFormData.unfriendly.lenght === 0) {
+      if (this.commentFormData.violation.length === 0 && this.commentFormData.unfriendly.length === 0) {
         this_.$message.error('请选择违规或者不友善原因');
+        return
       }
       this_.$refs[formName].validate(valid => {
         if (valid) {
@@ -226,9 +228,9 @@ export default {
       if (this_.loading) return;
       this_.loading = true;
       // 书籍评论
-      if (this_.getAjaxData === get_book_comment) {
-        params.status = 1;
-      }
+      // if (this_.getAjaxData === get_book_comment) {
+      // }
+      params.status = 1;
       this_.getAjaxData(
         page.currentPage,
         page.pageSize,

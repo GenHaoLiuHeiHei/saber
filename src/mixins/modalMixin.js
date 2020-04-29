@@ -48,8 +48,8 @@ export const modalMixin = {
             case 'userLike': 
                 this.title = '点赞列表'
                 break
-            case 'userViolation': 
-                this.title = '违规列表'
+            case 'bookViolation': 
+                this.title = '评论违规列表'
                 break
             case 'userRelieve': 
                 this.title = '解除停封'
@@ -60,7 +60,6 @@ export const modalMixin = {
             case 'bookLike': 
                 this.title = '点赞列表'
                 break
-           
             case 'bookChapter': 
                 this.title = '章节列表'
                 break
@@ -100,6 +99,33 @@ export const modalMixin = {
             case "quartzjobLog":
                 this.title = "日志";
                 break; 
+            case "blogComment":
+                this.title = "评论列表";
+                break;  
+            case "blogViolation":
+                this.title = "违规列表";
+                break;  
+                case "blogShare":
+                this.title = "分享列表";
+                break;  
+            case "blogReport":
+                this.title = "举报列表";
+                break;
+            case "blogImgList":
+                this.title = "图片列表";
+                break;  
+            case "blogVideo":
+                this.title = "视频预览";
+                break;  
+            case "blogNotBlockComments":
+                this.title = "不违规";
+                break; 
+            case "blogBlockComments":
+                this.title = "屏蔽";
+                break; 
+            case "blogLike":
+                this.title = "博文点赞列表";
+                break; 
             }
             this.isShowSeach = isShowSeach ? isShowSeach : false;
             this.isOptionTab = isOptionTab ? isOptionTab : false
@@ -107,7 +133,6 @@ export const modalMixin = {
         },
         //关闭模态框
         closeDialogAddgsVisible(res) {
-            debugger
             this.title = "";
             this.isShowDialog = false;
             if (res) this.onLoad(this.page);

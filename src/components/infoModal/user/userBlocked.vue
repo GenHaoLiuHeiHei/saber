@@ -1,7 +1,7 @@
 <template>
-  <basic-container>
+  <div>
     <avue-form ref="form" v-model="formData" :option="option" @submit="submitForm('form')"></avue-form>
-  </basic-container>
+  </div>
 </template>
 
 <script>
@@ -106,7 +106,6 @@
                       type: "success",
                       message: "操作成功!"
                     });
-                    debugger
                     this.closeDialog();
                   }, error => {
                     console.log(error);

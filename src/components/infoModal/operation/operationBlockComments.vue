@@ -1,5 +1,5 @@
 <template>
-  <basic-container>
+  <div>
     <el-form
       :model="formData"
       ref="formData"
@@ -8,6 +8,16 @@
       label-width="100px"
     >
       <el-row>
+        <el-col :span="16">
+          <el-form-item label="被举报次数" >
+            <el-input v-model="formData.informNum" :disabled="true" placeholder="请输入被举报次数"></el-input>
+          </el-form-item>
+        </el-col>
+        <el-col :span="16">
+          <el-form-item label="内容" >
+            <el-input v-model="formData.relateComment" type="textarea" :disabled="true" placeholder="请输入内容"></el-input>
+          </el-form-item>
+        </el-col>
         <el-col :span="16">
           <el-form-item label="违规">
             <el-checkbox-group v-model="formData.violation">
@@ -33,14 +43,14 @@
         </el-col>
       </el-row>
       <div class="dialog-footer p-t text-center">
-        <el-button type="primary" @click="submitForm('formData')">确 定 1</el-button>
+        <el-button type="primary" @click="submitForm('formData')">确 定</el-button>
       </div>
     </el-form>
-  </basic-container>
+  </div>
 </template>
 
 <script>
-import {handle_report} from "@/api/report/report";
+import {book_handle_report, blog_handle_report, bookUpdatelist, blogUpdatelist} from "@/api/report/report";
 import {
   getViolation,
   getUnfriendly
@@ -52,6 +62,10 @@ import {
         default: () => {
           return {}
         }
+      },
+      tofrom: {
+        type: String,
+        default: 'user'
       },
     },
     data() {
@@ -72,20 +86,16 @@ import {
     created () {
       let this_ = this;
       this_.formData = this.formDatas;
-      getViolation().then(res => {
-        this_.violationList = res.data.data;
-      }).then(() => {
-         return getUnfriendly()
-      }).then(res => {
-        this_.unfriendlytList = res.data.data;
-        if (this_.formData.reasons.length) {
-          JSON.parse(this_.formData.reasons).map(v => {
-            v.dictKey = v.dictKey.map(Number)
-            this_.formData[v.code] = v.dictKey;
-          })
-        }
+      this.onLoad();
+    },
+    computed: {
+      getAjax() {
+        return this.tofrom === 'book' ? bookUpdatelist : blogUpdatelist
+      },
+      getUpdateAjax() {
 
-      });
+        return this.tofrom === 'book' ? book_handle_report : blog_handle_report
+      }
     },
 
     methods: {
@@ -94,13 +104,34 @@ import {
         this.$emit("closeDialogAddgsVisible", true);
       },
 
+      onLoad() {
+        let this_ = this;
+        this_.loading = true;
+        this.getAjax(this_.formData.relateId).then(data => {
+          this_.formData = data.data.data;
+          getViolation().then(r => {
+                this_.violationList = r.data.data;
+              }).then(() => {
+                return getUnfriendly()
+              }).then(res => {
+                this_.unfriendlytList = res.data.data;
+                if (this_.formData.reasons.length) {
+                  console.log(JSON.parse(this_.formData.reasons));
+                  JSON.parse(this_.formData.reasons).map(v => {
+                    v.dictKey = JSON.parse(v.dictKey)
+                    this_.formData[v.code] = v.dictKey;
+                  })
+                }
+              });
+        });
+      },
+
       submitForm (formName) {
         let this_ = this;
         this_.formData.status = 2;
-        console.log(this_.formData)
         this_.$refs[formName].validate(valid => {
           if (valid) {
-          handle_report(this_.formData).then(res => {
+          this.getUpdateAjax(this_.formData).then(res => {
               if (res.data.code === 200) {
                 this_.$message({
                   type: "success",
@@ -111,7 +142,7 @@ import {
                   type: 'success',
                   onClose () {
                     this_.closeDialogAddgsVisible();
-                    this_.onLoad(this_.page);
+                    // this_.onLoad(this_.page);
                   }
                 });
               }

@@ -40,7 +40,7 @@
 </template>
 
 <script>
-import {handle_report} from "@/api/report/report";
+import { blog_editstatus } from "@/api/customer/blog";
 import {
   getViolation,
   getUnfriendly
@@ -91,23 +91,25 @@ import {
       },
 
       submitForm (formName) {
-        let this_ = this;
-        this_.formData.status = 2;
-        console.log(this_.formData)
+        let obj = {}, this_ = this;
+        obj.blogStatus = 2;
+        obj.id = this_.formData.id;
+        obj.violation = this_.commentFormData.violation.join(',');
+        obj.unfriendly = this_.commentFormData.unfriendly.join(',');
+        obj.password = this_.commentFormData.password;
+        if (this_.commentFormData.violation.length === 0 && this_.commentFormData.unfriendly.length === 0) {
+          this_.$message.error('请选择违规或者不友善原因');
+          return
+        }
         this_.$refs[formName].validate(valid => {
           if (valid) {
-          handle_report(this_.formData).then(res => {
+          blog_editstatus(obj).then(res => {
               if (res.data.code === 200) {
-                this_.$message({
-                  type: "success",
-                  message: "操作成功!"
-                });
                 this_.$message({
                   message: res.data.msg,
                   type: 'success',
                   onClose () {
                     this_.closeDialogAddgsVisible();
-                    this_.onLoad(this_.page);
                   }
                 });
               }

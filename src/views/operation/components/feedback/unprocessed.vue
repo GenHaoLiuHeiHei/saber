@@ -82,12 +82,12 @@
             {
               label: "反馈时间",
               prop: "createTime",
-              renderHeader: (h, { column, $index }) => {
-                return h('div',[
-                  h('span', column.label),
-                  h('div ', '排序'),
-                ])
-              },
+              // renderHeader: (h, { column, $index }) => {
+              //   return h('div',[
+              //     h('span', column.label),
+              //     h('div ', '排序'),
+              //   ])
+              // },
             },
             {
               label: "内容",

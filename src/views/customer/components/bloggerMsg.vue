@@ -36,7 +36,7 @@
       </template>
       <template slot="violationSum" slot-scope="scope">
         <!-- 违规 -->
-        <div class="isColorShow" style="color:red !important" @click="showModalInfo(scope.row, 'userViolation', true, true)">{{scope.row.violationSum}}</div>
+        <div class="isColorShow" style="color:red !important" @click="showModalInfo(scope.row, 'bookViolation', true, true)">{{scope.row.violationSum}}</div>
       </template>
       <template slot="realGold" slot-scope="scope">
         <!-- 余额 -->
@@ -63,7 +63,7 @@
         :modalInfoType="modalInfoType" 
         v-if="isShowDialog" 
         :formDatas="formDatas" 
-        tofrom="book" 
+        tofrom="user" 
         :optionTabs="optionTabs"
         :seachForms="seachForms"
         :isOptionTab="isOptionTab"
@@ -74,7 +74,7 @@
               <el-form-item :label="blogSum">
               </el-form-item>
               <el-form-item label="排序">
-                <el-select v-model="seachForms.sortIndex" placeholder="排序方式" size="mini">
+                <el-select v-model="seachForms.sortIndex" clearable placeholder="排序方式" size="mini">
                   <el-option
                     v-for="item in blogSortList"
                     :key="item.dictKey"
@@ -276,7 +276,8 @@
     },
     methods: {
       onSubmit () {
-        console.log(this.$refs.dialogA.onSubmit())
+        this.$refs.dialogA.onSubmit();
+
       },
       // 表单重置搜索
       searchReset() {

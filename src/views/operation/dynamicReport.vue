@@ -16,9 +16,9 @@
   </basic-container>
 </template>
 <script>
-import processed from './components/report/processed';
-import unprocessed from './components/report/unprocessed';
-import automaticProcessing from './components/report/automaticProcessing';
+import processed from './components/dynamicReport/processed';
+import unprocessed from './components/dynamicReport/unprocessed';
+import automaticProcessing from './components/dynamicReport/automaticProcessing';
 export default {
   components: {
       processed,

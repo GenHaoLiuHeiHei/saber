@@ -221,3 +221,17 @@ export const get_book_comment = (current, size, id, params) => {
   })
 }
 
+// 评论用户
+export const get_violation_book_list = (current, size, id, params) => {
+  return request({
+    url: '/api/blade-book/bookviolation/book_list',
+    method: 'get',
+    params: {
+      ...params,
+      current,
+      size,
+      id
+    }
+  })
+}
+

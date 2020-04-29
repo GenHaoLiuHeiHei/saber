@@ -1,5 +1,5 @@
 <template>
-  <basic-container id="bookHoard">
+  <div id="bookHoard">
     <avue-crud
       ref="crud"
       :option="option"
@@ -12,12 +12,16 @@
       @selection-change="selectionChange"
       @on-load="onLoad"
     ></avue-crud>
-  </basic-container>
+  </div>
 </template>
 <script>
 import { getReportList } from "@/api/customer/blog";
+import {
+  getViolation,
+  getUnfriendly
+} from "@/api/book/library";
 export default {
-  name: "bookHoard",
+  name: "blogReport",
   props: {
     formDatas: {
       type: Object,
@@ -76,13 +80,16 @@ export default {
           },
           {
             label: "举报原因",
-            prop: "reasons"
+            prop: "centextData"
           }
         ]
       },
-      data: []
+      data: [],
+      violationList: [],
+      unfriendlytList: []
     };
   },
+  
   methods: {
     currentChange(currentPage) {
       this.page.currentPage = currentPage;
@@ -94,17 +101,49 @@ export default {
       this.page.pageSize = pageSize;
     },
     onLoad(page, params = {}) {
+      let this_ = this;
       this.loading = true;
+      params.type = 1;
       getReportList(
         page.currentPage,
         page.pageSize,
         this.formDatas.id,
         Object.assign(params, this.query)
-      ).then(res => {
-        const data = res.data.data;
-        this.page.total = data.total;
-        this.data = data.records;
-        this.loading = false;
+      ).then(datas => {
+        let data = datas.data.data;
+        this_.page.total = data.total;
+        this_.loading = false;
+        getViolation().then(ress => {
+          this_.violationList = ress.data.data;
+        }).then(() => {
+          return getUnfriendly()
+        }).then(res => {
+          this_.unfriendlytList = res.data.data;
+          data.records.map(i => {
+            i.centextList = [];
+            if (i.reasons.length) {
+              JSON.parse(i.reasons).map(v => {
+                v.dictKey = v.dictKey.map(Number);
+                this_.violationList.map(s => {
+                  if (v.code === "violation") {
+                    if (v.dictKey.join(',').indexOf(s.dictKey) > -1) {
+                      i.centextList.push(s.dictValue)
+                    }
+                  }
+                })
+                this_.unfriendlytList.map(s => {
+                  if (v.code === "unfriendly") {
+                    if (v.dictKey.join(',').indexOf(s.dictKey) > -1) {
+                      i.centextList.push(s.dictValue)
+                    }
+                  }
+                })
+              });
+              i.centextData = i.centextList.join(',')
+            }
+          });
+          this_.data = data.records;
+        });
       });
     }
   }

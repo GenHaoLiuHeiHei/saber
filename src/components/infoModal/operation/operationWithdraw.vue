@@ -1,8 +1,8 @@
 <template>
-  <basic-container>
+  <div>
     <avue-form v-if="!formData.isDetails" ref="form" v-model="formData" :option="option" @submit="submitForm('form')"></avue-form>
     <avue-detail v-else :option="option" v-model="formData"></avue-detail>
-  </basic-container>
+  </div>
 </template>
 
 <script>

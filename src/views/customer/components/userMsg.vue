@@ -28,7 +28,7 @@
       </template>
       <template slot="violationSum" slot-scope="scope">
         <!-- 违规 -->
-        <div class="isColorShow" style="color:red !important" @click="showModalInfo(scope.row, 'userViolation', true, true)">{{scope.row.violationSum}}</div>
+        <div class="isColorShow" style="color:red !important" @click="showModalInfo(scope.row, 'bookViolation', true, true)">{{scope.row.violationSum}}</div>
       </template>
       <template slot="realGold" slot-scope="scope">
         <!-- 余额 -->

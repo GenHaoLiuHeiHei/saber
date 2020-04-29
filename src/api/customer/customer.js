@@ -89,19 +89,19 @@ export const getLikeList = (current, size, customerId, params) => {
 }
 
 // 点赞博文
-export const getBlogLikeList = (current, size, customerId, params) => {
+export const getBlogLikeList = (current, size, blogId, params) => {
   return request({
-    url: '/api/blade-blog/blogpraise/page-by-cutomer',
+    url: '/api/blade-blog/blogpraise/page',
     method: 'get',
     params: {
       ...params,
       current,
       size,
-      customerId
+      blogId
     }
   })
 }
-// 违规博文
+// 用户信息中违规博文
 export const get_dynamic_violation_list = (current, size, customerId, params) => {
   return request({
     url: '/api/blade-blog/bloginform/page-by-relate_id',
@@ -131,7 +131,7 @@ export const getBlogCommentList = (current, size, customerId, params) => {
 
 
 // 点赞评论
-export const getCommentList = (current, size, customerId, params) => {
+export const getCommentList = (current, size, id, params) => {
   return request({
     url: '/api/blade-book/bookcomment/getcustomercomment',
     method: 'get',
@@ -139,21 +139,21 @@ export const getCommentList = (current, size, customerId, params) => {
       ...params,
       current,
       size,
-      customerId
+      id
     }
   })
 }
 
 // 违规用户
-export const get_violation_list = (current, size, customerId, params) => {
+export const get_violation_user_list = (current, size, id, params) => {
   return request({
-    url: '/api/blade-customer/violation/get_violation_list',
+    url: '/api/blade-book/bookviolation/customer_list',
     method: 'get',
     params: {
       ...params,
       current,
       size,
-      customerId
+      id
     }
   })
 }
@@ -167,7 +167,7 @@ export const userUpdate = (row) => {
   })
 }
 
-// 屏蔽评论
+// 屏蔽评论----->违规
 export const update_comment = (row) => {
   return request({
     url: '/api/blade-customer/customer/update_comment',
@@ -176,6 +176,16 @@ export const update_comment = (row) => {
   })
 }
 
+// 删除违规-----》不违规
+export const bookviolation_remove = (ids) => {
+  return request({
+    url: '/api/blade-book/bookviolation/remove',
+    method: 'post',
+    params: {
+      ids,
+    }
+  })
+}
 // 解封
 export const removeban = (row) => {
   return request({

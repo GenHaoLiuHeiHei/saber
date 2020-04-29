@@ -109,7 +109,7 @@ export default {
       isSeach: false,
       isShow: false,
       seachForm: {},
-      isShowList: ['operationDetails', 'bookLike', 'bookComment', 'userViolation', 'dynamicLike', 'dynamicComment', 'dynamicViolation']
+      isShowList: ['operationDetails', 'bookLike', 'bookComment']
     };
   },
   created() {
@@ -146,11 +146,7 @@ export default {
         componentName = this.modalInfoType.split(splitType)[1];
         this.modalInfoTypeModel = this.tabsType.prop + componentName;
       }
-      if (this.isShowList.join(',').indexOf(this.modalInfoTypeModel) === -1) {
-        this.isShow = false
-      } else {
-        this.isShow = true
-      }
+      this.isShow = this.isShowList.includes(this.modalInfoTypeModel)
       this.seachForm = {
         startTime: "",
         endTime: ""

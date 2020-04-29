@@ -1,11 +1,60 @@
 <template>
-  <basic-container>
-    <avue-form ref="form" v-model="formData" :option="option" @submit="submitForm('form')"></avue-form>
-  </basic-container>
+  <div>
+    <el-form
+      :model="formData"
+      ref="formData"
+      :rules="formDataRules"
+      id="formData"
+      label-width="100px"
+    >
+      <el-row>
+        <el-col :span="16">
+          <el-form-item label="被举报次数" >
+            <el-input v-model="formData.informNum" :disabled="true" placeholder="请输入被举报次数"></el-input>
+          </el-form-item>
+        </el-col>
+        <el-col :span="16">
+          <el-form-item label="内容" >
+            <el-input v-model="formData.relateComment" type="textarea" :disabled="true" placeholder="请输入内容"></el-input>
+          </el-form-item>
+        </el-col>
+        <el-col :span="16">
+          <el-form-item label="违规">
+            <el-checkbox-group v-model="formData.violation">
+              <el-checkbox :label="item.dictKey" v-for="(item, index) in violationList" :checked="checked" :disabled="true" @change="checked=!checked" :key="index">{{item.dictValue}}</el-checkbox>
+            </el-checkbox-group>
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="16">
+          <el-form-item label="不友善">
+            <el-checkbox-group v-model="formData.unfriendly" >
+              <el-checkbox :label="item.dictKey" v-for="(item, index) in unfriendlytList" :checked="checked" :disabled="true" @change="checked=!checked" :key="index">{{item.dictValue}}</el-checkbox>
+            </el-checkbox-group>
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="16">
+          <el-form-item label="管理员密码" prop="password">
+            <el-input v-model="formData.password" placeholder="请输入管理员密码"></el-input>
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <div class="dialog-footer p-t text-center">
+        <el-button type="primary" @click="submitForm('formData')">确 定</el-button>
+      </div>
+    </el-form>
+  </div>
 </template>
 
 <script>
-  import {handle_report} from "@/api/report/report";
+import {book_handle_report, blog_handle_report} from "@/api/report/report";
+import {
+  getViolation,
+  getUnfriendly
+} from "@/api/book/library";
   export default {
     props:{
       formDatas: {
@@ -14,109 +63,81 @@
           return {}
         }
       },
+      tofrom: {
+        type: String,
+        default: 'user'
+      },
     },
     data() {
       return {
-         option: {
-          emptyBtn: false,
-          align:'center',
-          column: [
-            {
-              label: "举报人昵称",
-              span: 24,
-              labelWidth: 100,
-              prop: "customerNickName",
-              disabled: true
-            },
-            {
-              label: "举报人ID",
-              prop: "customerNumber",
-              span: 24,
-              labelWidth: 100,
-              disabled: true
-            },
-            {
-              label: "举报时间",
-              prop: "createTime",
-              span: 24,
-              labelWidth: 100,
-              disabled: true
-            },
-            {
-              label: "被举报人昵称",
-              prop: "informeeNickName",
-              span: 24,
-              labelWidth: 100,
-              disabled: true
-            },
-            {
-              label: "被举报人ID",
-              prop: "informeeNumber",
-              span: 24,
-              labelWidth: 100,
-              disabled: true
-            },
-            {
-              label: "内容",
-              prop: "content",
-              span: 24,
-              labelWidth: 100,
-              disabled: true
-            },
-            {
-              label: "管理员密码",
-              prop: "password",
-              rules: [{
-                required: true,
-                message: "请输入管理员密码",
-                trigger: "blur"
-              }],
-              span: 24,
-              labelWidth: 100
-            },
-          ]
-        },
+        checked: false,
         formData: {},
         formDataRules: {
           password: [
             { required: true, message: '请输入管理员密码', trigger: 'blur' },
           ],
-        }
+        },
+        violationList: [],
+        unfriendlytList: []
+
       };
     },
-
+    computed: {
+      getUpdateAjax() {
+        return this.tofrom === 'book' ? book_handle_report : blog_handle_report
+      }
+    },
     created () {
-      this.formData = this.formDatas;
+      let this_ = this;
+      this_.formData = this.formDatas;
+      getViolation().then(res => {
+        this_.violationList = res.data.data;
+      }).then(() => {
+         return getUnfriendly()
+      }).then(res => {
+        this_.unfriendlytList = res.data.data;
+        if (this_.formData.reasons.length) {
+          JSON.parse(this_.formData.reasons).map(v => {
+            v.dictKey = v.dictKey.map(Number)
+            this_.formData[v.code] = v.dictKey;
+          })
+        }
+
+      });
     },
 
     methods: {
-     
       // 关闭模态框
-      closeDialogAddgsVisible () {
-        this.$emit('closeDialogAddgsVisible', true)
+      closeDialogAddgsVisible() {
+        this.$emit("closeDialogAddgsVisible", true);
       },
 
-      submitForm(formName) {
-            this.formData.status = 1;
-            console.log(this.formData)
-            this.$refs[formName].validate((valid) => {
-                if (valid) {
-                  handle_report(this.formData).then(() => {
-                    this.$message({
-                      type: "success",
-                      message: "操作成功!"
-                    });
-                    this.closeDialogAddgsVisible();
-                    // this.$parent.onLoad(this.$parent.page);
-                  }, error => {
-                    console.log(error);
-                  });
-                } else {
-                console.log('error submit!!');
-                return false;
-                }
-            });
-        },
+      submitForm (formName) {
+        let this_ = this;
+        this_.formData.status = 3;
+        this_.$refs[formName].validate(valid => {
+          if (valid) {
+          this.getUpdateAjax(this_.formData).then(res => {
+              if (res.data.code === 200) {
+                this_.$message({
+                  type: "success",
+                  message: "操作成功!"
+                });
+                this_.$message({
+                  message: res.data.msg,
+                  type: 'success',
+                  onClose () {
+                    this_.closeDialogAddgsVisible();
+                    // this_.onLoad(this_.page);
+                  }
+                });
+              }
+            })
+          } else {
+            return false;
+          }
+        });
+      },
     }
 
   };

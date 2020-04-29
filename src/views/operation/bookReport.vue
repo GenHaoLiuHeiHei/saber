@@ -16,9 +16,9 @@
   </basic-container>
 </template>
 <script>
-import processed from './components/report/processed';
-import unprocessed from './components/report/unprocessed';
-import automaticProcessing from './components/report/automaticProcessing';
+import processed from './components/bookReport/processed';
+import unprocessed from './components/bookReport/unprocessed';
+import automaticProcessing from './components/bookReport/automaticProcessing';
 export default {
   components: {
       processed,

@@ -35,7 +35,7 @@
         :modalInfoType="modalInfoType" 
         v-if="isShowDialog" 
         :formDatas="formDatas" 
-        tofrom="book" 
+        tofrom="user" 
         :optionTabs="optionTabs"
         :isOptionTab="isOptionTab"
         :isShowSeach="isShowSeach"
@@ -46,7 +46,7 @@
 </template>
 
 <script>
-  import {outstanding_report} from "@/api/report/report";
+  import {dynamic_report} from "@/api/report/report";
   import {mapGetters} from "vuex";
   import {modalMixin} from "@/mixins/modalMixin";
   import infoModal from "@/components/infoModal/index";
@@ -73,10 +73,11 @@
           column: [
             {
               label: "举报人昵称",
-              prop: "customerNickName",
+              prop: "customerName",
               disabled: true,
               span: 24,
-              labelWidth: 120
+              labelWidth: 120,
+              search: true
             },
             {
               label: "举报人ID",
@@ -94,28 +95,28 @@
             },
             {
               label: "被举报人昵称",
-              prop: "informeeNickName",
+              prop: "beCustomerName",
               disabled: true,
               span: 24,
               labelWidth: 120
             },
             {
               label: "被举报人ID",
-              prop: "informeeNumber",
+              prop: "beCustomerNumber",
               disabled: true,
               span: 24,
               labelWidth: 120
             },
             {
               label: "内容",
-              prop: "content",
+              prop: "relateComment",
               disabled: true,
               span: 24,
               labelWidth: 120
             },
              {
               label: "此条内容被举报次数",
-              prop: "numberOfReports",
+              prop: "informNum",
               disabled: true,
               span: 24,
               labelWidth: 120
@@ -136,7 +137,6 @@
           viewBtn: false,
           delBtn: false,
           editBtn: false,
-          
         };
       },
       ids() {
@@ -172,7 +172,9 @@
       },
       onLoad(page, params = {}) {
         this.loading = true;
-        outstanding_report(page.currentPage, page.pageSize, Object.assign(params, this.query)).then(res => {
+        params.status = 1;
+        params.type = 1;
+        dynamic_report(page.currentPage, page.pageSize, Object.assign(params, this.query)).then(res => {
           const data = res.data.data;
           this.page.total = data.total;
           this.data = data.records;

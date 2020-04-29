@@ -1,5 +1,5 @@
 <template>
-  <basic-container id="chapterList">
+  <div id="chapterList">
     <avue-crud 
         ref="crud"
         :option="option"
@@ -26,7 +26,7 @@
           <avue-ueditor v-model="scope.row.chapterContent" :upload="upload" :pasteplain='true'></avue-ueditor>
         </template>
     </avue-crud>
-  </basic-container>
+  </div>
 </template>
 
 <script>

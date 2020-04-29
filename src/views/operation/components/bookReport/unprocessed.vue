@@ -73,7 +73,7 @@
           column: [
             {
               label: "举报人昵称",
-              prop: "customerNickName",
+              prop: "customerName",
               disabled: true,
               span: 24,
               labelWidth: 120
@@ -94,28 +94,28 @@
             },
             {
               label: "被举报人昵称",
-              prop: "informeeNickName",
+              prop: "beCustomerName",
               disabled: true,
               span: 24,
               labelWidth: 120
             },
             {
               label: "被举报人ID",
-              prop: "informeeNumber",
+              prop: "beCustomerNumber",
               disabled: true,
               span: 24,
               labelWidth: 120
             },
             {
               label: "内容",
-              prop: "content",
+              prop: "relateComment",
               disabled: true,
               span: 24,
               labelWidth: 120
             },
              {
               label: "此条内容被举报次数",
-              prop: "numberOfReports",
+              prop: "informNum",
               disabled: true,
               span: 24,
               labelWidth: 120
@@ -172,6 +172,7 @@
       },
       onLoad(page, params = {}) {
         this.loading = true;
+        params.status = 1;
         outstanding_report(page.currentPage, page.pageSize, Object.assign(params, this.query)).then(res => {
           const data = res.data.data;
           this.page.total = data.total;

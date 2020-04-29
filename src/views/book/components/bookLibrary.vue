@@ -41,15 +41,9 @@
           @click="showModalInfo(scope.row, 'bookComment', true)"
         >{{scope.row.bookCommentSum}}</div>
       </template>
-      <!-- <template slot="bookBrowse" slot-scope="scope">
-        <div class="isColorShow">{{scope.row.bookBrowse}}</div>
-      </template>
-      <template slot="bookChapterSum" slot-scope="scope">
-        <div class="isColorShow">{{scope.row.bookChapterSum}}</div>
-      </template> -->
       <template slot="violationSum" slot-scope="scope">
         <!-- 违规 -->
-        <div class="isColorShow" style="color:red !important" @click="showModalInfo(scope.row, 'userViolation')">{{scope.row.violationSum}}</div>
+        <div class="isColorShow" style="color:red !important" @click="showModalInfo(scope.row, 'bookViolation')">{{scope.row.violationSum}}</div>
       </template>
       <template slot-scope="scope" slot="menu">
         <el-button

@@ -1,5 +1,5 @@
 <template>
-  <basic-container id="bookHoard">
+  <div id="bookHoard">
     <avue-crud
       ref="crud"
       :option="option"
@@ -12,7 +12,7 @@
       @selection-change="selectionChange"
       @on-load="onLoad"
     ></avue-crud>
-  </basic-container>
+  </div>
 </template>
 <script>
 // 分享

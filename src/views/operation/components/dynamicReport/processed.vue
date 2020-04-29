@@ -13,12 +13,16 @@
                @current-change="currentChange"
                @size-change="sizeChange"
                @on-load="onLoad">
+      <template slot-scope="scope" slot="status">
+        <div v-if="scope.row.status === 2" class="color-blue">不违规</div>
+        <div v-else-if="scope.row.status === 3" class="color-red">blogLike</div>
+      </template>
     </avue-crud>
   </basic-container>
 </template>
 
 <script>
-  import {report_processed} from "@/api/report/report";
+  import {dynamic_report} from "@/api/report/report";
   import {mapGetters} from "vuex";
   export default {
     data() {
@@ -43,21 +47,23 @@
           column: [
             {
               label: "用户昵称",
-              prop: "informeeNickName",
+              prop: "beCustomerName",
               disabled: true,
               span: 24,
-              labelWidth: 120
+              labelWidth: 120,
+              search: true
+
             },
             {
               label: "用户ID",
-              prop: "informeeNumber",
+              prop: "beCustomerNumber",
               disabled: true,
               span: 24,
               labelWidth: 120
             },
             {
               label: "内容",
-              prop: "content",
+              prop: "relateComment",
               disabled: true,
               span: 24,
               labelWidth: 120
@@ -71,7 +77,8 @@
             },
             {
               label: "状态",
-              prop: "handleTime",
+              prop: "status",
+              slot: true,
               disabled: true,
               span: 24,
               labelWidth: 120
@@ -130,7 +137,9 @@
       },
       onLoad(page, params = {}) {
         this.loading = true;
-        report_processed(page.currentPage, page.pageSize, Object.assign(params, this.query)).then(res => {
+        params.status = 2;
+        params.type = 1;
+        dynamic_report(page.currentPage, page.pageSize, Object.assign(params, this.query)).then(res => {
           const data = res.data.data;
           this.page.total = data.total;
           this.data = data.records;

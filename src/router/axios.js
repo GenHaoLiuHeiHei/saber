@@ -18,7 +18,6 @@ import 'nprogress/nprogress.css' // progress bar style
 import {Base64} from 'js-base64';
 axios.defaults.timeout = 10000;
 axios.defaults.baseURL = baseUrl;
-// console.log(axios.defaults)
 //返回其他状态吗
 axios.defaults.validateStatus = function (status) {
   return status >= 200 && status <= 500; // 默认的

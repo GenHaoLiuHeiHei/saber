@@ -1,5 +1,5 @@
 <template>
-  <basic-container class="p-t0">
+  <div class="p-t0">
     <div class="infinite-list-wrapper" id="bookLike">
       <ul
         class="list"
@@ -25,7 +25,7 @@
         </div>
       </div>
     </div>
-  </basic-container>
+  </div>
 </template>
 <script>
 // 收藏

@@ -1,5 +1,5 @@
 <template>
-  <basic-container id="quartzjobLog">
+  <div id="quartzjobLog">
     <avue-crud
       ref="crud"
       :option="option"
@@ -14,7 +14,7 @@
       @size-change="sizeChange"
       @on-load="onLoad"
     ></avue-crud>
-  </basic-container>
+  </div>
 </template>
 
 <script>

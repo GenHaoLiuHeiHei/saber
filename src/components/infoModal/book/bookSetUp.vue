@@ -1,5 +1,5 @@
 <template>
-  <basic-container>
+  <div>
     <el-form
       :model="formData"
       :rules="formDataRules"
@@ -67,7 +67,7 @@
         <el-button type="primary" @click="submitForm('formData')">确 定</el-button>
       </div>
     </el-form>
-  </basic-container>
+  </div>
 </template>
 
 <script>
