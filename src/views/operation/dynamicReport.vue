@@ -4,9 +4,6 @@
     <div v-if="tabsType.prop === 'processed'">
       <processed></processed>
     </div>
-    <div v-if="tabsType.prop === 'automaticProcessing'">
-      <automaticProcessing></automaticProcessing>
-    </div>
     <div v-if="tabsType.prop === 'unprocessed'">
       <unprocessed></unprocessed>
     </div>
@@ -18,12 +15,10 @@
 <script>
 import processed from './components/dynamicReport/processed';
 import unprocessed from './components/dynamicReport/unprocessed';
-import automaticProcessing from './components/dynamicReport/automaticProcessing';
 export default {
   components: {
       processed,
-      unprocessed,
-      automaticProcessing
+      unprocessed
   },
   data () {
     return {
@@ -36,10 +31,6 @@ export default {
         },{
           label: '已处理',
           prop: 'processed',
-        },
-        {
-          label: '自动处罚',
-          prop: 'automaticProcessing',
         }
         ]
       }
