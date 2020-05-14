@@ -1,16 +1,16 @@
 <template>
-  <div class="p-t0" id="blogImgList">
-   <video class="w100" height="400" controls :poster="formDatas.blogVideoImage">
-      <source :src="formDatas.blogVideoUrl" type="video/mp4">
-      <source :src="formDatas.blogVideoUrl" type="video/ogg">
-      您的浏览器不支持 video 标签。
-    </video>
+  <div class="p-t0" id="blogAllImgList">
+    <el-row>
+      <el-col :span="4" v-for="(item, index) in pictrueList" :key="index" class="m-r10 bookArticleImg" style="max-height: 80px;overflow: hidden;">
+        <img class="w100" @click="showBigImg(index)" :src="item.url" alt="" >
+      </el-col>
+    </el-row>
   </div>
 </template>
 <script>
 // 收藏
 export default {
-  name: "blogImgList",
+  name: "blogAllImgList",
   props: {
     formDatas: {
       type: Object,
@@ -58,7 +58,7 @@ export default {
 };
 </script>
 <style scoped>
-#blogImgList {
+#blogAllImgList {
   max-height: 500px;
   overflow: auto;
 }

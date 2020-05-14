@@ -21,7 +21,7 @@ import {
   getUnfriendly
 } from "@/api/book/library";
 export default {
-  name: "blogReport",
+  name: "blogAllReport",
   props: {
     formDatas: {
       type: Object,

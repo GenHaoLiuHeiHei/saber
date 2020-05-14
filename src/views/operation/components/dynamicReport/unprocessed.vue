@@ -13,6 +13,11 @@
                @current-change="currentChange"
                @size-change="sizeChange"
                @on-load="onLoad">
+      <template slot="relateComment" slot-scope="scope">
+        <!-- 内容 -->
+        <div v-if="scope.row.contentType !== 3">{{scope.row.relateComment}}</div>
+        <div v-else>{{scope.row.blogTitle}}</div>
+      </template>
       <template slot-scope="scope" slot="menu">
         <el-button
           type="button"
@@ -110,6 +115,7 @@
             {
               label: "内容",
               prop: "relateComment",
+              slot: true,
               disabled: true,
               span: 24,
               labelWidth: 120

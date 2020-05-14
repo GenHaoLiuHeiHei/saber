@@ -27,7 +27,8 @@ module.exports = {
     inline: false,  
     proxy: {
       '/api': {
-        target: 'http://192.168.1.99:80',
+        /* 正式 http://39.102.64.71:8090*/
+        target: 'http://192.168.1.99:8090',
         changeOrigin: true,
         ws: true,
         pathRewrite: {

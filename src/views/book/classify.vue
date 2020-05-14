@@ -25,7 +25,21 @@
         </el-button>
       </template>
       <template slot-scope="scope" slot="menu">
-        <el-button type="button" size="small" class="el-button--text" v-if="scope.row.classifyState === 1">默 认</el-button>
+         <el-button
+          type="button"
+          size="small"
+          class="el-button--text color-red"
+          icon="el-icon-edit"
+          v-if="scope.row.classifyState === 2"
+          @click="changeUpdate(scope.row, 1)"
+        >设为默认</el-button>
+        <el-button
+          type="button"
+          size="small"
+          class="el-button--text"
+          icon="el-icon-edit"
+          v-if="scope.row.classifyState === 1"
+        >默 认</el-button>
         <el-button type="button" size="small" class="el-button--text" v-else icon="el-icon-delete" @click="rowDel(scope.row)">删 除</el-button>
       </template>
     </avue-crud>
@@ -170,6 +184,25 @@
           done();
           console.log(error);
         });
+      },
+       changeUpdate(row, status) {
+        let msg = '确定将选择数据设为默认'
+        this.$confirm(msg, {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        })
+          .then(() => {
+            row.classifyState = status;
+            return update(row)
+          })
+          .then(() => {
+            this.onLoad(this.page);
+            this.$message({
+              type: "success",
+              message: "操作成功!"
+            });
+          });
       },
       rowDel(row) {
         this.$confirm("确定将选择数据删除?", {

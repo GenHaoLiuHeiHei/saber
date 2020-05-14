@@ -13,45 +13,20 @@
                @current-change="currentChange"
                @size-change="sizeChange"
                @on-load="onLoad">
-      <template slot-scope="scope" slot="menu">
-        <el-button
-          type="button"
-          size="small"
-          class="el-button--text"
-          icon="el-icon-edit"
-          @click="showModalInfo(scope.row, 'operationFeedbackReply')"
-        >回复</el-button>
-        <el-button
-          type="button"
-          size="small"
-          class="el-button--text"
-          icon="el-icon-edit"
-          @click="showModalInfo(scope.row, 'operationHaveRead')"
-        >标为已读</el-button>
-      </template>
     </avue-crud>
-    <el-dialog :title="title" :visible.sync="isShowDialog" :modal="false" :close-on-click-modal="false" @close="closeDialogAddgsVisible">
-       <infoModal 
-        :modalInfoType="modalInfoType" 
-        v-if="isShowDialog" 
-        :formDatas="formDatas" 
-        tofrom="book" 
-        :optionTabs="optionTabs"
-        :isOptionTab="isOptionTab"
-        :isShowSeach="isShowSeach"
-        @closeDialogAddgsVisible="closeDialogAddgsVisible">
-        </infoModal>
-    </el-dialog>
   </basic-container>
 </template>
 
 <script>
-  import {getList} from "@/api/report/feedback";
+  import { getBookList } from "@/api/customer/blog";
   import {mapGetters} from "vuex";
-  import {modalMixin} from "@/mixins/modalMixin";
-  import infoModal from "@/components/infoModal/index";
   export default {
-    mixins: [modalMixin],
+    props: {
+      formDatas: {
+        type: Object,
+        required: true
+      },
+    },
     data() {
       return {
         form: {},
@@ -64,42 +39,88 @@
         },
         selectionList: [],
         option: {
-         align: "center",
           tip: false,
           border: true,
           index: false,
-          viewBtn: true,
+          viewBtn: false,
           selection: false,
+          menu: false,
+          align: 'center',
           column: [
             {
-              label: "反馈人昵称",
-              prop: "feedbackUserName",
+              label: "书籍编号",
+              prop: "bookNoId",
+              addDisplay: false,
+              editDisplay: false
             },
             {
-              label: "反馈人ID",
-              prop: "feedbackCustomerNumber",
+              label: "书籍名称",
+              search: true,
+              prop: "bookName",
+              rules: [
+                {
+                  required: true,
+                  message: "请输入",
+                  trigger: "blur"
+                }
+              ]
             },
             {
-              label: "反馈时间",
+              label: "作者名称",
+              prop: "authorName",
+              search: true,
+              rules: [
+                {
+                  required: true,
+                  message: "请输入",
+                  trigger: "blur"
+                }
+              ]
+            },
+            {
+              label: "作者ID",
+              prop: "authorId",
+              search: true,
+              span: 24,
+              placeholder: "非博主用户可不填"
+            },
+            {
+              label: "首次上传",
               prop: "createTime",
-              // renderHeader: (h, { column, $index }) => {
-              //   return h('div',[
-              //     h('span', column.label),
-              //     h('div ', '排序'),
-              //   ])
-              // },
+              addDisplay: false,
+              editDisplay: false
             },
             {
-              label: "内容",
-              prop: "feedbackContent",
-            }
+              label: "更新时间",
+              prop: "updateTime",
+              addDisplay: false,
+              editDisplay: false
+            },
+             {
+              label: "字数",
+              prop: "bookWord",
+              addDisplay: false,
+              editDisplay: false
+            },
+            {
+              label: "书籍简介",
+              hide: true,
+              prop: "bookIntro",
+              span: 24,
+              type: "textarea",
+              maxlength: 500,
+              rules: [
+                {
+                  required: true,
+                  message: "请输入",
+                  trigger: "blur"
+                }
+              ]
+            },
           ]
         },
         data: []
       };
-    },
-    components: {
-      infoModal
     },
     computed: {
       ...mapGetters(["permission"]),
@@ -108,8 +129,7 @@
           addBtn: false,
           viewBtn: false,
           delBtn: false,
-          editBtn: false,
-          
+          editBtn: false
         };
       },
       ids() {
@@ -121,7 +141,6 @@
       }
     },
     methods: {
-   
       searchReset() {
         this.query = {};
         this.onLoad(this.page);
@@ -145,8 +164,7 @@
       },
       onLoad(page, params = {}) {
         this.loading = true;
-        params.status = 0;
-        getList(page.currentPage, page.pageSize, Object.assign(params, this.query)).then(res => {
+        getBookList(page.currentPage, page.pageSize, this.formDatas.customerNumber, Object.assign(params, this.query)).then(res => {
           const data = res.data.data;
           this.page.total = data.total;
           this.data = data.records;

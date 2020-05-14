@@ -14,6 +14,11 @@
       @current-change="currentChange"
       @size-change="sizeChange"
       @on-load="onLoad">
+      <!-- <template slot="search">
+        <el-form-item label="用户昵称">
+          <el-input placeholder="用户昵称" size="small" v-model="query.customerNickname" @focus="handelChangeUserSearch('customerNickname')"/>
+        </el-form-item>
+      </template> -->
       <template slot="blogArticleSum" slot-scope="scope">
         <!-- 博文 -->
         <div class="isColorShow" @click="showModalInfo(scope.row, 'bookArticle')">{{scope.row.blogArticleSum}}</div>
@@ -37,6 +42,39 @@
       <template slot="violationSum" slot-scope="scope">
         <!-- 违规 -->
         <div class="isColorShow" style="color:red !important" @click="showModalInfo(scope.row, 'bookViolation', true, true)">{{scope.row.violationSum}}</div>
+      </template>
+      <template slot="pictureSum" slot-scope="scope">
+        <!-- 图片 -->
+        <div
+          class="isColorShow"
+          @click="showModalInfo(scope.row, 'blogImgList')"
+          v-if="scope.row.pictureSum > 0"
+        >{{scope.row.pictureSum}}</div>
+         <div
+          v-else
+        >暂无</div>
+      </template>
+      <template slot="videoSum" slot-scope="scope">
+        <!-- 视频 -->
+        <div
+          class="isColorShow"
+          @click="showModalInfo(scope.row, 'blogVideoList')"
+          v-if="scope.row.videoSum > 0"
+        >{{scope.row.videoSum}}</div>
+         <div
+          v-else
+        >暂无</div>
+      </template>
+       <template slot="bookSum" slot-scope="scope">
+        <!-- 书籍 -->
+        <div
+          class="isColorShow"
+          @click="showModalInfo(scope.row, 'blogBookList')"
+          v-if="scope.row.bookSum > 0"
+        >{{scope.row.bookSum}}</div>
+         <div
+          v-else
+        >暂无</div>
       </template>
       <template slot="realGold" slot-scope="scope">
         <!-- 余额 -->
@@ -88,7 +126,7 @@
                     size="mini"
                     type="datetime"
                     placeholder="选择开始时间"
-                    value-format="yyyy-MM-dd hh:mm:ss"
+                    value-format="yyyy-MM-dd HH:mm:ss"
                     v-model="seachForms.startTime"
                   ></el-date-picker>
               </el-form-item>
@@ -97,7 +135,7 @@
                     size="mini"
                     type="datetime"
                     placeholder="选择结束时间"
-                    value-format="yyyy-MM-dd hh:mm:ss"
+                    value-format="yyyy-MM-dd HH:mm:ss"
                     v-model="seachForms.endTime"
                   ></el-date-picker>
               </el-form-item>
@@ -110,6 +148,9 @@
           </template>
         </infoModal>
     </el-dialog>
+    <el-dialog title="选择" :visible.sync="isShowUserSelectSearch" @close="closeDialogSearch">
+      <userSearch :formDataName='userSelectSearchData' @closeDialogSearch="closeDialogSearch"></userSearch>
+    </el-dialog>
   </basic-container>
 </template>
 <script>
@@ -117,11 +158,13 @@
   import {mapGetters} from "vuex";
   import {modalMixin} from "@/mixins/modalMixin";
   import infoModal from '@/components/infoModal/index';
+  import userSearch from '@/components/infoModal/userSearch';
   import {getBlogSort} from "@/api/book/library";
   export default {
     mixins: [modalMixin],
     components: {
-      infoModal
+      infoModal,
+      userSearch
     },
     data() {
       return {
@@ -144,11 +187,6 @@
           delBtn: false,
           align:'center',
           column: [
-            {
-              label: "",
-              prop: "id",
-              hide: true
-            },
             {
               label: "ID",
               prop: "customerNumber",
@@ -181,15 +219,17 @@
             {
               label: "图片",
               prop: "pictureSum",
-              type: 'img'
+              slot: true
             },
             {
               label: "视频",
-              prop: "videoSum"
+              prop: "videoSum",
+              slot: true
             },
             {
               label: "书籍",
-              prop: "bookSum"
+              prop: "bookSum",
+              slot: true
             },
             {
               label: "收藏",
@@ -238,7 +278,7 @@
             },
             {
               label: "动态",
-              prop: "dynamic"
+              prop: "blog"
             }
           ]
         },
@@ -265,7 +305,7 @@
         };
       },
       blogSum () {
-        return "共条" + this.formDatas.bookHoardSum + "博文"
+        return "共" + this.formDatas.blogArticleSum + "条博文"
       }
     },
     created () {
@@ -287,8 +327,7 @@
 
       // 表单input搜索
       searchChange(params) {
-        this.query = params;
-        console.log(this.query)
+        this.query = {...this.query, ...params};
         this.onLoad(this.page, params);
       },
 

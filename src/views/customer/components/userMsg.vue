@@ -164,7 +164,7 @@
             },
             {
               label: "动态",
-              prop: "dynamic"
+              prop: "blog"
             }
           ]
         },

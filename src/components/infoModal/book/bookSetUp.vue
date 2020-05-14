@@ -185,7 +185,15 @@ export default {
               if (res) {
                 console.log(res);
                 if (res.data.msg === '1') {
-                  this_.confirmClick(res.data.data)
+                  this_.confirmClick(res.data.data);
+                  return
+                }
+                if (res.data.code === 200) {
+                  this.$message({
+                    type: "success",
+                    message: "操作成功!"
+                  });
+                  this.closeDialogAddgsVisible();
                 }
               }
             });

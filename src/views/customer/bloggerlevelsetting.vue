@@ -5,6 +5,7 @@
                :data="data"
                :page="page"
                :permission="permissionList"
+               :before-open="beforeOpen"
                v-model="form"
                ref="crud"
                @row-update="rowUpdate"
@@ -16,26 +17,24 @@
                @current-change="currentChange"
                @size-change="sizeChange"
                @on-load="onLoad">
-      <template slot="exchangeRate" slot-scope="scope">
-        {{scope.row.exchangeRate}} %
+      <template slot="menuLeft">
+        <el-button type="danger"
+                   size="small"
+                   icon="el-icon-delete"
+                   plain
+                   @click="handleDelete">删 除
+        </el-button>
       </template>
     </avue-crud>
   </basic-container>
 </template>
 
 <script>
-  import {getList, add, update, remove} from "@/api/customer/exchangerate";
+  import {getList, getDetail, add, update, remove} from "@/api/customer/bloggerlevelsetting";
   import {mapGetters} from "vuex";
 
   export default {
     data() {
-      var validatePass = (rule, value, callback) => {
-        if (value <= 0 || value > 100) {
-          callback(new Error('请输入0-100的数字'));
-        } else {
-          callback();
-        }
-      };
       return {
         form: {},
         query: {},
@@ -50,45 +49,46 @@
           tip: false,
           border: true,
           index: false,
-          viewBtn: true,
-          selection: false,
-          addBtn: false,
+          viewBtn: false,
+          selection: true,
           align: 'center',
           column: [
+            // {
+            //   label: "等级",
+            //   prop: "levelIndex",
+            //   type: 'select',
+            //   dicUrl: "/api/blade-system/dict/dictionary?code=BloggerLevelSetting",
+            //   props: {
+            //     label: "dictValue",
+            //     value: "dictKey"
+            //   },
+            //   rules: [{
+            //     required: true,
+            //     message: "请选择等级",
+            //     trigger: "blur"
+            //   }],
+            //   span: 24,
+            //   labelWidth:120
+            // },
             {
-              label: "汇率",
-              prop: "exchangeRate",
-              rules: [
-                {
-                  required: true,
-                  message: "请输入汇率",
-                  trigger: "blur"
-                },
-                { 
-                  required: true,
-                  validator: validatePass, 
-                  trigger: 'blur' 
-                }
-              ],
+              label: "等级",
+              prop: "levelIndex",
               type: 'number',
-              maxlength: 3,
-              span: 24,
-              labelWidth:120,
-              slot: true
-            },
-            {
-              label: "类型",
-              prop: "type",
-              type: 'select',
-              dicUrl: "/api/blade-system/dict/dictionary?code=exchangeRate",
-              disabled: true,
-              props: {
-                label: "dictValue",
-                value: "dictKey"
-              },
               rules: [{
                 required: true,
-                message: "请选择类型",
+                message: "请输入等级",
+                trigger: "blur"
+              }],
+              span: 24,
+              labelWidth:120
+            },
+            {
+              label: "等级所需经验",
+              prop: "levelExperience",
+              type: 'number',
+              rules: [{
+                required: true,
+                message: "请输入等级所需经验",
                 trigger: "blur"
               }],
               span: 24,
@@ -105,7 +105,7 @@
               }],
               span: 24,
               labelWidth:120
-            },
+            }
           ]
         },
         data: []
@@ -115,10 +115,9 @@
       ...mapGetters(["permission"]),
       permissionList() {
         return {
-          addBtn: this.vaildData(this.permission.exchangerate_add, false),
-          viewBtn: this.vaildData(this.permission.exchangerate_view, false),
-          delBtn: this.vaildData(this.permission.exchangerate_delete, false),
-          // editBtn: this.vaildData(this.permission.exchangerate_edit, false)
+          addBtn: true,
+          viewBtn: true,
+          delBtn: true,
           editBtn: true
         };
       },
@@ -196,7 +195,14 @@
             this.$refs.crud.toggleSelection();
           });
       },
-
+      beforeOpen(done, type) {
+        if (["edit", "view"].includes(type)) {
+          getDetail(this.form.id).then(res => {
+            this.form = res.data.data;
+          });
+        }
+        done();
+      },
       searchReset() {
         this.query = {};
         this.onLoad(this.page);

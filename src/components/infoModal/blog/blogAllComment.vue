@@ -1,6 +1,6 @@
 <template>
   <div class="p-t0" id="bookComment">
-    <div class="infinite-list-wrapper bookComment">
+    <div class="infinite-list-wrapper" calss="bookComment">
       <ul
         class="list"
         v-infinite-scroll="load"
@@ -15,11 +15,11 @@
             @click="commentManagement(item)"
             style="right:0;top:10px;"
           >管理</el-button>
-          <div class="font-18 color-B05E07">{{item.customerNickName}}（ID: {{item.customerNumber}}）</div>
+          <div class="font-18 color-B05E07" v-if="item.contentType === 2">{{item.customerNickName}}（ID: {{item.customerNumber}}）评论了你</div>
+          <div class="font-18 color-blue" v-else>{{item.customerNickName}}（ID: {{item.customerNumber}}）回复了你</div>
           <div class="p-tb05">评论的内容</div>
-          <div class="p-tb05 p-tb05 p-lr10 bg-e1">{{item.comment}}</div>
+          <div class="p-tb05 p-tb05 p-lr10 bg-e1">{{item.content}}</div>
           <div class="flex" style="justify-content: space-between;align-items: flex-end;">
-            <div class="p-tb05">&lt;&lt;{{item.bookName || formDatas.bookName}}&gt;&gt;</div>
             <div class="font-16 p-tb05">{{item.createTime}}</div>
           </div>
         </li>
@@ -82,9 +82,8 @@
   </div>
 </template>
 <script>
-// 评论
-import { getBookCommentList, update_comment } from "@/api/customer/customer";
-import { get_book_comment } from "@/api/book/library";
+// 博文评论
+import { getCommentList, update_blogLost_comment } from "@/api/customer/blog";
 import {
   getViolation,
   getUnfriendly
@@ -157,8 +156,15 @@ export default {
       return this.loading || this.noMore;
     },
     getAjaxData () {
-      console.log(this.tofrom)
-      return this.tofrom === 'book' ? get_book_comment : getBookCommentList /* 判断是用户列表进入还是书库列表进入*/
+      /*
+      article  用户信息中的博文管理获取单条博文点赞数量 ---取的是博文ID
+      blog     博文管理获取单条博文点赞数量 ---取的是博文ID
+      user     用户信息获取用户的博文点赞数量 ---取的是用户ID
+      */
+      return getCommentList
+    },
+    updateAjax () {
+      return update_blogLost_comment
     }
   },
   created () {
@@ -190,8 +196,14 @@ export default {
     submitForm (formName) {
       let obj = {}, this_ = this;
       obj.status = 2;
-      obj.authorId = this_.listItem.customerId;
-      obj.commentId = this_.listItem.id;
+      if (this_.listItem.id) {
+        obj.id = this_.listItem.id;
+        obj.contentType = this_.listItem.contentType;
+      } else {
+        obj.id = this_.formDatas.id;
+        obj.contentType = this_.formDatas.contentType;
+      }
+      
       obj.violation = this_.commentFormData.violation.join(',');
       obj.unfriendly = this_.commentFormData.unfriendly.join(',');
       obj.password = this_.commentFormData.password;
@@ -201,7 +213,7 @@ export default {
       }
       this_.$refs[formName].validate(valid => {
         if (valid) {
-         update_comment(obj).then(res => {
+         this_.updateAjax(obj).then(res => {
             if (res.data.code === 200) {
               this_.$message({
                 type: "success",
@@ -227,10 +239,7 @@ export default {
       let this_ = this;
       if (this_.loading) return;
       this_.loading = true;
-      // 书籍评论
-      // if (this_.getAjaxData === get_book_comment) {
-      // }
-      params.status = 1;
+      // params.relateType = 2;
       this_.getAjaxData(
         page.currentPage,
         page.pageSize,

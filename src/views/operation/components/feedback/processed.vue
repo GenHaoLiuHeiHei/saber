@@ -51,7 +51,7 @@
             },
             {
               label: "反馈人ID",
-              prop: "feedbackUserId",
+              prop: "feedbackCustomerNumber",
             },
             {
               label: "反馈时间",

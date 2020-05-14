@@ -250,13 +250,17 @@ export default {
         }
       })
 
-      let formData = {};
+      let formData = {},this_ = this;
       formData.pictureType = 2;
       formData.listAdvertisement = arr; 
       console.log(formData);
       add(formData).then(res => {
         if (res) {
           console.log(res);
+          this_.$message({
+            type: "success",
+            message: "操作成功!"
+          });
         }
       });
     }

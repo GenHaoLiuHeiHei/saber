@@ -27,8 +27,7 @@
 </template>
 <script>
 // 博文点赞
-import { getBlogLikeList } from "@/api/customer/customer";
-import { getLikeList } from "@/api/customer/blog";
+import { getUserLikeList } from "@/api/customer/customer";
 export default {
   name: "blogLike",
   props: {
@@ -61,9 +60,6 @@ export default {
           Object.assign(this.query, this.seachForm);
           this.onLoad(this.page);
         }
-        // else {
-        //   this.query = {};
-        // }
         this.$emit("changeIsSeach", false);
       }
     }
@@ -86,8 +82,12 @@ export default {
       return this.loading || this.noMore;
     },
     getAjaxData () {
-      return this.tofrom === 'article' ? getLikeList : getBlogLikeList /* 判断是用户列表进入还是书库列表进入*/
-    }
+      /*
+      从用户信息列表点赞---动态进入  需要用户ID
+      */
+      return getUserLikeList
+
+    },
   },
   methods: {
     load() {

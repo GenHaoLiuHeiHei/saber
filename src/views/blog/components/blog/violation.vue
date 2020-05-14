@@ -22,7 +22,10 @@
     >
      <template slot="blogContent" slot-scope="scope">
         <!-- 内容 -->
-        <avue-text-ellipsis :text="scope.row.blogContent" use-tooltip placement="top" :height="30">
+        <avue-text-ellipsis :text="scope.row.blogContent" use-tooltip placement="top" v-if="scope.row.contentType !== 3" :height="30">
+          <small slot="more">...</small>
+        </avue-text-ellipsis>
+         <avue-text-ellipsis :text="scope.row.blogTitle" use-tooltip placement="top" v-else :height="30">
           <small slot="more">...</small>
         </avue-text-ellipsis>
       </template>
@@ -30,32 +33,32 @@
         <!-- 赞 -->
         <div
           class="isColorShow"
-          @click="showModalInfo(scope.row, 'blogLike')"
+          @click="showModalInfo(scope.row, 'blogAllLike')"
         >{{scope.row.blogPraiseSum}}</div>
       </template>
       <template slot="blogCommentSum" slot-scope="scope">
         <!-- 评论 -->
         <div
           class="isColorShow"
-          @click="showModalInfo(scope.row, 'blogComment', true)"
+          @click="showModalInfo(scope.row, 'blogAllComment', true)"
         >{{scope.row.blogCommentSum}}</div>
       </template>
       <template slot="informNum" slot-scope="scope">
         <!-- 举报 -->
         <div
           class="isColorShow color-red"
-          @click="showModalInfo(scope.row, 'blogReport')"
+          @click="showModalInfo(scope.row, 'blogAllReport')"
         >{{scope.row.informNum}}</div>
       </template>
        <template slot="commentViolationSum" slot-scope="scope">
         <!-- 违规 -->
-        <div class="isColorShow" style="color:red !important" @click="showModalInfo(scope.row, 'blogViolation', true)">{{scope.row.commentViolationSum}}</div>
+        <div class="isColorShow" style="color:red !important" @click="showModalInfo(scope.row, 'blogAllViolation', true)">{{scope.row.commentViolationSum}}</div>
       </template>
       <template slot="pictrueList" slot-scope="scope">
         <!-- 图片 -->
         <div
           class="isColorShow"
-          @click="showModalInfo(scope.row, 'blogImgList')"
+          @click="showModalInfo(scope.row, 'blogAllImgList')"
           v-if="scope.row.pictrueList.length"
         >{{scope.row.pictrueList.length}}</div>
          <div
@@ -66,7 +69,7 @@
         <!-- 视频 -->
         <div
           class="isColorShow"
-          @click="showModalInfo(scope.row, 'blogVideo')"
+          @click="showModalInfo(scope.row, 'blogAllVideo')"
           v-if="scope.row.blogVideoUrl.length"
         >1</div>
          <div
@@ -79,7 +82,7 @@
           size="small"
           class="el-button--text color-red"
           icon="el-icon-edit"
-          @click="showModalInfo(scope.row, 'blogBlockComments')"
+          @click="showModalInfo(scope.row, 'blogAllBlockComments')"
           v-if="tabsType ==='shelves'"
         >判定违规</el-button>
         <el-button
@@ -87,7 +90,7 @@
           size="small"
           class="el-button--text"
           icon="el-icon-edit"
-          @click="showModalInfo(scope.row, 'blogNotBlockComments')"
+          @click="showModalInfo(scope.row, 'blogAllNotBlockComments')"
           v-else
         >不违规</el-button>
       </template>
@@ -159,15 +162,17 @@ export default {
           {
             label: "博主ID",
             prop: "customerNumber",
+            search: true,
           },
           {
             label: "博主名称",
             search: true,
-            prop: "customerNickName",
+            prop: "customerName",
           },
           {
             label: "博文内容",
             prop: "blogContent",
+            search: true,
             slot: true
           },
           {
@@ -234,7 +239,7 @@ export default {
     }
   },
   created () {
-    console.log(this.$refs.crud);
+    console.log(this);
   },
   methods: {
 
@@ -266,9 +271,6 @@ export default {
         }
       );
     },
-    // handleEdit (row, index) {
-    //     this.$refs.crud.rowEdit(row, index);
-    // },  
     // 编辑方法保存按钮
     rowUpdate(row, index, loading, done) {
       update(row).then(
@@ -342,9 +344,9 @@ export default {
 
     // 初始化
     onLoad(page, params = {}) {
+      let this_ = this;
       this.loading = true;
       let blogStatus = null;
-      console.log(this.tabsType);
       // （博文状态 1:正常 2:违规）
       if (this.tabsType === "shelves") {
         // 查询上架

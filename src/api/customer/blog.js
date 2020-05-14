@@ -25,16 +25,16 @@ export const getReportList = (current, size, relateId, params) => {
     }
   })
 }
-// 屏蔽评论
+// 根据评论ID修改评论状态
 export const update_comment = (row) => {
   return request({
-    url: '/api/blade-customer/customer/update_comment',
+    url: '/api/blade-book/bookcomment/update_comment',
     method: 'post',
     data: row
   })
 }
 
-// 修改博文管理中博文的评论状态 
+// 根据博文ID修改评论状态
 export const update_blogLost_comment = (row) => {
   return request({
     url: '/api/blade-blog/blogcomment/editstatus',
@@ -43,10 +43,10 @@ export const update_blogLost_comment = (row) => {
   })
 }
 
-//博文评论
+//  根据博文ID获取评论
 export const getCommentList = (current, size, blogId, params) => {
   return request({
-    url: '/api/blade-blog/blogcomment/page',
+    url: '/api/blade-blog/blogcomment/page_by_blog',
     method: 'get',
     params: {
       ...params,
@@ -56,7 +56,7 @@ export const getCommentList = (current, size, blogId, params) => {
     }
   })
 }
-//博文违规评论
+//根据博文ID获取博文违规评论
 export const get_violation_blog_list = (current, size, id, params) => {
   return request({
     url: '/api/blade-blog/blogviolation/blog_list',
@@ -70,7 +70,7 @@ export const get_violation_blog_list = (current, size, id, params) => {
   })
 }
 
-//博文违规评论删除
+//违规评论(博文中的)----删除
 export const blogviolation_remove = (ids) => {
   return request({
     url: '/api/blade-blog/blogviolation/remove',
@@ -82,23 +82,9 @@ export const blogviolation_remove = (ids) => {
 }
 
 
-
 export const getShareList = (current, size, blogId, params) => {
   return request({
     url: '/api/blade-blog/blogforward/list',
-    method: 'get',
-    params: {
-      ...params,
-      current,
-      size,
-      blogId
-    }
-  })
-}
-
-export const getLikeList = (current, size, blogId, params) => {
-  return request({
-    url: '/api/blade-blog/blogpraise/page',
     method: 'get',
     params: {
       ...params,
@@ -154,3 +140,41 @@ export const blog_editstatus = (row) => {
   })
 }
 
+// 获取所有图片列表
+export const getImgList = (current, size, id) => {
+  return request({
+    url: '/api/blade-blog/blog/getPicture',
+    method: 'get',
+    params: {
+      current,
+      size,
+      id
+    }
+  })
+}
+
+// 获取所有书籍列表
+export const getBookList = (current, size, authorId) => {
+  return request({
+    url: '/api/blade-book/booklibrary/list',
+    method: 'get',
+    params: {
+      current,
+      size,
+      authorId
+    }
+  })
+}
+
+// 获取所有视频列表
+export const getVideoList = (current, size, id) => {
+  return request({
+    url: '/api/blade-blog/blog/getVideo',
+    method: 'get',
+    params: {
+      current,
+      size,
+      id
+    }
+  })
+}

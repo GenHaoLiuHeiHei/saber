@@ -8,7 +8,8 @@
         v-loading.fullscreen.lock="loading"
       >
         <li v-for="(item, index) in data" :key="index" class="list-item p-b15 m-b20">
-          <div class="m-b15">{{item.blogContent}}</div>
+          <div class="m-b15" v-if="!item.langContent">{{item.blogContent}}</div>
+          <div class="m-b15" v-else v-html="item.langContent"></div>
           <el-row v-if="item.contentType === 1">
             <el-col :span="4" v-for="(itemSrc, itemSrcIndex) in item.showList" :key="itemSrcIndex" class="m-r10 bookArticleImg" style="max-height: 80px;overflow: hidden;">
               <img class="w100" @click="showBigDialog('isImg', index, itemSrcIndex)" :src="itemSrc.url" alt="" >
@@ -16,23 +17,23 @@
           </el-row>
           <el-row v-else-if="item.contentType === 2">
             <el-col :span="4" class="m-r10 bookArticleImg">
-               <div class="videoImg" @click="showBigDialog('isVideo')">
+               <div class="videoImg" @click="showBigDialog('isVideo', index)">
                  <i class="el-icon-caret-right color-white"></i>
                </div>
-              <img class="w100" src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1585213171260&di=0ddb022c4d097a881c769a62f44f8bfb&imgtype=0&src=http%3A%2F%2Fpic1.win4000.com%2Fwallpaper%2F0%2F582d1d1458e84.jpg" alt="">
+              <img class="w100" :src="item.blogVideoImage" alt="">
             </el-col>
           </el-row>
           <div class="flex m-t10" style="justify-content: space-between;flex-wrap:wrap">
             <div class="m-r10">
               展示次数：{{item.blogBrowse}}
             </div>
-            <!-- <div class="m-r10 isColorShow" @click="showBigDialog('blogShare', index)">
+            <!-- <div class="m-r10 isColorShow" @click="showBigDialog('blogAllShare', index)">
               分享次数：{{item.blogForwardSum}}
             </div> -->
-             <div class="m-r10 isColorShow" @click="showBigDialog('blogComment', index)">
+             <div class="m-r10 isColorShow" @click="showBigDialog('blogAllComment', index)">
               评论数量：{{item.blogCommentSum}}
             </div>
-             <div class="m-r10 isColorShow" @click="showBigDialog('blogLike', index)">
+             <div class="m-r10 isColorShow" @click="showBigDialog('blogAllLike', index)">
               点赞数量：{{item.blogPraiseSum}}
             </div>
              <div>
@@ -40,13 +41,13 @@
             </div>
           </div>
           <div class="flex m-t10" style="justify-content: space-between;flex-wrap:wrap">
-            <div class="m-r10 isColorShow color-red" @click="showBigDialog('blogReport', index)">
+            <div class="m-r10 isColorShow color-red" @click="showBigDialog('blogAllReport', index)">
               举报次数：{{item.informNum || 0}}
             </div>
-            <div class="isColorShow" @click="showBigDialog('blogNotBlockComments', index)" v-if="item.blogStatus === 2">
+            <div class="isColorShow" @click="showBigDialog('blogAllNotBlockComments', index)" v-if="item.blogStatus === 2">
               不违规
             </div>
-            <div class="isColorShow color-red" @click="showBigDialog('blogBlockComments', index)"  v-else>
+            <div class="isColorShow color-red" @click="showBigDialog('blogAllBlockComments', index)"  v-else>
               判定违规
             </div>
           </div>
@@ -72,25 +73,25 @@
       <div v-if="isShowComment">
         <!-- bigDialogType:isVideo -->
         <div v-if="bigDialogType === 'isVideo'">
-          <blogVideo :formDatas="bigDialogForm" tofrom="article" ></blogVideo>
+          <blogAllVideo :formDatas="bigDialogForm" tofrom="article"></blogAllVideo>
         </div>
-        <div v-else-if="bigDialogType === 'blogShare'">
-          <blogShare :formDatas="bigDialogForm" @closeDialogAddgsVisible="closeIsShowComment"></blogShare>
+        <div v-else-if="bigDialogType === 'blogAllShare'">
+          <blogAllShare :formDatas="bigDialogForm" @closeDialogAddgsVisible="closeIsShowComment" tofrom="article"></blogAllShare>
         </div>
-        <div v-else-if="bigDialogType === 'blogLike'">
-          <blogLike :formDatas="bigDialogForm" tofrom="article" @closeDialogAddgsVisible="closeIsShowComment"></blogLike>
+        <div v-else-if="bigDialogType === 'blogAllLike'">
+          <blogAllLike :formDatas="bigDialogForm" tofrom="article" @closeDialogAddgsVisible="closeIsShowComment"></blogAllLike>
         </div>
-        <div v-else-if="bigDialogType === 'blogReport'">
-          <blogReport :formDatas="bigDialogForm" @closeDialogAddgsVisible="closeIsShowComment"></blogReport>
+        <div v-else-if="bigDialogType === 'blogAllReport'">
+          <blogAllReport :formDatas="bigDialogForm" @closeDialogAddgsVisible="closeIsShowComment" tofrom="article"></blogAllReport>
         </div>
-        <div v-else-if="bigDialogType === 'blogComment'">
-          <blogComment :formDatas="bigDialogForm" @closeDialogAddgsVisible="closeIsShowComment"></blogComment>
+        <div v-else-if="bigDialogType === 'blogAllComment'">
+          <blogAllComment :formDatas="bigDialogForm" @closeDialogAddgsVisible="closeIsShowComment" tofrom="article"></blogAllComment>
         </div>
-        <div v-else-if="bigDialogType === 'blogBlockComments'">
-          <blogBlockComments :formDatas="bigDialogForm" @closeDialogAddgsVisible="closeIsShowComment"></blogBlockComments>
+        <div v-else-if="bigDialogType === 'blogAllBlockComments'">
+          <blogAllBlockComments :formDatas="bigDialogForm" @closeDialogAddgsVisible="closeIsShowComment" tofrom="article"></blogAllBlockComments>
         </div>
-        <div v-else-if="bigDialogType === 'blogNotBlockComments'">
-          <blogNotBlockComments :formDatas="bigDialogForm" @closeDialogAddgsVisible="closeIsShowComment"></blogNotBlockComments>
+        <div v-else-if="bigDialogType === 'blogAllNotBlockComments'">
+          <blogAllNotBlockComments :formDatas="bigDialogForm" @closeDialogAddgsVisible="closeIsShowComment" tofrom="article"></blogAllNotBlockComments>
         </div>
       </div>
     </el-dialog>
@@ -99,24 +100,24 @@
 <script>
 // 博文
 import { getList } from "@/api/customer/blog";
-import blogShare from '@/components/infoModal/blog/blogShare';
-import blogLike from '@/components/infoModal/blog/blogLike';
-import blogReport from '@/components/infoModal/blog/blogReport';
-import blogComment from '@/components/infoModal/blog/blogComment';
-import blogVideo from '@/components/infoModal/blog/blogVideo';
-import blogBlockComments from '@/components/infoModal/blog/blogBlockComments';
-import blogNotBlockComments from '@/components/infoModal/blog/blogNotBlockComments';
+import blogAllShare from '@/components/infoModal/blog/blogAllShare';
+import blogAllLike from '@/components/infoModal/blog/blogAllLike';
+import blogAllReport from '@/components/infoModal/blog/blogAllReport';
+import blogAllComment from '@/components/infoModal/blog/blogAllComment';
+import blogAllVideo from '@/components/infoModal/blog/blogAllVideo';
+import blogAllBlockComments from '@/components/infoModal/blog/blogAllBlockComments';
+import blogAllNotBlockComments from '@/components/infoModal/blog/blogAllNotBlockComments';
 
 export default {
   name: "bookArticle",
   components : {
-    blogComment,
-    blogReport,
-    blogShare,
-    blogLike,
-    blogVideo,
-    blogNotBlockComments,
-    blogBlockComments
+    blogAllComment,
+    blogAllReport,
+    blogAllShare,
+    blogAllLike,
+    blogAllVideo,
+    blogAllNotBlockComments,
+    blogAllBlockComments
   },
   props: {
     formDatas: {
@@ -186,37 +187,37 @@ export default {
           this.bigDialogType = bigDialogType;
           this.isShowComment = true;
           break
-        case 'blogShare': 
+        case 'blogAllShare': 
           this.title = '分享列表';
           this.bigDialogForm = this.data[index];
           this.bigDialogType = bigDialogType;
           this.isShowComment = true;
           break
-        case 'blogLike': 
+        case 'blogAllLike': 
           this.title = '点赞列表';
           this.bigDialogForm = this.data[index];
           this.bigDialogType = bigDialogType;
           this.isShowComment = true;
           break
-        case 'blogReport': 
+        case 'blogAllReport': 
           this.title = '举报列表';
           this.bigDialogForm = this.data[index];
           this.bigDialogType = bigDialogType;
           this.isShowComment = true;
           break
-        case 'blogComment': 
+        case 'blogAllComment': 
           this.title = '评论列表';
           this.bigDialogForm = this.data[index];
           this.bigDialogType = bigDialogType;
           this.isShowComment = true;
           break
-        case 'blogNotBlockComments': 
+        case 'blogAllNotBlockComments': 
           this.title = '不违规';
           this.bigDialogForm = this.data[index];
           this.bigDialogType = bigDialogType;
           this.isShowComment = true;
           break
-        case 'blogBlockComments': 
+        case 'blogAllBlockComments': 
           this.title = '屏蔽';
           this.bigDialogForm = this.data[index];
           this.bigDialogType = bigDialogType;
@@ -269,6 +270,18 @@ export default {
                 })
               }
             })
+            if (v.contentType === 3) {
+              v.langContent = '';
+              JSON.parse(v.blogContent).map(s => {
+                let tag = '';
+                if (s.type === 1) {
+                  tag = `<p>${s.content}</p>`
+                } else if (s.type === 2) {
+                  tag = `<img src="${s.content}"/>`
+                }
+                v.langContent += tag
+              });
+            }
           })
         })
         .catch(err => {

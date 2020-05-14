@@ -5,7 +5,6 @@
                :data="data"
                :page="page"
                :permission="permissionList"
-               :before-open="beforeOpen"
                v-model="form"
                ref="crud"
                @row-update="rowUpdate"
@@ -16,21 +15,14 @@
                @selection-change="selectionChange"
                @current-change="currentChange"
                @size-change="sizeChange"
+               @refresh-change="refreshChange"
                @on-load="onLoad">
-      <template slot="menuLeft">
-        <el-button type="danger"
-                   size="small"
-                   icon="el-icon-delete"
-                   plain
-                   @click="handleDelete">删 除
-        </el-button>
-      </template>
     </avue-crud>
   </basic-container>
 </template>
 
 <script>
-  import {getList, getDetail, add, update, remove} from "@/api/report/autoreply";
+  import {getList, add, update, remove} from "@/api/report/autoreply";
   import {mapGetters} from "vuex";
 
   export default {
@@ -51,7 +43,9 @@
           border: true,
           index: false,
           viewBtn: false,
-          selection: true,
+          selection: false,
+          addBtn: false,
+          delBtn: false,
           column: [
             {
               label: "类型",
@@ -187,14 +181,6 @@
             this.$refs.crud.toggleSelection();
           });
       },
-      beforeOpen(done, type) {
-        if (["edit", "view"].includes(type)) {
-          getDetail(this.form.id).then(res => {
-            this.form = res.data.data;
-          });
-        }
-        done();
-      },
       searchReset() {
         this.query = {};
         this.onLoad(this.page);
@@ -215,6 +201,9 @@
       },
       sizeChange(pageSize){
         this.page.pageSize = pageSize;
+      },
+      refreshChange(page){
+        this.$message.success('刷新回调,当前分页对象'+ JSON.stringify(page));
       },
       onLoad(page, params = {}) {
         this.loading = true;

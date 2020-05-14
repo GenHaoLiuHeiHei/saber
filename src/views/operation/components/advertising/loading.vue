@@ -98,15 +98,22 @@ export default {
 
   methods: {
     submitForm(formName) {
+      let this_ = this;
       this.formData.createTime = this.formData.startTime[0];
       this.formData.endTime = this.formData.startTime[1];
-      this.formData.pictureType = 1;
-      console.log(this.formData);
+      let obj = {};
+      obj.pictureType = 1;
+      obj.listAdvertisement = [];
+      obj.listAdvertisement[0] = this.formData
+      console.log(obj);
       this.$refs[formName].validate(valid => {
         if (valid) {
-          add(this.formData).then(res => {
-              if (res) {
-                // debugger
+          add(obj).then(res => {
+              if (res.data.code === 200) {
+                this_.$message({
+                  type: "success",
+                  message: "操作成功!"
+                });
                 console.log(res);
               }
             });

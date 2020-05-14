@@ -1,39 +1,31 @@
 <template>
   <div class="p-t0">
-    <div class="infinite-list-wrapper" id="blogViolation">
-      <ul
-        class="list"
-        v-infinite-scroll="load"
-        :infinite-scroll-disabled="disabled"
-        v-loading.fullscreen.lock="loading"
-      >
-        <li v-for="(item, index) in data" :key="index" class="list-item p-b15">
-          <div class="flex" style="justify-content: space-between;align-items: center;">
-            <div class="font-18 color-B05E07">{{item.authorName}}（ID: {{item.customerNumber || '暂无'}}）</div>
-            <div>
-              <span class="m-r15">管理员 : {{item.handleUserName}}</span>
-              <span class="m-r15">
-                状态 : 
-                <span class="color-red">已屏蔽</span>
-                <span class='color-blue m-l05 hand' @click="changeViolationStatus(item)">修改</span>
-              </span>
-              <span>处理时间 : {{item.handleTime}}</span>
-            </div>
-          </div>
-          <div class="p-tb05 p-tb05 p-lr10 bg-e1">{{item.relateComment}}</div>
-          <div class="flex" style="justify-content: space-between;align-items: flex-end;">
-            <div class="font-16 p-tb05">{{item.relateTime}}</div>
-          </div>
-        </li>
-      </ul>
-      <p v-if="loading" class="text-center">加载中...</p>
-      <div v-if="noMore" class="text-center">
-        <div v-if="data && data.length" class="p-t10">没有更多了</div>
-        <div v-else>
-          <avue-empty></avue-empty>
-        </div>
-      </div>
-    </div>
+    <avue-crud 
+        ref="crud"
+        :option="option"
+        :table-loading="loading"
+        :data="data"
+        :page="page"
+        v-model="form"
+        @size-change="sizeChange"
+        @current-change="currentChange"
+        @selection-change="selectionChange"
+        @on-load="onLoad">
+        <template slot-scope="scope" slot="menu">
+          <el-button
+            type="button"
+            size="small"
+            class="el-button--text"
+            icon="el-icon-edit"
+            @click="changeViolationStatus(scope.row)"
+          >修改</el-button>
+        </template>
+        <template slot="relateType" slot-scope="scope">
+          <div v-if="scope.row.relateType === 1">博文</div>
+          <div v-if="scope.row.relateType === 2">评论</div>
+          <div v-if="scope.row.relateType === 3">回复</div>
+        </template>
+    </avue-crud>
     <el-dialog
       title="修改评论状态"
       :visible.sync="isShowComment"
@@ -77,7 +69,9 @@
 </template>
 <script>
 // 违规
-import { get_violation_blog_list, blogviolation_remove } from "@/api/customer/blog";
+import { blogviolation_remove } from "@/api/customer/blog";
+import { get_blog_violation_list } from "@/api/customer/customer";
+
 export default {
   name: "blogViolation",
   props: {
@@ -118,12 +112,55 @@ export default {
     return {
       isShowComment: false,
       query: {},
-      loading: false,
-      noMore: false,
+      form: {},
+      loading: true,
       page: {
         pageSize: 10,
-        currentPage: 0,
+        currentPage: 1,
         total: 0
+      },
+      selectionList: [],
+      option: {
+        align: "center",
+        tip: false,
+        border: true,
+        index: false,
+        viewBtn: false,
+        selection: false,
+        addBtn:false,
+        delBtn:false,
+        editBtn:false,
+        column: [
+          {
+            label: "昵称",
+            prop: "customerName",
+          },
+          {
+            label: "ID",
+            prop: "customerNumber",
+          },
+          {
+            label: "违规时间",
+            prop: "createTime",
+          },
+          {
+            label: "处理时间",
+            prop: "handleTime",
+          },
+          {
+            label: "评论内容",
+            prop: "relateComment",
+          },
+          {
+            label: "类型",
+            prop: "relateType",
+            slot: true
+          },
+          {
+            label: "管理员",
+            prop: "handleUserName",
+          },
+        ]
       },
       data: [],
       changeFormData: {},
@@ -139,7 +176,12 @@ export default {
       return this.loading || this.noMore;
     },
     getAjaxData () {
-      return get_violation_blog_list /* 判断是用户列表进入还是书库列表进入*/
+      /*
+      article  用户信息中的博文管理获取单条博文点赞数量 ---取的是博文ID
+      blog     博文管理获取单条博文点赞数量 ---取的是博文ID
+      user     用户信息获取用户的博文点赞数量 ---取的是用户ID
+      */
+      return get_blog_violation_list
     }
   },
   methods: {
@@ -155,12 +197,6 @@ export default {
       this.changeFormData = item;
     },
 
-    // 下拉加载
-    load() {
-      if (this.disabled) return;
-      this.page.currentPage++;
-      this.onLoad(this.page);
-    },
 
     // 提交修改评论状态
     submitForm (formName) {
@@ -191,40 +227,36 @@ export default {
     },
 
     // 初始化获取数据
+    searchReset() {
+      this.query = {};
+      this.onLoad(this.page);
+    },
+    searchChange(params) {
+      this.query = params;
+      this.onLoad(this.page, params);
+    },
+    selectionChange(list) {
+      this.selectionList = list;
+    },
+    selectionClear() {
+      this.selectionList = [];
+      this.$refs.crud.toggleSelection();
+    },
+    currentChange(currentPage){
+      this.page.currentPage = currentPage;
+    },
+    sizeChange(pageSize){
+      this.page.pageSize = pageSize;
+    },
     onLoad(page, params = {}) {
-      let this_ = this;
-      if (this_.loading) return;
-      this_.loading = true;
-      if (this_.getAjaxData === get_violation_blog_list) {
-        params.relateType = 2;
-      }
-      this_.getAjaxData(
-        page.currentPage,
-        page.pageSize,
-        this_.formDatas.id,
-        Object.assign(params, this_.query)
-      )
-        .then(res => {
-          const data = res.data.data;
-          this_.page.total = data.total;
-          this_.loading = false;
-          if (data.records.length !== 0) {
-            if (this_.page.currentPage === 1) {
-              this_.data = data.records;
-              if (this_.data.length < this_.page.pageSize) this_.noMore = true;
-            } else {
-              this_.data = this_.data.concat(data.records);
-            }
-            this_.$emit("changeIsSeach", false);
-          } else {
-            if (data.total === 0) this_.data = [];
-            this_.noMore = true;
-          }
-        })
-        .catch(err => {
-          console.log(err);
-          this_.loading = false;
-        });
+      this.loading = true;
+      this.getAjaxData(page.currentPage, page.pageSize, this.formDatas.id, Object.assign(params, this.query)).then(res => {
+        const data = res.data.data;
+        this.page.total = data.total;
+        this.data = data.records;
+        this.loading = false;
+        this.selectionClear();
+      });
     }
   }
 };
@@ -233,5 +265,6 @@ export default {
 #blogViolation {
   max-height: 500px;
   overflow: auto;
+  padding: 0 20px;
 }
 </style>

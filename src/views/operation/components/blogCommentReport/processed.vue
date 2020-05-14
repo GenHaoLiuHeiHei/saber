@@ -14,8 +14,8 @@
                @size-change="sizeChange"
                @on-load="onLoad">
       <template slot-scope="scope" slot="status">
-        <div v-if="scope.row.status === 2" class="color-blue">不违规</div>
-        <div v-else-if="scope.row.status === 3" class="color-red">违规</div>
+        <div v-if="scope.row.status === 3" class="color-blue">不违规</div>
+        <div v-else-if="scope.row.status === 2" class="color-red">违规</div>
       </template>
     </avue-crud>
   </basic-container>

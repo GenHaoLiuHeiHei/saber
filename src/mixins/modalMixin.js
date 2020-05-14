@@ -15,10 +15,12 @@ export const modalMixin = {
                     },
                     {
                     label: "动态",
-                    prop: "dynamic"
+                    prop: "blog"
                     }
                 ]
             },
+            isShowUserSelectSearch: false,
+            userSelectSearchData: ''
         }
     },
     methods: {
@@ -102,30 +104,46 @@ export const modalMixin = {
             case "blogComment":
                 this.title = "评论列表";
                 break;  
+            case "blogAllComment":
+                this.title = "评论列表";
+                break;  
             case "blogViolation":
                 this.title = "违规列表";
                 break;  
-                case "blogShare":
+            case "blogAllViolation":
+                this.title = "违规列表";
+                break;  
+            case "blogAllShare":
                 this.title = "分享列表";
                 break;  
-            case "blogReport":
+            case "blogAllReport":
                 this.title = "举报列表";
                 break;
+            case "blogAllImgList":
+                this.title = "图片列表";
+                break;  
             case "blogImgList":
                 this.title = "图片列表";
                 break;  
-            case "blogVideo":
+            case "blogVideoList":
+                this.title = "视频列表";
+                break;  
+            case "blogAllVideo":
                 this.title = "视频预览";
                 break;  
-            case "blogNotBlockComments":
+            case "blogAllNotBlockComments":
                 this.title = "不违规";
                 break; 
-            case "blogBlockComments":
+            case "blogAllBlockComments":
                 this.title = "屏蔽";
                 break; 
-            case "blogLike":
+            case "blogAllLike":
                 this.title = "博文点赞列表";
                 break; 
+            case "blogBookList":
+                this.title = "书籍列表";
+                break; 
+            
             }
             this.isShowSeach = isShowSeach ? isShowSeach : false;
             this.isOptionTab = isOptionTab ? isOptionTab : false
@@ -137,5 +155,22 @@ export const modalMixin = {
             this.isShowDialog = false;
             if (res) this.onLoad(this.page);
         },
+
+        closeDialogSearch(data, formDataName, isSearch) {
+           if (isSearch) {
+               if (data instanceof Array) {
+                //    多选
+               } else {
+                //    单选
+                this.query[formDataName] = data.name;
+               }
+           }
+           this.isShowUserSelectSearch = false;
+        },
+
+        handelChangeUserSearch(dataName) {
+            this.isShowUserSelectSearch = true;
+            this.userSelectSearchData = dataName;
+        }
     }
 }

@@ -9,7 +9,7 @@
       >
         <li v-for="(item, index) in data" :key="index" class="list-item p-b15">
           <div class="flex" style="justify-content: space-between;align-items: center;">
-            <div class="font-18 color-B05E07">{{item.authorName}}（ID: {{item.customerNumber || '暂无'}}）</div>
+            <div class="font-18 color-B05E07">{{item.customerName}}（ID: {{item.customerNumber || '暂无'}}）</div>
             <div>
               <span class="m-r15">管理员 : {{item.handleUserName}}</span>
               <span class="m-r15">
@@ -197,9 +197,7 @@ export default {
       let this_ = this;
       if (this_.loading) return;
       this_.loading = true;
-      if (this_.getAjaxData === get_violation_user_list) {
-        params.status = 2;
-      }
+      params.status = 2;
       this_.getAjaxData(
         page.currentPage,
         page.pageSize,
@@ -235,5 +233,6 @@ export default {
 #bookViolation {
   max-height: 500px;
   overflow: auto;
+  padding: 0 20px;
 }
 </style>

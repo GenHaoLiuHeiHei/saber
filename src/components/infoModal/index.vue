@@ -10,7 +10,7 @@
               placeholder="选择开始时间"
               size="small"
               v-model="seachForm.startTime"
-              value-format="yyyy-MM-dd hh:mm:ss"
+              value-format="yyyy-MM-dd HH:mm:ss"
             ></el-date-picker>
           </el-form-item>
           <el-form-item label="结束时间" class="m-b0">
@@ -18,7 +18,7 @@
               type="datetime"
               placeholder="选择结束时间"
               size="small"
-              value-format="yyyy-MM-dd hh:mm:ss"
+              value-format="yyyy-MM-dd HH:mm:ss"
               v-model="seachForm.endTime"
             ></el-date-picker>
           </el-form-item>
@@ -109,7 +109,7 @@ export default {
       isSeach: false,
       isShow: false,
       seachForm: {},
-      isShowList: ['operationDetails', 'bookLike', 'bookComment']
+      isShowList: ['operationDetails', 'bookLike', 'bookComment','blogComment','blogViolation','blogUserLike', 'bookViolation']
     };
   },
   created() {

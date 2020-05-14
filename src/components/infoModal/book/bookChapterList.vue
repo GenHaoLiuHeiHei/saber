@@ -23,7 +23,7 @@
           </el-button>
         </template>
         <template slot-scope="scope" slot="chapterContentForm">
-          <avue-ueditor v-model="scope.row.chapterContent" :upload="upload" :pasteplain='true'></avue-ueditor>
+          <avue-ueditor v-model="scope.row.chapterContent" id='main' :upload="upload" :pasteplain='true'></avue-ueditor>
         </template>
     </avue-crud>
   </div>
@@ -91,7 +91,7 @@
               span: 24,
               rules: [{
                 required: true,
-                message: "请输入标签时间",
+                message: "请输入章节内容",
                 trigger: "blur"
               }],
               formslot:true
@@ -218,13 +218,15 @@
       getImgDe () {
         let this_ = this;
         return new Promise(function (resolve) {
-           let imgs = document.getElementById("main").getElementsByTagName("img");
-          if (!imgs) return
-          for (let i = 0;i < imgs.length; i++) {
-            imgs[i].style.width = imgs[i].width
-            imgs[i].setAttribute("style", '')
-            imgs[i].setAttribute("data-width", imgs[i].width)
-            imgs[i].setAttribute("data-height", imgs[i].height)
+          let imgs = document.getElementById("main").getElementsByTagName("img");
+          console.log(imgs.lengt)
+          if (imgs && imgs.length) {
+            for (let i = 0;i < imgs.length; i++) {
+              imgs[i].style.width = imgs[i].width
+              imgs[i].setAttribute("style", '')
+              imgs[i].setAttribute("data-width", imgs[i].width)
+              imgs[i].setAttribute("data-height", imgs[i].height)
+            }
           }
           let chapterContent = document.getElementById("main").getElementsByClassName("w-e-text")[0];
           let isNoHeight = chapterContent.getElementsByTagName('p');

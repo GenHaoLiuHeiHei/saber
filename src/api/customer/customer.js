@@ -88,7 +88,7 @@ export const getLikeList = (current, size, customerId, params) => {
   })
 }
 
-// 点赞博文
+// 博文管理获取单条博文点赞数量
 export const getBlogLikeList = (current, size, blogId, params) => {
   return request({
     url: '/api/blade-blog/blogpraise/page',
@@ -101,10 +101,11 @@ export const getBlogLikeList = (current, size, blogId, params) => {
     }
   })
 }
-// 用户信息中违规博文
-export const get_dynamic_violation_list = (current, size, customerId, params) => {
+
+// 用户获取博文点赞数量
+export const getUserLikeList = (current, size, customerId, params) => {
   return request({
-    url: '/api/blade-blog/bloginform/page-by-relate_id',
+    url: '/api/blade-blog/blogpraise/page-by-cutomer',
     method: 'get',
     params: {
       ...params,
@@ -115,8 +116,22 @@ export const get_dynamic_violation_list = (current, size, customerId, params) =>
   })
 }
 
-// 评论博文
-export const getBlogCommentList = (current, size, customerId, params) => {
+// 根据用户信息ID获取违规博文
+export const get_blog_violation_list = (current, size, customerId, params) => {
+  return request({
+    url: '/api/blade-blog/blogviolation/blog_customer_list',
+    method: 'get',
+    params: {
+      ...params,
+      current,
+      size,
+      customerId
+    }
+  })
+}
+
+// 根据用户ID获取评论
+export const getUserCommentList = (current, size, customerId, params) => {
   return request({
     url: '/api/blade-blog/blogcomment/page-by-customer',
     method: 'get',
@@ -131,7 +146,7 @@ export const getBlogCommentList = (current, size, customerId, params) => {
 
 
 // 点赞评论
-export const getCommentList = (current, size, id, params) => {
+export const getBookCommentList = (current, size, id, params) => {
   return request({
     url: '/api/blade-book/bookcomment/getcustomercomment',
     method: 'get',
@@ -170,7 +185,7 @@ export const userUpdate = (row) => {
 // 屏蔽评论----->违规
 export const update_comment = (row) => {
   return request({
-    url: '/api/blade-customer/customer/update_comment',
+    url: '/api/blade-book/bookcomment/update_comment',
     method: 'post',
     data: row
   })

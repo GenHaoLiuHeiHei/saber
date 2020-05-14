@@ -1,12 +1,8 @@
 <template>
   <basic-container id="library">
     <avue-tabs :option="optionTabs" @change="handleChange"></avue-tabs>
-    <div v-if="tabsType.prop ==='shelves'">
-      <Violation :tabsType="tabsType.prop"></Violation>
-    </div>
-    <div v-if="tabsType.prop ==='takeOff'">
-      <Violation :tabsType="tabsType.prop"></Violation>
-    </div>
+    <Violation :tabsType="tabsType.prop"  v-if="tabsType.prop ==='shelves'"></Violation>
+    <Violation :tabsType="tabsType.prop"  v-if="tabsType.prop ==='takeOff'"></Violation>
   </basic-container>
 </template>
 <script>

@@ -1,6 +1,7 @@
 <template>
   <div class="p-t0">
-    <div class="infinite-list-wrapper" id="bookLike">
+    <avue-tabs :option="optionTabs" @change="handleChange"></avue-tabs>
+    <div class="infinite-list-wrapper" id="blogLike">
       <ul
         class="list"
         v-infinite-scroll="load"
@@ -8,12 +9,12 @@
         v-loading.fullscreen.lock="loading"
       >
         <li v-for="(item, index) in data" :key="index" class="list-item p-b15">
-          <div class="font-18 color-blue" v-if="item.praiseState == '1'">{{item.customerNickName}}（ID: {{item.customerNumber}}）赞了你</div>
-          <div class="font-18 color-B05E07" v-else>你赞了 {{item.customerNickName}}（ID: {{item.customerNumber}}）</div>
+          <div class="font-18 color-B05E07 m-b05" v-if="optionTabIndex === 1">{{item.customerNickName}}（ID: {{item.customerNumber}}）赞了你的博文</div>
+          <div class="font-18 color-blue m-b05" v-else-if="optionTabIndex === 2">{{item.customerNickName}}（ID: {{item.customerNumber}}）赞了你的评论</div>
+          <div class="font-18 color-B05E07 m-b05" v-else-if="optionTabIndex === 3">{{item.customerNickName}}（ID: {{item.customerNumber}}）赞了你的回复</div>
           <div class="p-tb05 p-tb05 p-lr10 bg-e1">{{item.content}}</div>
           <div class="flex" style="justify-content: space-between;align-items: flex-end;">
-            <div class="p-tb05">&lt;&lt;{{item.bookName}}&gt;&gt;</div>
-            <div class="font-16 p-tb05">{{item.praiseTime}}</div>
+            <div class="font-16 p-tb05">{{item.optime || item.praiseTime}}</div>
           </div>
         </li>
       </ul>
@@ -28,10 +29,10 @@
   </div>
 </template>
 <script>
-// 收藏
-import { getLikeList } from "@/api/customer/customer";
+// 博文点赞 
+import { getBlogLikeList } from "@/api/customer/customer";
 export default {
-  name: "bookLike",
+  name: "blogLike",
   props: {
     formDatas: {
       type: Object,
@@ -48,7 +49,11 @@ export default {
       default() {
         return false;
       }
-    }
+    },
+    tofrom: {
+      type: String,
+      default: 'user'
+    },
   },
   watch: {
     isSeach: {
@@ -58,9 +63,6 @@ export default {
           Object.assign(this.query, this.seachForm);
           this.onLoad(this.page);
         }
-        // else {
-        //   this.query = {};
-        // }
         this.$emit("changeIsSeach", false);
       }
     }
@@ -75,15 +77,49 @@ export default {
         currentPage: 0,
         total: 0
       },
-      data: []
+      data: [],
+      optionTabs: {
+        column: [{
+          label: '博文点赞',
+          prop: 'bloggerMsg',
+          index: 1
+        }, {
+          label: '评论点赞',
+          prop: 'userMsg',
+          index: 2
+
+        }, {
+          label: '回复点赞',
+          prop: 'blacklist',
+          index: 3
+        }]
+      },
+      optionTabIndex: 1,
     };
   },
   computed: {
     disabled() {
       return this.loading || this.noMore;
-    }
+    },
+    getAjaxData () {
+      /*
+      博文管理，用户信息博文管理进入的点赞
+      article  用户信息中的博文管理获取单条博文点赞数量 ---取的是博文ID
+      blog     博文管理获取单条博文点赞数量 ---取的是博文ID
+      user     用户信息获取用户的博文点赞数量 ---取的是用户ID
+      */
+      return getBlogLikeList
+
+    },
   },
   methods: {
+    handleChange(column) {
+      if (column.index === this.optionTabIndex) return
+      this.optionTabIndex = column.index;
+      this.page.currentPage = 0;
+      this.data = [];
+      this.onLoad(this.page);
+    },
     load() {
       if (this.disabled) return;
       this.page.currentPage++;
@@ -93,7 +129,8 @@ export default {
       let this_ = this;
       if (this_.loading) return;
       this_.loading = true;
-      getLikeList(
+      params.type = this_.optionTabIndex;
+      this_.getAjaxData(
         page.currentPage,
         page.pageSize,
         this_.formDatas.id,
@@ -125,9 +162,9 @@ export default {
 };
 </script>
 <style scoped>
-#bookLike {
+#blogLike {
   max-height: 500px;
   overflow: auto;
-  padding: 10px 20px 0;
+  padding: 0 20px;
 }
 </style>

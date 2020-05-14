@@ -1,8 +1,8 @@
 <template>
   <div class="p-t0" id="blogAllImgList">
     <el-row class="m-b15">
-      <el-col :span="4" v-for="(item, index) in pictrueList" :key="index" class="m-r10 bookArticleImg m-b20" style="max-height: 80px;overflow: hidden;">
-        <img class="w100" @click="showBigImg(index)" :src="item.url" alt="" >
+      <el-col :span="4" v-for="(item, index) in pictrueList" :key="index" class="m-r10 bookArticleImg m-b20" style="max-height: 250px;overflow: hidden;">
+        <img class="w100" @click="showVideo(index)" :src="item.url" alt="" >
       </el-col>
     </el-row>
     <el-pagination
@@ -12,13 +12,30 @@
       :hide-on-single-page="true"
       @current-change="currentChange">
     </el-pagination>
+    <el-dialog
+      title="视频预览"
+      :visible.sync="isShowComment"
+      class="dialogComment"
+      :modal-append-to-body="false"
+      :modal="false" 
+      :close-on-click-modal="false"
+      @close="closeIsShowComment"
+    >
+      <div v-if="isShowComment">
+        <blogAllVideo :formDatas="bigDialogForm" tofrom="blog"></blogAllVideo>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
 // 图片
-import { getImgList } from "@/api/customer/blog";
+import { getVideoList } from "@/api/customer/blog";
+import blogAllVideo from './blogAllVideo'
 export default {
-  name: "blogAllImgList",
+  name: "blogViodeList",
+  components:{
+    blogAllVideo
+  },
   props: {
     formDatas: {
       type: Object,
@@ -49,7 +66,9 @@ export default {
         pageSize: 10,
         total: 0
       },
-      data: []
+      data: [],
+      isShowComment: false,
+      bigDialogForm: {},
     };
   },
   computed: {
@@ -57,9 +76,9 @@ export default {
       let showList = [];
       if (this.data && this.data.length > 0) {
         this.data.map(v => {
-          if (v.blogPictrueUrl && v.blogPictrueUrl.length) {
+          if (v.blogVideoImage && v.blogVideoImage.length) {
               showList.push({
-                url: v.blogPictrueUrl
+                url: v.blogVideoImage
               })
             }
         });
@@ -70,21 +89,25 @@ export default {
   },
   created () {
     if (this.tofrom === 'user') {
-      this.getImgListAjax();
+      this.getVideoListAjax();
     }
     
   },
   methods: {
-    showBigImg (index) {
-        this.$ImagePreview(this.pictrueList, index);
+    showVideo (index) {
+      this.bigDialogForm = this.data[index];
+      this.isShowComment = true;
+    },
+    closeIsShowComment () {
+      this.isShowComment = false;
     },
     currentChange(currentPage){
         this.page.currentPage = currentPage;
-        this.getImgListAjax();
+        this.getVideoListAjax();
     },
-    getImgListAjax () {
+    getVideoListAjax () {
       let this_ = this;
-      getImgList(
+      getVideoList(
         this_.page.currentPage,
         this_.page.pageSize,
         this_.formDatas.id,

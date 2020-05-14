@@ -1,6 +1,6 @@
 <template>
-  <div class="p-t0" id="bookComment">
-    <div class="infinite-list-wrapper" calss="bookComment">
+  <div class="p-t0" id="blogComment">
+    <div class="infinite-list-wrapper blogComment">
       <ul
         class="list"
         v-infinite-scroll="load"
@@ -15,11 +15,12 @@
             @click="commentManagement(item)"
             style="right:0;top:10px;"
           >管理</el-button>
-          <div class="font-18 color-B05E07">{{item.customerNickName}}（ID: {{item.customerNumber}}）</div>
+          <div class="font-18 color-B05E07" v-if="item.contentType === 2">{{item.customerNickName}}（ID: {{item.customerNumber}}）评论了你</div>
+          <div class="font-18 color-blue" v-else>{{item.customerNickName}}（ID: {{item.customerNumber}}）回复了你</div>
           <div class="p-tb05">评论的内容</div>
-          <div class="p-tb05 p-tb05 p-lr10 bg-e1">{{item.comment}}</div>
+          <div class="p-tb05 p-tb05 p-lr10 bg-e1">{{item.content}}</div>
           <div class="flex" style="justify-content: space-between;align-items: flex-end;">
-            <div class="font-16 p-tb05">{{item.commentTime}}</div>
+            <div class="font-16 p-tb05">{{item.createTime}}</div>
           </div>
         </li>
       </ul>
@@ -82,14 +83,14 @@
 </template>
 <script>
 // 博文评论
-import { getBlogCommentList, update_comment } from "@/api/customer/customer";
-import { getCommentList, update_blogLost_comment } from "@/api/customer/blog";
+import { getUserCommentList } from "@/api/customer/customer";
+import { update_blogLost_comment } from "@/api/customer/blog";
 import {
   getViolation,
   getUnfriendly
 } from "@/api/book/library";
 export default {
-  name: "bookComment",
+  name: "blogComment",
   props: {
     formDatas: {
       type: Object,
@@ -156,10 +157,16 @@ export default {
       return this.loading || this.noMore;
     },
     getAjaxData () {
-      return this.tofrom === 'article' ? getBlogCommentList : getCommentList /* 判断是用户列表进入还是书库列表进入*/
+      /*
+      article  用户信息中的博文管理获取单条博文点赞数量 ---取的是博文ID
+      blog     博文管理获取单条博文点赞数量 ---取的是博文ID
+      user     用户信息获取用户的博文点赞数量 ---取的是用户ID
+      */
+      return getUserCommentList
     },
     updateAjax () {
-      return this.tofrom === 'article' ? update_comment : update_blogLost_comment /* 判断是用户列表进入还是书库列表进入*/
+      return update_blogLost_comment
+      // return this.tofrom !== 'user' ? update_comment : update_blogLost_comment
     }
   },
   created () {
@@ -193,8 +200,10 @@ export default {
       obj.status = 2;
       if (this_.listItem.id) {
         obj.id = this_.listItem.id;
+        obj.contentType = this_.listItem.contentType;
       } else {
         obj.id = this_.formDatas.id;
+        obj.contentType = this_.formDatas.contentType;
       }
       obj.violation = this_.commentFormData.violation.join(',');
       obj.unfriendly = this_.commentFormData.unfriendly.join(',');
@@ -231,8 +240,7 @@ export default {
       let this_ = this;
       if (this_.loading) return;
       this_.loading = true;
-      // 书籍评论
-      params.status = 1;
+      // params.relateType = 2;
       this_.getAjaxData(
         page.currentPage,
         page.pageSize,
@@ -265,11 +273,12 @@ export default {
 };
 </script>
 <style scoped>
-.bookComment {
+.blogComment {
   max-height: 500px;
   overflow: auto;
+  padding: 0 20px;
 }
-#bookComment .dialogComment {
+#blogComment .dialogComment {
   z-index: 3000 !important;
 }
 
