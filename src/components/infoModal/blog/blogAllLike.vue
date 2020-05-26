@@ -9,9 +9,9 @@
         v-loading.fullscreen.lock="loading"
       >
         <li v-for="(item, index) in data" :key="index" class="list-item p-b15">
-          <div class="font-18 color-B05E07 m-b05" v-if="optionTabIndex === 1">{{item.customerNickName}}（ID: {{item.customerNumber}}）赞了你的博文</div>
-          <div class="font-18 color-blue m-b05" v-else-if="optionTabIndex === 2">{{item.customerNickName}}（ID: {{item.customerNumber}}）赞了你的评论</div>
-          <div class="font-18 color-B05E07 m-b05" v-else-if="optionTabIndex === 3">{{item.customerNickName}}（ID: {{item.customerNumber}}）赞了你的回复</div>
+          <div class="font-18 color-B05E07 m-b05" v-if="optionTabIndex === 1">{{item.customerNickName}}（ID: {{item.customerNumber}}）赞了{{item.beCustomerNickName}}（ID: {{item.beCustomerNumber}}）的博文</div>
+          <div class="font-18 color-blue m-b05" v-else-if="optionTabIndex === 2">{{item.customerNickName}}（ID: {{item.customerNumber}}）赞了{{item.beCustomerNickName}}（ID: {{item.beCustomerNumber}}）的评论</div>
+          <div class="font-18 color-B05E07 m-b05" v-else-if="optionTabIndex === 3">{{item.customerNickName}}（ID: {{item.customerNumber}}）赞了{{item.beCustomerNickName}}（ID: {{item.beCustomerNumber}}）的回复</div>
           <div class="p-tb05 p-tb05 p-lr10 bg-e1">{{item.content}}</div>
           <div class="flex" style="justify-content: space-between;align-items: flex-end;">
             <div class="font-16 p-tb05">{{item.optime || item.praiseTime}}</div>

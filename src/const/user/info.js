@@ -13,8 +13,8 @@ export default {
           url: 'link',
         },
         canvasOption: {
-          text: 'blade',
-          ratio: 0.1
+          text: ' ',
+          ratio: 1
         },
         action: '/api/blade-resource/oss/endpoint/put-file',
         tip: '只能上传jpg/png用户头像，且不超过500kb',

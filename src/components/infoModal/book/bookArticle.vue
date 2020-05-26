@@ -277,7 +277,7 @@ export default {
                 if (s.type === 1) {
                   tag = `<p>${s.content}</p>`
                 } else if (s.type === 2) {
-                  tag = `<img src="${s.content}"/>`
+                  tag = `<img src="${s.content}" style="max-width: 100%"/>`
                 }
                 v.langContent += tag
               });
@@ -307,6 +307,7 @@ export default {
   position: relative;
   img {
     display: block;
+    max-width: 100;
   }
   .videoImg{
     position: absolute;

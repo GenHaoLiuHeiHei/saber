@@ -10,9 +10,9 @@
       :permission="permissionList"
       :upload-before="uploadBefore"
       :upload-after="uploadAfter"
+      @row-update="rowUpdate"
       @row-del="rowDel"
       @row-save="rowSave"
-      @row-update="rowUpdate"
       @search-change="searchChange"
       @search-reset="searchReset"
       @selection-change="selectionChange"
@@ -46,6 +46,13 @@
         <div class="isColorShow" style="color:red !important" @click="showModalInfo(scope.row, 'bookViolation')">{{scope.row.violationSum}}</div>
       </template>
       <template slot-scope="scope" slot="menu">
+        <el-button
+          type="button"
+          size="small"
+          class="el-button--text"
+          icon="el-icon-edit"
+          @click="showUpdate(scope.row, scope.row.$index)"
+        >编辑书籍</el-button>
         <el-button
           type="button"
           size="small"
@@ -178,7 +185,7 @@ export default {
             prop: "authorId",
             search: true,
             span: 24,
-            placeholder: "非博主用户可不填"
+            placeholder: "非博主用户可不填",
           },
           {
             label: "首次上传",
@@ -272,8 +279,8 @@ export default {
               url: "link"
             },
             canvasOption: {
-              text: "blade",
-              ratio: 0.1
+              text: ' ',
+              ratio: 1
             },
             tip: "只能上传jpg/png文件，且不超过500kb",
             action: baseUrl + "api/blade-resource/oss/endpoint/put-file",
@@ -334,7 +341,7 @@ export default {
         addBtn: true,
         viewBtn: true,
         delBtn: true,
-        editBtn: true
+        editBtn: false
         // addBtn: this.vaildData(this.permission.book_add, false),
         // viewBtn: this.vaildData(this.permission.book_aview, false),
         // delBtn: this.vaildData(this.permission.book_adelete, false),
@@ -376,6 +383,14 @@ export default {
       );
     },
 
+    showUpdate (row, index) {
+      if (row.authorId && row.authorId.length > 0) {
+        this.option.column[3].editDisabled = true;
+      } else {
+        this.option.column[3].editDisabled = false;
+      }
+       this.$refs.crud.rowEdit(row, index);
+    },
     // 编辑方法保存按钮
     rowUpdate(row, index, loading, done) {
       update(row).then(
@@ -470,7 +485,8 @@ export default {
         this.loading = false;
         this.selectionClear();
       });
-    }
+    },
+
   }
 };
 </script>

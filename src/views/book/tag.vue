@@ -25,9 +25,19 @@
         <el-button
           type="button"
           size="small"
+          class="el-button--text color-red"
+          icon="el-icon-edit"
+          v-if="scope.row.tagState === 2"
+          @click="changeUpdate(scope.row, 1)"
+        >启 用</el-button>
+        <el-button
+          type="button"
+          size="small"
           class="el-button--text"
+          icon="el-icon-edit"
           v-if="scope.row.tagState === 1"
-        >默 认</el-button>
+          @click="changeUpdate(scope.row, 2)"
+        >停 用</el-button>
         <el-button
           type="button"
           size="small"
@@ -92,13 +102,45 @@ export default {
             rules: [
               {
                 required: true,
-                message: "请输入",
+                message: "请选择",
                 trigger: "change"
               }
             ]
           },
           {
-            label: "时间",
+            label: '权重',
+            prop: 'tagWeights',
+            type: 'select',
+            labelWidth: 100,
+            span: 13,
+            dicData: [
+              {
+                label: '100',
+                value: 100
+              },
+              {
+                label: '90',
+                value: 90
+              },
+              {
+                label: '80',
+                value: 80
+              },
+              {
+                label: '70',
+                value: 70
+              }
+            ],
+            rules: [
+              {
+                required: true,
+                message: "请选择",
+                trigger: "change"
+              }
+            ]
+          },
+          {
+            label: "时间(天)",
             prop: "tagTime",
             labelWidth: 100,
             span: 13,
@@ -120,10 +162,12 @@ export default {
             span: 13,
             type: "color",
             colorFormat: "hex",
+            editDisabled: true,
+            addDisabled: true,
             rules: [
               {
                 required: true,
-                message: "请输入标签颜色",
+                message: "请选择标签颜色",
                 trigger: "blur"
               }
             ],
@@ -189,6 +233,25 @@ export default {
     }
   },
   methods: {
+    changeUpdate(row, status) {
+        let msg = '确定将选择该标签启用'
+        this.$confirm(msg, {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        })
+          .then(() => {
+            row.tagState = status;
+            return update(row)
+          })
+          .then(() => {
+            this.onLoad(this.page);
+            this.$message({
+              type: "success",
+              message: "操作成功!"
+            });
+          });
+      },
     rowSave(row, loading, done) {
       add(row).then(
         () => {

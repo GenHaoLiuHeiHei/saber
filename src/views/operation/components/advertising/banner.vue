@@ -54,8 +54,8 @@ export default {
                     url: "link"
                   },
                   canvasOption: {
-                    text: "blade",
-                    ratio: 0.1
+                    text: " ",
+                    ratio: 1
                   },
                   tip: "只能上传jpg/png文件，且不超过500kb",
                   action: baseUrl + "api/blade-resource/oss/endpoint/put-file",
@@ -142,8 +142,8 @@ export default {
                       url: "link"
                     },
                     canvasOption: {
-                      text: "blade",
-                      ratio: 0.1
+                      text: " ",
+                      ratio: 1
                     },
                     tip: "只能上传jpg/png文件，且不超过500kb",
                     action: baseUrl + "api/blade-resource/oss/endpoint/put-file",
@@ -171,6 +171,22 @@ export default {
     // 点击删除
     deleteRules(item) {
       let this_ = this;
+      let arr = []
+      this.option.group.map((v, s) => {
+        let o = {};
+        for(let i in this_.form){
+          let subIndex = i.charAt(i.length - 1);
+          if (+subIndex === (s + 1)) {
+            if (i.indexOf('pictureUrl') > -1) {
+              o.pictureUrl = this_.form[i];
+            } else {
+              o.pictureLink = this_.form[i];
+            }
+              arr[s] = o;
+          }
+        }
+      });
+      this_.dataList = arr;
       this_.dataList.splice(item.column.groupIndex, 1);
       this_.form = {};
       this_.option.group = [];
@@ -211,8 +227,8 @@ export default {
                   url: "link"
                 },
                 canvasOption: {
-                  text: "blade",
-                  ratio: 0.1
+                  text: " ",
+                  ratio: 1
                 },
                 tip: "只能上传jpg/png文件，且不超过500kb",
                 action: baseUrl + "api/blade-resource/oss/endpoint/put-file",
@@ -234,6 +250,7 @@ export default {
     handleSubmit(form){
       let self = form;
       delete self.del;
+      let formData = {},this_ = this;
       let arr = []
       this.option.group.map((v, s) => {
         let o = {};
@@ -248,15 +265,11 @@ export default {
               arr[s] = o;
           }
         }
-      })
-
-      let formData = {},this_ = this;
+      });
       formData.pictureType = 2;
       formData.listAdvertisement = arr; 
-      console.log(formData);
       add(formData).then(res => {
         if (res) {
-          console.log(res);
           this_.$message({
             type: "success",
             message: "操作成功!"

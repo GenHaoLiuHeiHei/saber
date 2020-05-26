@@ -164,7 +164,7 @@ export const chapTerRemove = (ids) => {
 // 新增章节
 export const chapTerAdd = (row) => {
   return request({
-    url: '/api/blade-book/chapter/save',
+    url: '/api/blade-book/chapter/save_chapter',
     method: 'post',
     data: row
   })
@@ -173,7 +173,7 @@ export const chapTerAdd = (row) => {
 // 修改章节
 export const chapTerUpdate = (row) => {
   return request({
-    url: '/api/blade-book/chapter/update',
+    url: '/api/blade-book/chapter/save',
     method: 'post',
     data: row
   })

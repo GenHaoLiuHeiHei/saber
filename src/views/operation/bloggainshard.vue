@@ -131,6 +131,7 @@
               label: "管理员密码",
               prop: "password",
               hide: true,
+              editDisplay: false,
               rules: [{
                 required: true,
                 message: "请输入管理员密码",

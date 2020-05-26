@@ -25,6 +25,11 @@
           <div v-if="scope.row.relateType === 2">评论</div>
           <div v-if="scope.row.relateType === 3">回复</div>
         </template>
+        <template slot="relateComment" slot-scope="scope">
+          <!-- 内容 -->
+          <div v-if="scope.row.contentType !== 3">{{scope.row.relateComment}}</div>
+          <div v-else>{{scope.row.blogTitle}}</div>
+        </template>
     </avue-crud>
     <el-dialog
       title="修改评论状态"
@@ -148,8 +153,9 @@ export default {
             prop: "handleTime",
           },
           {
-            label: "评论内容",
+            label: "内容",
             prop: "relateComment",
+            slot: true,
           },
           {
             label: "类型",

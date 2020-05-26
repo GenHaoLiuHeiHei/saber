@@ -107,7 +107,7 @@ export default {
           },
           {
             label: "操作人员",
-            prop: "createUser"
+            prop: "updateUserName"
           }
         ]
       },

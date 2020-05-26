@@ -24,9 +24,15 @@
 <script>
   import {dynamic_report} from "@/api/report/report";
   import {mapGetters} from "vuex";
+  import {
+  getViolation,
+  getUnfriendly
+  } from "@/api/book/library";
   export default {
     data() {
       return {
+        violationList: [],
+        unfriendlytList: [],
         form: {},
         query: {},
         loading: true,
@@ -46,7 +52,7 @@
           menu: false,
           column: [
             {
-              label: "用户昵称",
+              label: "被举报人昵称",
               prop: "beCustomerName",
               disabled: true,
               span: 24,
@@ -55,7 +61,7 @@
 
             },
             {
-              label: "用户ID",
+              label: "被举报人ID",
               prop: "beCustomerNumber",
               disabled: true,
               span: 24,
@@ -64,6 +70,13 @@
             {
               label: "内容",
               prop: "relateComment",
+              disabled: true,
+              span: 24,
+              labelWidth: 120
+            },
+            {
+              label: "举报原因",
+              prop: "centextData",
               disabled: true,
               span: 24,
               labelWidth: 120
@@ -136,15 +149,46 @@
         this.page.pageSize = pageSize;
       },
       onLoad(page, params = {}) {
+        let this_ = this;
         this.loading = true;
         params.status = 2;
         params.type = 1;
-        dynamic_report(page.currentPage, page.pageSize, Object.assign(params, this.query)).then(res => {
-          const data = res.data.data;
-          this.page.total = data.total;
-          this.data = data.records;
-          this.loading = false;
-          this.selectionClear();
+        dynamic_report(page.currentPage, page.pageSize, Object.assign(params, this.query)).then(datas => {
+          let data = datas.data.data;
+          this_.page.total = data.total;
+          this_.loading = false;
+           getViolation().then(ress => {
+            this_.violationList = ress.data.data;
+          }).then(() => {
+            return getUnfriendly()
+          }).then(res => {
+            this_.unfriendlytList = res.data.data;
+            data.records.map(i => {
+              i.centextList = [];
+              if (i.reasons.length) {
+                JSON.parse(i.reasons).map(v => {
+                  v.dictKey = v.dictKey.map(Number);
+                  this_.violationList.map(s => {
+                    if (v.code === "violation") {
+                      if (v.dictKey.join(',').indexOf(s.dictKey) > -1) {
+                        i.centextList.push(s.dictValue)
+                      }
+                    }
+                  })
+                  this_.unfriendlytList.map(s => {
+                    if (v.code === "unfriendly") {
+                      if (v.dictKey.join(',').indexOf(s.dictKey) > -1) {
+                        i.centextList.push(s.dictValue)
+                      }
+                    }
+                  })
+                });
+                i.centextData = i.centextList.join(',')
+              }
+            });
+            this_.data = data.records;
+            this.selectionClear();
+          });
         });
       }
     }

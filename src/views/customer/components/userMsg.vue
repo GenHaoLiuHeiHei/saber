@@ -16,7 +16,7 @@
       @on-load="onLoad">
       <template slot="bookHoardSum" slot-scope="scope">
         <!-- 收藏 -->
-        <div class="isColorShow" @click="showModalInfo(scope.row, 'bookHoard', false, true)">{{scope.row.bookHoardSum}}</div>
+        <div class="isColorShow" @click="showModalInfo(scope.row, 'bookHoard')">{{scope.row.bookHoardSum}}</div>
       </template>
       <template slot="bookLikeSum" slot-scope="scope">
         <!-- 赞 -->

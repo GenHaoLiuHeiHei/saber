@@ -8,8 +8,15 @@
         v-loading.fullscreen.lock="loading"
       >
         <li v-for="(item, index) in data" :key="index" class="list-item p-b15">
-          <div class="font-18 color-B05E07 m-b05" >{{item.customerNickName}}（ID: {{item.customerNumber}}）赞了你的博文</div>
-          <div class="p-tb05 p-tb05 p-lr10 bg-e1">{{item.content}}</div>
+          <div class="font-18 color-B05E07 m-b05" v-if="item.action === 1">你点赞了{{item.customerNickName}}（ID: {{item.customerNumber}}）的博文</div>
+          <div class="font-18 color-blue m-b05" v-else-if="item.action === 2">{{item.customerNickName}}（ID: {{item.customerNumber}}）赞了你的博文</div>
+          <div class="font-18 color-B05E07 m-b05" v-else-if="item.action === 3">你点赞了{{item.customerNickName}}（ID: {{item.customerNumber}}）的评论</div>
+          <div class="font-18 color-blue m-b05" v-else-if="item.action === 4">{{item.customerNickName}}（ID: {{item.customerNumber}}）赞了你的评论</div>
+          <div class="font-18 color-B05E07 m-b05" v-else-if="item.action === 5">你点赞了{{item.customerNickName}}（ID: {{item.customerNumber}}）的回复</div>
+          <div class="font-18 color-blue m-b05" v-else-if="item.action === 6">{{item.customerNickName}}（ID: {{item.customerNumber}}）赞了你的回复</div>
+          <div class="font-18 color-blue m-b05" v-else>{{item.customerNickName}}（ID: {{item.customerNumber}}）</div>
+          <div class="p-tb05 p-tb05 p-lr10 bg-e1" v-if="item.contentType !== 3">{{item.content}}</div>
+          <div class="p-tb05 p-tb05 p-lr10 bg-e1" v-else>{{item.blogTitle}}</div>
           <div class="flex" style="justify-content: space-between;align-items: flex-end;">
             <div class="font-16 p-tb05">{{item.optime || item.praiseTime}}</div>
           </div>

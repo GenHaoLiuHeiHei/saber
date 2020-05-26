@@ -54,8 +54,8 @@ export default {
               url: "link"
             },
             canvasOption: {
-              text: "blade",
-              ratio: 0.1
+              text: ' ',
+              ratio: 1
             },
             tip: "只能上传jpg/png文件，且不超过500kb",
             action: baseUrl + "api/blade-resource/oss/endpoint/put-file",
