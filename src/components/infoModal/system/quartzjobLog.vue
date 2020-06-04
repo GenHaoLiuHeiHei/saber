@@ -52,7 +52,7 @@ export default {
               label: "开始时间",
               prop: "startTime",
               type: "datetime",
-              format: "yyyy-MM-dd hh:mm:ss",
+              format: "yyyy-MM-dd HH:mm:ss",
               valueFormat: "timestamp",
               search: true,
             hide: true
@@ -61,7 +61,7 @@ export default {
               label: "结束时间",
               prop: "endTime",
               type: "datetime",
-              format: "yyyy-MM-dd hh:mm:ss",
+              format: "yyyy-MM-dd HH:mm:ss",
               valueFormat: "timestamp",
               search: true,
             hide: true

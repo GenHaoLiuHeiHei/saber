@@ -2,8 +2,8 @@
 let RouterPlugin = function () {
     this.$router = null;
     this.$store = null;
-
 };
+let isDelTitle = ['share', 'down']
 RouterPlugin.install = function (vue, router, store, i18n) {
     this.$router = router;
     this.$store = store;
@@ -28,7 +28,16 @@ RouterPlugin.install = function (vue, router, store, i18n) {
         // 设置标题
         setTitle: (title) => {
             const defaultTitle = this.$vue.$t('title');
+            let isShwoTitle = false;
             title = title ? `${title}-${defaultTitle}` : defaultTitle;
+            for (var i = 0; i < isDelTitle.length; i++) {
+                if (window.location.href.indexOf(isDelTitle[i]) > -1) {
+                    isShwoTitle = true
+                    break;
+                }
+                isShwoTitle = false
+            }
+            if (isShwoTitle) return
             document.title = title;
         },
         closeTag: (value) => {

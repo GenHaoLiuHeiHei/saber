@@ -33,12 +33,12 @@
         </el-button>
       </template>
       <template slot-scope="scope" slot="isPause">
-        <span v-if="scope.row.isPause === 1" class="color-green">运行中</span>
+        <span v-if="scope.row.isPause == '1'" class="color-green">运行中</span>
         <span v-else class="color-orange">已暂停</span>
       </template>
       <template slot-scope="scope" slot="menu">
         <el-button
-          v-if="scope.row.isPause === 1"
+          v-if="scope.row.isPause == '1'"
           type="button"
           size="small"
           class="el-button--text"
@@ -362,17 +362,18 @@ export default {
       this.page.pageSize = pageSize;
     },
     onLoad(page, params = {}) {
-      this.loading = true;
+      let this_ = this;
+      this_.loading = true;
       getList(
         page.currentPage,
         page.pageSize,
-        Object.assign(params, this.query)
+        Object.assign(params, this_.query)
       ).then(res => {
         const data = res.data.data;
-        this.page.total = data.total;
-        this.data = data.records;
-        this.loading = false;
-        this.selectionClear();
+        this_.page.total = data.total;
+        this_.data = data.records;
+        this_.loading = false;
+        this_.selectionClear();
       });
     }
   }

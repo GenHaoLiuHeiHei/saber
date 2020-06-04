@@ -34,6 +34,28 @@ export default [{
 
 },
 {
+    path: '/down',
+    name: 'APP下载',
+    component: () =>
+        import( /* webpackChunkName: "page" */ '@/views/down/index'),
+    meta: {
+        keepAlive: false,
+        isTab: false,
+        isAuth: false
+    }
+},
+{
+    path: '/share',
+    name: 'APP分享',
+    component: () =>
+        import( /* webpackChunkName: "page" */ '@/views/down/share'),
+    meta: {
+        keepAlive: false,
+        isTab: false,
+        isAuth: false
+    }
+},
+{
     path: '/403',
     component: () =>
         import( /* webpackChunkName: "page" */ '@/components/error-page/403'),

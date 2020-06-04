@@ -22,27 +22,18 @@
                    size="small"
                    icon="el-icon-delete"
                    plain
-                   v-if="permission.notice_delete"
+                   v-if="permission.revenue_delete"
                    @click="handleDelete">删 除
         </el-button>
-      </template>
-      <template slot-scope="scope" slot="menu">
-        <el-button
-          type="button"
-          size="small"
-          class="el-button--text"
-          icon="el-icon-edit"
-          @click="handleEdit(scope.row, scope.index)"
-        >再次发送</el-button>
       </template>
     </avue-crud>
   </basic-container>
 </template>
 
 <script>
-  import {getList, getDetail, add, update, remove} from "@/api/report/notice";
+  import {getList, getDetail, add, update, remove} from "@/api/customer/revenue";
   import {mapGetters} from "vuex";
-
+  import { getRenderSort } from '@/util/util'
   export default {
     data() {
       return {
@@ -57,86 +48,72 @@
         selectionList: [],
         option: {
           tip: false,
-          align:'center',
           border: true,
           index: false,
           viewBtn: false,
-          selection: true,
-          editBtn: false,
+          selection: false,
+          addBtn: false,
+          menu: false,
+          align: 'center',
           column: [
             {
-              label: "发送时间",
-              rules: [{
-                required: true,
-                message: "请输入发送时间",
-                trigger: "blur"
-              }],
-              span: 24,
-              labelWidth:120,
-              prop: "noticeTime",
-              type: "datetime",
-              format:'yyyy-MM-dd HH:mm:ss',
-              valueFormat:'yyyy-MM-dd HH:mm:ss',
-              mock:{
-                type:'datetime',
-                format:'yyyy-MM-dd HH:mm:ss',
-                now:true,
+              label: "收益人昵称",
+              prop: "customerNickName"
+            },
+            {
+              label: "收益时间",
+              prop: "createTime",
+              renderHeader: (h, { column }) => {
+                let this_ = this;
+                return getRenderSort(h, column, this_.query, function (query) {
+                  this_.query = query;
+                  this_.page.currentPage = 1
+                  this_.onLoad(this_.page);
+                })
               },
             },
             {
-              label: "用户",
-              prop: "receivingCustomer",
+              label: "收益类型",
+              prop: "revenuePeopleType",
               type: 'select',
-              dicUrl: "/api/blade-system/dict/dictionary?code=userType",
+              dicUrl: "/api/blade-system/dict/dictionary?code=ConsumeGoogsType",
               props: {
                 label: "dictValue",
                 value: "dictKey"
-              },
-              rules: [{
-                required: true,
-                message: "请选择接收用户",
-                trigger: "blur"
-              }],
-              span: 24,
-              labelWidth:120
-            },
-       
-            {
-              label: "通知内容",
-              prop: "noticeContent",
-              type: 'textarea',
-              rules: [{
-                required: true,
-                message: "请输入通知内容",
-                trigger: "blur"
-              }],
-              span: 24,
-              labelWidth:120
+              }
             },
             {
-              label: "阅读人数",
-              prop: "noticeReadSum",
-              addDisplay: false,
-              editDisplay: false,
+              label: "收益金币",
+              prop: "money"
             },
             {
-              label: "管理员",
-              prop: "adminName",
-              addDisplay: false,
-              editDisplay: false,
-            },
-            {
-              label: "管理员密码",
-              prop: "password",
+              label: "昵称或者用户编号",
+              prop: "name",
               hide: true,
-              rules: [{
-                required: true,
-                message: "请输入管理员密码",
-                trigger: "blur"
-              }],
-              span: 24,
-              labelWidth:120
+              search: true
             },
+            {
+              label: "开始时间",
+              prop: "startTime",
+              type: "datetime",
+              format: "yyyy-MM-dd HH:mm:ss",
+              valueFormat: "yyyy-MM-dd HH:mm:ss",
+              search: true,
+              hide: true,
+              addDispaly: true,
+              editDispaly: true
+            },
+            {
+              label: "结束时间",
+              prop: "endTime",
+              type: "datetime",
+              format: "yyyy-MM-dd HH:mm:ss",
+              valueFormat: "yyyy-MM-dd HH:mm:ss",
+              search: true,
+              hide: true,
+              addDispaly: true,
+              editDispaly: true
+            }
           ]
         },
         data: []
@@ -146,10 +123,10 @@
       ...mapGetters(["permission"]),
       permissionList() {
         return {
-          addBtn: this.vaildData(this.permission.notice_add, false),
-          viewBtn: this.vaildData(this.permission.notice_view, false),
-          delBtn: this.vaildData(this.permission.notice_delete, false),
-          editBtn: this.vaildData(this.permission.notice_edit, false)
+          addBtn: this.vaildData(this.permission.revenue_add, false),
+          viewBtn: this.vaildData(this.permission.revenue_view, false),
+          delBtn: this.vaildData(this.permission.revenue_delete, false),
+          editBtn: this.vaildData(this.permission.revenue_edit, false)
         };
       },
       ids() {
@@ -173,9 +150,6 @@
           done();
           console.log(error);
         });
-      },
-      handleEdit (row, index) {
-        this.$refs.crud.rowEdit(row, index);
       },
       rowUpdate(row, index, loading, done) {
         update(row).then(() => {

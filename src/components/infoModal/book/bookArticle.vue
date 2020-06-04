@@ -9,7 +9,10 @@
       >
         <li v-for="(item, index) in data" :key="index" class="list-item p-b15 m-b20">
           <div class="m-b15" v-if="!item.langContent">{{item.blogContent}}</div>
-          <div class="m-b15" v-else v-html="item.langContent"></div>
+          <div class="m-b15" v-else>
+            <div class="m-b10"><b>{{item.blogTitle}}</b></div>
+            <div v-html="item.langContent"></div>
+          </div>
           <el-row v-if="item.contentType === 1">
             <el-col :span="4" v-for="(itemSrc, itemSrcIndex) in item.showList" :key="itemSrcIndex" class="m-r10 bookArticleImg" style="max-height: 80px;overflow: hidden;">
               <img class="w100" @click="showBigDialog('isImg', index, itemSrcIndex)" :src="itemSrc.url" alt="" >

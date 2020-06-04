@@ -26,24 +26,6 @@
                    @click="handleDelete">删 除
         </el-button>
       </template>
-      <template slot-scope="scope" slot="menu">
-        <el-button
-          type="button"
-          size="small"
-          class="el-button--text color-red"
-          icon="el-icon-edit"
-          v-if="scope.row.status === 1"
-          @click="changeUpdate(scope.row, 2)"
-        >停用</el-button>
-        <el-button
-          type="button"
-          size="small"
-          class="el-button--text"
-          icon="el-icon-edit"
-          v-if="scope.row.status === 2"
-          @click="changeUpdate(scope.row, 1)"
-        >启用</el-button>
-      </template>
     </avue-crud>
   </basic-container>
 </template>
@@ -80,12 +62,12 @@
           align: "center",
           column: [
             {
-              label: "利润分成",
-              prop: "gainShard",
+              label: "提成比例",
+              prop: "cutRate",
               type: "number",
               rules: [{
                 required: true,
-                message: "请输入利润分成",
+                message: "请输入提成比例",
                 trigger: "blur"
               }, { 
                   required: true,
@@ -96,12 +78,12 @@
               labelWidth: 120,
             },
             {
-              label: "博文类型",
-              prop: "blogContentType",
+              label: "博主收益类型",
+              prop: "type",
               span: 24,
               labelWidth: 120,
               type: 'select',
-              dicUrl: "/api/blade-system/dict/dictionary?code=blogType",
+              dicUrl: "/api/blade-system/dict/dictionary?code=ConsumeGoogsType",
               props: {
                 label: "dictValue",
                 value: "dictKey"
@@ -109,21 +91,32 @@
               rules: [
                 {
                     required: true,
-                    message: "请选择博文类型",
+                    message: "请选择博主收益类型",
                     trigger: "blur"
                 }
               ]
             },
-            
             {
               label: "创建者",
               prop: "createAdminName",
               addDisplay: false,
               editDisplay: false
             },
+             {
+              label: "创建时间",
+              prop: "createTime",
+              addDisplay: false,
+              editDisplay: false
+            },
             {
               label: "修改者",
               prop: "updateAdminName",
+              addDisplay: false,
+              editDisplay: false
+            },
+            {
+              label: "修改时间",
+              prop: "updateTime",
               addDisplay: false,
               editDisplay: false
             },

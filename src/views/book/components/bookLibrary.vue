@@ -116,6 +116,7 @@ export default {
   watch: {
     tabsType: {
       handler() {
+        this.page.currentPage = 1;
         this.searchReset();
       }
     },

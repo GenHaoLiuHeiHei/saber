@@ -148,9 +148,9 @@
           </template>
         </infoModal>
     </el-dialog>
-    <el-dialog title="选择" :visible.sync="isShowUserSelectSearch" @close="closeDialogSearch">
+    <!-- <el-dialog title="选择" :visible.sync="isShowUserSelectSearch" @close="closeDialogSearch">
       <userSearch :formDataName='userSelectSearchData' @closeDialogSearch="closeDialogSearch"></userSearch>
-    </el-dialog>
+    </el-dialog> -->
   </basic-container>
 </template>
 <script>
@@ -168,6 +168,7 @@
     },
     data() {
       return {
+        // isShowUserSelectSearch: true,
         blogSortList: [],
         form: {},
         query: {},

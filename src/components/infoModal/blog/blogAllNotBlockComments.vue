@@ -14,7 +14,7 @@
           </el-form-item>
         </el-col>
         <el-col :span="16">
-          <el-form-item label="内容" >
+          <el-form-item label="内容" v-if="formData.contentType !== 3" >
             <el-input v-model="formData.blogContent" type="textarea" :disabled="true" placeholder="请输入内容"></el-input>
           </el-form-item>
         </el-col>
@@ -79,7 +79,6 @@ import {
         },
         violationList: [],
         unfriendlytList: []
-
       };
     },
     created () {

@@ -1,5 +1,90 @@
 import { validatenull } from './validate'
-//表单序列化
+
+/**
+ * 删除数组的指定项
+ */
+export const arrRemove = (data, delString) => {
+    data.map((v, i) => {
+        if (v === delString) {
+            data.splice(i,1)
+        }
+    });
+};
+
+/**
+ * render表格升降序
+ */
+export const getRenderSort = (h, column, query, cb) => {
+    if (!query.ascsArr) query.ascsArr = [];
+    if (!query.descsArr) query.descsArr = [];
+    let num = 0;
+    return h('div', {
+        style: {
+            display: 'flex',
+            justifyContent : 'center',
+            alignItems: 'center'
+        },
+        on: {
+            click: (e) => {
+                num++;
+                let firstChild = e.currentTarget.lastElementChild.firstChild;
+                let lastChild = e.currentTarget.lastElementChild.lastChild;
+                if (num%3 === 0) {
+                    // 清空
+                    firstChild.classList.remove('color-blue');
+                    lastChild.classList.remove('color-blue');
+                    arrRemove(query.ascsArr, column.property);
+                    arrRemove(query.descsArr, column.property);
+                } else if (num%3 === 1) {
+                    // 向下排序descsArr
+                    firstChild.classList.remove('color-blue');
+                    lastChild.classList.add('color-blue');
+                    arrRemove(query.ascsArr, column.property);
+                    query.descsArr.push(column.property);
+                } else if (num%3 === 2) {
+                    // 向上排序ascsArr
+                    firstChild.classList.add('color-blue');
+                    lastChild.classList.remove('color-blue');
+                    arrRemove(query.descsArr, column.property);
+                    query.ascsArr.push(column.property);
+                }
+                query.descs = query.descsArr.join(',');
+                query.ascs = query.ascsArr.join(',');
+                cb(query);
+            }
+        }
+    }, [
+        h('span', column.label),
+        h('span', {
+            style: {
+                color: '#ccc',
+                lineHeight: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                paddingLeft: '5px'
+            }
+        }, [
+            h('i', {
+                class: ['el-icon-caret-top'],
+                style: {
+                    lineHeight: 0.7,
+                   
+                },
+                
+            }),
+            h('i', {
+                class: ['el-icon-caret-bottom'],
+                style: {
+                    lineHeight: 0.7,
+                }
+            })
+        ]),
+    ])
+};
+
+/**
+ * 表单序列化
+ */
 export const serialize = data => {
     let list = [];
     Object.keys(data).forEach(ele => {
@@ -7,6 +92,7 @@ export const serialize = data => {
     })
     return list.join('&');
 };
+
 export const getObjType = obj => {
     var toString = Object.prototype.toString;
     var map = {
@@ -26,6 +112,7 @@ export const getObjType = obj => {
     }
     return map[toString.call(obj)];
 };
+
 /**
  * 对象深拷贝
  */
@@ -51,6 +138,7 @@ export const deepClone = data => {
     }
     return obj;
 };
+
 /**
  * 设置灰度模式
  */
@@ -61,6 +149,7 @@ export const toggleGrayMode = (status) => {
         document.body.className = document.body.className.replace(' grayMode', '');
     }
 };
+
 /**
  * 设置主题
  */
@@ -92,7 +181,6 @@ export const encryption = (params) => {
     return result;
 };
 
-
 /**
  * 浏览器判断是否全屏
  */
@@ -103,6 +191,7 @@ export const fullscreenToggel = () => {
         reqFullScreen();
     }
 };
+
 /**
  * esc监听全屏
  */
@@ -123,6 +212,7 @@ export const listenfullscreen = (callback) => {
         listen();
     });
 };
+
 /**
  * 浏览器判断是否全屏
  */
@@ -143,6 +233,7 @@ export const reqFullScreen = () => {
         document.documentElement.mozRequestFullScreen();
     }
 };
+
 /**
  * 浏览器退出全屏
  */
@@ -155,6 +246,7 @@ export const exitFullScreen = () => {
         document.mozCancelFullScreen();
     }
 };
+
 /**
  * 递归寻找子类的父类
  */
@@ -174,6 +266,7 @@ export const findParent = (menu, id) => {
         }
     }
 };
+
 /**
  * 判断2个对象属性和值是否相等
  */
@@ -181,7 +274,6 @@ export const findParent = (menu, id) => {
 /**
  * 动态插入css
  */
-
 export const loadStyle = url => {
     const link = document.createElement('link');
     link.type = 'text/css';
@@ -190,6 +282,7 @@ export const loadStyle = url => {
     const head = document.getElementsByTagName('head')[0];
     head.appendChild(link);
 };
+
 /**
  * 判断路由是否相等
  */
@@ -217,6 +310,7 @@ export const diff = (obj1, obj2) => {
     }
     return true;
 }
+
 /**
  * 根据字典的value显示label
  */
@@ -246,6 +340,7 @@ export const findByvalue = (dic, value) => {
     }
     return result;
 };
+
 /**
  * 根据字典的value查找对应的index
  */
@@ -257,6 +352,7 @@ export const findArray = (dic, value) => {
     }
     return -1;
 };
+
 /**
  * 生成随机len位数字
  */
@@ -266,6 +362,7 @@ export const randomLenNum = (len, date) => {
     if (date) random = random + Date.now();
     return random;
 };
+
 /**
  * 打开小窗口
  */

@@ -18,13 +18,6 @@ export default {
   data () {
     return {
       tabsType:{},
-      loading: true,
-      page: {
-        pageSize: 10,
-        currentPage: 1,
-        total: 0
-      },
-      selectionList: [],
       optionTabs: {
         column: [{
           label: '上架中',

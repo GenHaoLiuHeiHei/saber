@@ -27,11 +27,11 @@
                 type: "datetime",
                 labelWidth: 120,
                 span: 24,
-                format:'yyyy-MM-dd hh:mm:ss',
-                valueFormat:'yyyy-MM-dd hh:mm:ss',
+                format:'yyyy-MM-dd HH:mm:ss',
+                valueFormat:'yyyy-MM-dd HH:mm:ss',
                 mock:{
                   type:'datetime',
-                  format:'yyyy-MM-dd hh:mm:ss',
+                  format:'yyyy-MM-dd HH:mm:ss',
                   now:true,
                 },
                 rules: [{
