@@ -1,46 +1,38 @@
 <template>
   <basic-container>
     <avue-crud :option="option"
+               :table-loading="loading"
                :data="data"
                :page="page"
-               @row-del="rowDel"
-               v-model="form"
                :permission="permissionList"
+               :before-open="beforeOpen"
+               v-model="form"
+               ref="crud"
                @row-update="rowUpdate"
                @row-save="rowSave"
-               :before-open="beforeOpen"
+               @row-del="rowDel"
                @search-change="searchChange"
                @search-reset="searchReset"
                @selection-change="selectionChange"
                @current-change="currentChange"
                @size-change="sizeChange"
                @on-load="onLoad">
-      <template slot="menuLeft">
-        <el-button type="danger"
-                   size="small"
-                   icon="el-icon-delete"
-                   plain
-                   v-if="permission.notice_delete"
-                   @click="handleDelete">删 除
-        </el-button>
-      </template>
-      <template slot-scope="{row}"
-                slot="category">
-        <el-tag>{{row.categoryName}}</el-tag>
-      </template>
     </avue-crud>
   </basic-container>
 </template>
 
 <script>
-  import {getList, remove, update, add, getNotice} from "@/api/dept/notice";
+  import {getList, getDetail, add, update, remove} from "@/api/customer/customerbag";
   import {mapGetters} from "vuex";
-
+  import {findObject} from '@/util/util';
+  import {getGoodsList} from "@/api/parameter/goods";
   export default {
     data() {
       return {
+        goodsType: [],
         form: {},
         query: {},
+        loading: true,
         page: {
           pageSize: 10,
           currentPage: 1,
@@ -53,69 +45,57 @@
           border: true,
           index: false,
           viewBtn: false,
-          selection: true,
+          selection: false,
+          menu: false,
           column: [
-            {
-              label: "通知标题",
-              prop: "title",
-              row: true,
-              search: true,
-              rules: [{
-                required: true,
-                message: "请输入通知标题",
-                trigger: "blur"
-              }]
+             {
+              label: "用户昵称",
+              prop: "customerName",
+              search: true
             },
             {
-              label: "通知类型",
-              type: "select",
-              row: true,
-              dicUrl: "/api/blade-system/dict/dictionary?code=notice",
+              label: "道具名称",
+              prop: "goodsId",
+              type: 'select',
+              dicData: [],
+            },
+            {
+              label: "道具数量",
+              prop: "goodsNum",
+              type: "number",
+            },
+            {
+              label: "来源类型",
+              prop: "reason",
+              type: 'select',
+              dicUrl: "/api/blade-system/dict/dictionary?code=customer_bag_form",
               props: {
                 label: "dictValue",
                 value: "dictKey"
-              },
-              slot: true,
-              prop: "category",
-              search: true,
-              rules: [{
-                required: true,
-                message: "请输入通知类型",
-                trigger: "blur"
-              }]
+              }
             },
-            {
-              label: "通知日期",
-              prop: "releaseTime",
-              type: "date",
-              format: "yyyy-MM-dd HH:mm:ss",
-              valueFormat: "yyyy-MM-dd HH:mm:ss",
-              rules: [{
-                required: true,
-                message: "请输入通知日期",
-                trigger: "blur"
-              }]
-            },
-            {
-              label: "通知内容",
-              prop: "content",
-              span: 24,
-              minRows: 6,
-              type: "textarea"
-            }
           ]
         },
         data: []
       };
     },
+    watch: {
+       'goodsType':{
+          handler(val){
+            var goodsId = findObject(this.option.column,'goodsId');
+            goodsId.dicData = val;
+          },
+          immediate: true
+      },
+    },
     computed: {
       ...mapGetters(["permission"]),
       permissionList() {
         return {
-          addBtn: this.vaildData(this.permission.notice_add, false),
-          viewBtn: this.vaildData(this.permission.notice_view, false),
-          delBtn: this.vaildData(this.permission.notice_delete, false),
-          editBtn: this.vaildData(this.permission.notice_edit, false)
+          addBtn: false,
+          viewBtn: false,
+          delBtn: false,
+          editBtn: false
         };
       },
       ids() {
@@ -125,6 +105,17 @@
         });
         return ids.join(",");
       }
+    },
+    created () {
+      getGoodsList(this.page.currentPage, 100).then(res => {
+          const data = res.data.data.records;
+          this.goodsType = data.map(v => {
+            let res = {};
+            res.label = v.goodsName;
+            res.value = v.id;
+            return res
+          });
+      });
     },
     methods: {
       rowSave(row, loading, done) {
@@ -170,17 +161,6 @@
             });
           });
       },
-      searchReset() {
-        this.query = {};
-        this.onLoad(this.page);
-      },
-      searchChange(params) {
-        this.query = params;
-        this.onLoad(this.page, params);
-      },
-      selectionChange(list) {
-        this.selectionList = list;
-      },
       handleDelete() {
         if (this.selectionList.length === 0) {
           this.$message.warning("请选择至少一条数据");
@@ -205,11 +185,26 @@
       },
       beforeOpen(done, type) {
         if (["edit", "view"].includes(type)) {
-          getNotice(this.form.id).then(res => {
+          getDetail(this.form.id).then(res => {
             this.form = res.data.data;
           });
         }
         done();
+      },
+      searchReset() {
+        this.query = {};
+        this.onLoad(this.page);
+      },
+      searchChange(params) {
+        this.query = params;
+        this.onLoad(this.page, params);
+      },
+      selectionChange(list) {
+        this.selectionList = list;
+      },
+      selectionClear() {
+        this.selectionList = [];
+        this.$refs.crud.toggleSelection();
       },
       currentChange(currentPage){
         this.page.currentPage = currentPage;
@@ -218,10 +213,13 @@
         this.page.pageSize = pageSize;
       },
       onLoad(page, params = {}) {
+        this.loading = true;
         getList(page.currentPage, page.pageSize, Object.assign(params, this.query)).then(res => {
           const data = res.data.data;
           this.page.total = data.total;
           this.data = data.records;
+          this.loading = false;
+          this.selectionClear();
         });
       }
     }

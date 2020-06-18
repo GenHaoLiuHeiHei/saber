@@ -238,12 +238,12 @@
           this_.form.chapterContent = chapterContent.innerHTML;
           this_.form.chapterContent = document.getElementById("main").getElementsByClassName("w-e-text")[0].innerHTML;
           this_.saveData = this_.form.chapterContent.replace(/<style>[\s\S]*?<\/style>/g,"");
+          this_.saveData = this_.saveData.replace(/<\/?br+?[^>]*>/gi,'\n')
           this_.saveData = this_.saveData.replace(/<\/?(?!(p|img))[a-z]+?[^>]*>/gi,"");
           this_.saveData = this_.saveData.replace(/&nbsp;/g,' ')
-          this_.saveData = this_.saveData.replace(/<([\/]?)(p)((:?\s*)(:?[^>]*)(:?\s*))>/g,'\n')
+          this_.saveData = this_.saveData.replace(/<\/?(p)((:?\s*)(:?[^>]*)(:?\s*))>/g,'\n')
           this_.saveData = this_.saveData.replace(/<!(-*)(.*)(-*)>/g,'');
           // this_.chapterContent = this_.chapterContent.replace(/<!--\[if\s+gte\s+mso\s+9\]>(?:(?!<!\[endif\]-->)[\s\S])*<!\[endif\]-->/gi,"");
-          console.log(this_.form);
           resolve();
       })
        

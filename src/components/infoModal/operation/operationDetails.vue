@@ -11,7 +11,12 @@
       @current-change="currentChange"
       @selection-change="selectionChange"
       @on-load="onLoad"
-    ></avue-crud>
+    >
+      <template slot-scope="scope" slot="remark">
+        <div v-if='scope.row.remark'>{{scope.row.remark}}</div>
+        <div v-else>暂无</div>
+      </template>
+    </avue-crud>
   </div>
 </template>
 <script>
@@ -70,59 +75,36 @@ export default {
         align: "center",
         column: [
             {
-              label: "收益人id",
-              prop: "revenueId",
-              rules: [{
-                required: true,
-                message: "请输入收益人id",
-                trigger: "blur"
-              }]
+              label: "购买人昵称",
+              prop: "customerNickName"
             },
             {
-              label: "消费者id",
-              prop: "consumerId",
-              rules: [{
-                required: true,
-                message: "请输入消费者id",
-                trigger: "blur"
-              }]
+              label: "购买人ID",
+              prop: "customerNumber"
+            },
+             {
+              label: "购买类型",
+              prop: "buyType"
             },
             {
-              label: "订单id",
-              prop: "orderId",
-              rules: [{
-                required: true,
-                message: "请输入订单id",
-                trigger: "blur"
-              }]
+              label: "明细",
+              prop: "remark",
+              slot: true
+            },
+            {
+              label: "购买时间",
+              prop: "createTime"
+            },
+            {
+              label: "购买价格",
+              prop: "buyGold"
             },
             {
               label: "收益金币",
-              prop: "money",
-              rules: [{
-                required: true,
-                message: "请输入收益金币",
-                trigger: "blur"
-              }]
+              prop: "money"
             },
-            {
-              label: "备注",
-              prop: "remark",
-              rules: [{
-                required: true,
-                message: "请输入备注",
-                trigger: "blur"
-              }]
-            },
-            {
-              label: "创建时间",
-              prop: "createTime",
-              rules: [{
-                required: true,
-                message: "请输入创建时间",
-                trigger: "blur"
-              }]
-            },
+            
+           
           ]
       },
       data: []

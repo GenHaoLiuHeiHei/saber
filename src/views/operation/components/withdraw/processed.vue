@@ -86,7 +86,7 @@ export default {
           },
           {
             label: "用户ID",
-            prop: "customerId",
+            prop: "customerNumber",
             search: true
 
           },

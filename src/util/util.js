@@ -81,6 +81,13 @@ export const getRenderSort = (h, column, query, cb) => {
         ]),
     ])
 };
+export const findObject = (data, prop) => {
+    let res = null
+    data.map(v => {
+      if (v.prop === prop) res = v
+    });
+    return res
+};
 
 /**
  * 表单序列化

@@ -1,46 +1,71 @@
 <template>
   <basic-container>
     <avue-crud :option="option"
+               :table-loading="loading"
                :data="data"
                :page="page"
-               @row-del="rowDel"
-               v-model="form"
                :permission="permissionList"
+               :before-open="beforeOpen"
+               v-model="form"
+               ref="crud"
                @row-update="rowUpdate"
                @row-save="rowSave"
-               :before-open="beforeOpen"
+               @row-del="rowDel"
                @search-change="searchChange"
                @search-reset="searchReset"
                @selection-change="selectionChange"
                @current-change="currentChange"
                @size-change="sizeChange"
                @on-load="onLoad">
+        <template slot-scope="scope" slot="menu">
+          <el-button
+            type="button"
+            size="small"
+            class="el-button--text"
+            icon="el-icon-edit"
+            @click="showModalInfo(scope.row, 'parameterHomegoodsbox')"
+          >配置</el-button>
+      </template>
       <template slot="menuLeft">
         <el-button type="danger"
                    size="small"
                    icon="el-icon-delete"
                    plain
-                   v-if="permission.notice_delete"
                    @click="handleDelete">删 除
         </el-button>
       </template>
-      <template slot-scope="{row}"
-                slot="category">
-        <el-tag>{{row.categoryName}}</el-tag>
-      </template>
     </avue-crud>
+    <el-dialog :title="title" :visible.sync="isShowDialog" :modal="false" :close-on-click-modal="false" @close="closeDialogAddgsVisible">
+       <infoModal 
+        :modalInfoType="modalInfoType" 
+        v-if="isShowDialog" 
+        :formDatas="formDatas" 
+        tofrom="user" 
+        :optionTabs="optionTabs"
+        :isOptionTab="isOptionTab"
+        :isShowSeach="isShowSeach"
+        @closeDialogAddgsVisible="closeDialogAddgsVisible">
+        </infoModal>
+    </el-dialog>
   </basic-container>
 </template>
 
 <script>
-  import {getList, remove, update, add, getNotice} from "@/api/dept/notice";
+  import {getList, getDetail, add, update, remove} from "@/api/parameter/bloggerhomegrade";
   import {mapGetters} from "vuex";
-
+  import { findObject } from '@/util/util';
+  import {modalMixin} from "@/mixins/modalMixin";
+  import infoModal from "@/components/infoModal/index";
   export default {
+    mixins: [modalMixin],
+    components: {
+      infoModal
+    },
     data() {
       return {
         form: {},
         query: {},
+        loading: true,
         page: {
           pageSize: 10,
           currentPage: 1,
@@ -56,53 +81,46 @@
           selection: true,
           column: [
             {
-              label: "通知标题",
-              prop: "title",
-              row: true,
-              search: true,
+              label: "建筑等级",
+              prop: "grade",
+              type: 'number',
               rules: [{
                 required: true,
-                message: "请输入通知标题",
+                message: "请输入建筑等级(1,2,3,4,5...)",
                 trigger: "blur"
-              }]
+              }],
+              span: 24,
+              labelWidth:120
             },
             {
-              label: "通知类型",
-              type: "select",
-              row: true,
-              dicUrl: "/api/blade-system/dict/dictionary?code=notice",
+              label: "状态是否开启",
+              prop: "status",
+              type: 'select',
+              dicUrl: "/api/blade-system/dict/dictionary?code=yes_no",
               props: {
                 label: "dictValue",
                 value: "dictKey"
               },
-              slot: true,
-              prop: "category",
-              search: true,
               rules: [{
                 required: true,
-                message: "请输入通知类型",
+                message: "请选择道具标签",
                 trigger: "blur"
-              }]
-            },
-            {
-              label: "通知日期",
-              prop: "releaseTime",
-              type: "date",
-              format: "yyyy-MM-dd HH:mm:ss",
-              valueFormat: "yyyy-MM-dd HH:mm:ss",
-              rules: [{
-                required: true,
-                message: "请输入通知日期",
-                trigger: "blur"
-              }]
-            },
-            {
-              label: "通知内容",
-              prop: "content",
+              }],
               span: 24,
-              minRows: 6,
-              type: "textarea"
-            }
+              labelWidth:120
+            },
+            // {
+            //   label: "管理员密码",
+            //   prop: "password",
+            //   hide: true,
+            //   rules: [{
+            //     required: true,
+            //     message: "请输入管理员密码",
+            //     trigger: "blur"
+            //   }],
+            //   span: 24,
+            //   labelWidth:120
+            // },
           ]
         },
         data: []
@@ -112,10 +130,14 @@
       ...mapGetters(["permission"]),
       permissionList() {
         return {
-          addBtn: this.vaildData(this.permission.notice_add, false),
-          viewBtn: this.vaildData(this.permission.notice_view, false),
-          delBtn: this.vaildData(this.permission.notice_delete, false),
-          editBtn: this.vaildData(this.permission.notice_edit, false)
+        //   addBtn: this.vaildData(this.permission.bloggerhomegrade_add, false),
+        //   viewBtn: this.vaildData(this.permission.bloggerhomegrade_view, false),
+        //   delBtn: this.vaildData(this.permission.bloggerhomegrade_delete, false),
+        //   editBtn: this.vaildData(this.permission.bloggerhomegrade_edit, false)
+          addBtn: true,
+          viewBtn: true,
+          delBtn: true,
+          editBtn: true
         };
       },
       ids() {
@@ -170,17 +192,6 @@
             });
           });
       },
-      searchReset() {
-        this.query = {};
-        this.onLoad(this.page);
-      },
-      searchChange(params) {
-        this.query = params;
-        this.onLoad(this.page, params);
-      },
-      selectionChange(list) {
-        this.selectionList = list;
-      },
       handleDelete() {
         if (this.selectionList.length === 0) {
           this.$message.warning("请选择至少一条数据");
@@ -205,11 +216,26 @@
       },
       beforeOpen(done, type) {
         if (["edit", "view"].includes(type)) {
-          getNotice(this.form.id).then(res => {
+          getDetail(this.form.id).then(res => {
             this.form = res.data.data;
           });
         }
         done();
+      },
+      searchReset() {
+        this.query = {};
+        this.onLoad(this.page);
+      },
+      searchChange(params) {
+        this.query = params;
+        this.onLoad(this.page, params);
+      },
+      selectionChange(list) {
+        this.selectionList = list;
+      },
+      selectionClear() {
+        this.selectionList = [];
+        this.$refs.crud.toggleSelection();
       },
       currentChange(currentPage){
         this.page.currentPage = currentPage;
@@ -218,10 +244,13 @@
         this.page.pageSize = pageSize;
       },
       onLoad(page, params = {}) {
+        this.loading = true;
         getList(page.currentPage, page.pageSize, Object.assign(params, this.query)).then(res => {
           const data = res.data.data;
           this.page.total = data.total;
           this.data = data.records;
+          this.loading = false;
+          this.selectionClear();
         });
       }
     }

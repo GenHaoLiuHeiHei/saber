@@ -21,28 +21,22 @@
     data() {
       return {
          option: {
+          emptyBtn:false,
           column: [
-          {
-            label: "提现单号",
-            prop: "extractNoId",
-            span: 12,
-            labelWidth:120,
-            disabled: true,
-          },
-          {
-            label: "用户昵称",
-            prop: "customerName",
-            span: 12,
-            disabled: true,
-            labelWidth:120
-          },
-          {
-            label: "用户ID",
-            prop: "customerId",
-            span: 12,
-            disabled: true,
-            labelWidth:120
-          },
+            {
+              label: "用户昵称",
+              prop: "customerName",
+              span: 12,
+              disabled: true,
+              labelWidth:120
+            },
+            {
+              label: "用户ID",
+              prop: "customerNumber",
+              span: 12,
+              disabled: true,
+              labelWidth:120
+            },
            {
             label: "提现金币",
             prop: "extractGold",
@@ -57,49 +51,48 @@
             disabled: true,
             labelWidth:120
           },
-          // {
-          //   label: "提现状态（1，审核中2，提现成功3，失败）",
-          //   prop: "extractStatus",
-          //   rules: [
-          //     {
-          //       required: true,
-          //       message: "请输入提现状态（1，审核中2，提现成功3，失败）",
-          //       trigger: "blur"
-          //     }
-          //   ]
-          // },
-          // {
-          //   label: "提现渠道",
-          //   prop: "extractWay",
-          //   rules: [
-          //     {
-          //       required: true,
-          //       message: "请输入提现渠道",
-          //       trigger: "blur"
-          //     }
-          //   ]
-          // },
           {
-            label: "申请日期",
-            prop: "createTime",
+            label: "提现方式",
+            prop: "accountType",
             span: 12,
             disabled: true,
             labelWidth:120
           },
           {
-            label: "提现日期",
-            prop: "updateTime",
+            label: "提现账号",
+            prop: "account",
             span: 12,
             disabled: true,
             labelWidth:120
           },
           {
-            label: "操作人员",
-            prop: "updateUser",
+            label: "申请人",
+            prop: "name",
             span: 12,
             disabled: true,
             labelWidth:120
           },
+          {
+            label: "手机号",
+            prop: "customerPhoneNumber",
+            span: 12,
+            disabled: true,
+            labelWidth:120
+          },
+          {
+            label: "开户行",
+            prop: "openBank",
+            span: 12,
+            disabled: true,
+            labelWidth:120
+          },
+          {
+              label: "提现单号",
+              prop: "extractNoId",
+              span: 12,
+              labelWidth:120,
+              disabled: true,
+            },
           {
             label: "管理员密码",
             prop: "password",

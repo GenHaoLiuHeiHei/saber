@@ -93,7 +93,7 @@ export default {
           },
           {
             label: "用户ID",
-            prop: "customerId",
+            prop: "customerNumber",
             search: true
 
           },
@@ -108,14 +108,6 @@ export default {
           {
             label: "申请日期",
             prop: "createTime"
-          },
-          {
-            label: "提现日期",
-            prop: "updateTime"
-          },
-          {
-            label: "操作人员",
-            prop: "updateUser"
           }
         ]
       },

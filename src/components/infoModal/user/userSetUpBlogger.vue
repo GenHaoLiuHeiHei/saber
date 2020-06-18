@@ -36,6 +36,39 @@
               disabled: true
             },
             {
+              label: "坐标编号",
+              prop: "siteNum",
+              type:'number',
+              rules: [{
+                required: true,
+                message: "请输入坐标编号",
+                trigger: "blur"
+              }],
+              labelWidth: 120,
+              span: 24,
+            },
+            {
+              label: "区域编号",
+              prop: "areaNum",
+              type:'select',
+              dicData:[
+                {
+                  label:'区域一',
+                  value:1
+                },{
+                  label:'区域二',
+                  value:2
+                }
+              ],
+              rules: [{
+                required: true,
+                message: "请选择区域编号",
+                trigger: "blur"
+              }],
+              labelWidth: 120,
+              span: 24,
+            },
+            {
               label: "管理员密码",
               prop: "password",
               rules: [{

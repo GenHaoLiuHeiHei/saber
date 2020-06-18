@@ -29,6 +29,7 @@ export const modalMixin = {
             this.formDatas = row;
             this.modalInfoType = type;
             switch (type) {
+           
             case "bookChapterList":
                 this.title = "章节列表";
                 break;
@@ -89,6 +90,9 @@ export const modalMixin = {
             case "operationNotBlockComments":
                 this.title = "不违规";
                 break;
+            case "operationGoodsBox":
+                this.title = "宝箱";
+                break;
             case "operationFeedbackReply":
                 this.title = "反馈回复";
                 break;
@@ -96,7 +100,7 @@ export const modalMixin = {
                 this.title = "标位已读";
                 break;
             case "operationWithdraw":
-                this.title = "提现";
+                this.title = "提现处理";
                 break;   
             case "quartzjobLog":
                 this.title = "日志";

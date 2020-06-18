@@ -1,46 +1,38 @@
 <template>
   <basic-container>
     <avue-crud :option="option"
+               :table-loading="loading"
                :data="data"
                :page="page"
-               @row-del="rowDel"
-               v-model="form"
                :permission="permissionList"
+               :before-open="beforeOpen"
+               v-model="form"
+               ref="crud"
                @row-update="rowUpdate"
                @row-save="rowSave"
-               :before-open="beforeOpen"
+               @row-del="rowDel"
                @search-change="searchChange"
                @search-reset="searchReset"
                @selection-change="selectionChange"
                @current-change="currentChange"
                @size-change="sizeChange"
                @on-load="onLoad">
-      <template slot="menuLeft">
-        <el-button type="danger"
-                   size="small"
-                   icon="el-icon-delete"
-                   plain
-                   v-if="permission.notice_delete"
-                   @click="handleDelete">删 除
-        </el-button>
-      </template>
-      <template slot-scope="{row}"
-                slot="category">
-        <el-tag>{{row.categoryName}}</el-tag>
-      </template>
     </avue-crud>
   </basic-container>
 </template>
 
 <script>
-  import {getList, remove, update, add, getNotice} from "@/api/dept/notice";
+  import {getList, getDetail, add, update, remove} from "@/api/customer/customerboxlog";
   import {mapGetters} from "vuex";
-
+  import {findObject} from '@/util/util';
+  import {getGoodsList} from "@/api/parameter/goods";
   export default {
     data() {
       return {
+        goodsType: [],
         form: {},
         query: {},
+        loading: true,
         page: {
           pageSize: 10,
           currentPage: 1,
@@ -48,61 +40,43 @@
         },
         selectionList: [],
         option: {
-          tip: false,
+           tip: false,
           align:'center',
           border: true,
           index: false,
           viewBtn: false,
-          selection: true,
+          selection: false,
+          menu: false,
           column: [
             {
-              label: "通知标题",
-              prop: "title",
-              row: true,
-              search: true,
-              rules: [{
-                required: true,
-                message: "请输入通知标题",
-                trigger: "blur"
-              }]
+              label: "任务ID",
+              prop: "boxMode"
             },
             {
-              label: "通知类型",
-              type: "select",
-              row: true,
-              dicUrl: "/api/blade-system/dict/dictionary?code=notice",
-              props: {
-                label: "dictValue",
-                value: "dictKey"
-              },
-              slot: true,
-              prop: "category",
-              search: true,
-              rules: [{
-                required: true,
-                message: "请输入通知类型",
-                trigger: "blur"
-              }]
+              label: "用户昵称",
+              prop: "customerName",
+            },
+            // {
+            //   label: "用户ID",
+            //   prop: "customerId",
+            // },
+            // {
+            //   label: "博主用户ID",
+            //   prop: "bloggerId"
+            // },
+            {
+              label: "道具名称",
+              prop: "goodsId",
+              dicData: []
             },
             {
-              label: "通知日期",
-              prop: "releaseTime",
-              type: "date",
-              format: "yyyy-MM-dd HH:mm:ss",
-              valueFormat: "yyyy-MM-dd HH:mm:ss",
-              rules: [{
-                required: true,
-                message: "请输入通知日期",
-                trigger: "blur"
-              }]
+              label: "获取时间",
+              prop: "createTime"
             },
             {
-              label: "通知内容",
-              prop: "content",
-              span: 24,
-              minRows: 6,
-              type: "textarea"
-            }
+              label: "关联对象内容(组装日志信息)",
+              prop: "relateComment"
+            },
           ]
         },
         data: []
@@ -112,10 +86,10 @@
       ...mapGetters(["permission"]),
       permissionList() {
         return {
-          addBtn: this.vaildData(this.permission.notice_add, false),
-          viewBtn: this.vaildData(this.permission.notice_view, false),
-          delBtn: this.vaildData(this.permission.notice_delete, false),
-          editBtn: this.vaildData(this.permission.notice_edit, false)
+          addBtn: this.vaildData(this.permission.customerboxlog_add, false),
+          viewBtn: this.vaildData(this.permission.customerboxlog_view, false),
+          delBtn: this.vaildData(this.permission.customerboxlog_delete, false),
+          editBtn: this.vaildData(this.permission.customerboxlog_edit, false)
         };
       },
       ids() {
@@ -125,6 +99,26 @@
         });
         return ids.join(",");
       }
+    },
+    watch: {
+       'goodsType':{
+          handler(val){
+            var goodsId = findObject(this.option.column,'goodsId');
+            goodsId.dicData = val;
+          },
+          immediate: true
+      },
+    },
+    created () {
+      getGoodsList(this.page.currentPage, 100).then(res => {
+          const data = res.data.data.records;
+          this.goodsType = data.map(v => {
+            let res = {};
+            res.label = v.goodsName;
+            res.value = v.id;
+            return res
+          });
+      });
     },
     methods: {
       rowSave(row, loading, done) {
@@ -170,17 +164,6 @@
             });
           });
       },
-      searchReset() {
-        this.query = {};
-        this.onLoad(this.page);
-      },
-      searchChange(params) {
-        this.query = params;
-        this.onLoad(this.page, params);
-      },
-      selectionChange(list) {
-        this.selectionList = list;
-      },
       handleDelete() {
         if (this.selectionList.length === 0) {
           this.$message.warning("请选择至少一条数据");
@@ -205,11 +188,26 @@
       },
       beforeOpen(done, type) {
         if (["edit", "view"].includes(type)) {
-          getNotice(this.form.id).then(res => {
+          getDetail(this.form.id).then(res => {
             this.form = res.data.data;
           });
         }
         done();
+      },
+      searchReset() {
+        this.query = {};
+        this.onLoad(this.page);
+      },
+      searchChange(params) {
+        this.query = params;
+        this.onLoad(this.page, params);
+      },
+      selectionChange(list) {
+        this.selectionList = list;
+      },
+      selectionClear() {
+        this.selectionList = [];
+        this.$refs.crud.toggleSelection();
       },
       currentChange(currentPage){
         this.page.currentPage = currentPage;
@@ -218,10 +216,13 @@
         this.page.pageSize = pageSize;
       },
       onLoad(page, params = {}) {
+        this.loading = true;
         getList(page.currentPage, page.pageSize, Object.assign(params, this.query)).then(res => {
           const data = res.data.data;
           this.page.total = data.total;
           this.data = data.records;
+          this.loading = false;
+          this.selectionClear();
         });
       }
     }

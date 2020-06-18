@@ -1,14 +1,16 @@
 <template>
   <basic-container>
     <avue-crud :option="option"
+               :table-loading="loading"
                :data="data"
                :page="page"
-               @row-del="rowDel"
-               v-model="form"
                :permission="permissionList"
+               :before-open="beforeOpen"
+               v-model="form"
+               ref="crud"
                @row-update="rowUpdate"
                @row-save="rowSave"
-               :before-open="beforeOpen"
+               @row-del="rowDel"
                @search-change="searchChange"
                @search-reset="searchReset"
                @selection-change="selectionChange"
@@ -20,27 +22,28 @@
                    size="small"
                    icon="el-icon-delete"
                    plain
-                   v-if="permission.notice_delete"
                    @click="handleDelete">删 除
         </el-button>
-      </template>
-      <template slot-scope="{row}"
-                slot="category">
-        <el-tag>{{row.categoryName}}</el-tag>
       </template>
     </avue-crud>
   </basic-container>
 </template>
 
 <script>
-  import {getList, remove, update, add, getNotice} from "@/api/dept/notice";
+  import {getList, getDetail, add, update, remove} from "@/api/parameter/goodsbox";
   import {mapGetters} from "vuex";
-
+  import {getGoodsList} from "@/api/parameter/goods";
+  import { findObject } from '@/util/util'
   export default {
     data() {
       return {
+        goodsType: {
+          chest: [],
+          supplies: []
+        },
         form: {},
         query: {},
+        loading: true,
         page: {
           pageSize: 10,
           currentPage: 1,
@@ -56,53 +59,55 @@
           selection: true,
           column: [
             {
-              label: "通知标题",
-              prop: "title",
-              row: true,
-              search: true,
+              label: "物品名称",
+              prop: "goodsId",
+              type: 'select',
+              dicData: [],
               rules: [{
                 required: true,
-                message: "请输入通知标题",
+                message: "请选择物品名称",
                 trigger: "blur"
-              }]
-            },
-            {
-              label: "通知类型",
-              type: "select",
-              row: true,
-              dicUrl: "/api/blade-system/dict/dictionary?code=notice",
-              props: {
-                label: "dictValue",
-                value: "dictKey"
-              },
-              slot: true,
-              prop: "category",
-              search: true,
-              rules: [{
-                required: true,
-                message: "请输入通知类型",
-                trigger: "blur"
-              }]
-            },
-            {
-              label: "通知日期",
-              prop: "releaseTime",
-              type: "date",
-              format: "yyyy-MM-dd HH:mm:ss",
-              valueFormat: "yyyy-MM-dd HH:mm:ss",
-              rules: [{
-                required: true,
-                message: "请输入通知日期",
-                trigger: "blur"
-              }]
-            },
-            {
-              label: "通知内容",
-              prop: "content",
+              }],
               span: 24,
-              minRows: 6,
-              type: "textarea"
-            }
+              labelWidth:200
+            },
+            {
+              label: "宝箱里面的物品",
+              prop: "goodsChildId",
+              type: 'select',
+              dicData: [],
+              rules: [{
+                required: true,
+                message: "请选择宝箱里面的物品",
+                trigger: "blur"
+              }],
+              span: 24,
+              labelWidth:200
+            },
+            {
+              label: "物品数量随机数最小",
+              type: 'number',
+              prop: "childMinNum",
+              rules: [{
+                required: true,
+                message: "请输入物品数量随机数最小",
+                trigger: "blur"
+              }],
+              span: 24,
+              labelWidth:200
+            },
+            {
+              label: "物品数量随机数最大",
+              type: 'number',
+              prop: "childMaxNum",
+              rules: [{
+                required: true,
+                message: "请输入物品数量随机数最大",
+                trigger: "blur"
+              }],
+              span: 24,
+              labelWidth:200
+            },
           ]
         },
         data: []
@@ -112,10 +117,14 @@
       ...mapGetters(["permission"]),
       permissionList() {
         return {
-          addBtn: this.vaildData(this.permission.notice_add, false),
-          viewBtn: this.vaildData(this.permission.notice_view, false),
-          delBtn: this.vaildData(this.permission.notice_delete, false),
-          editBtn: this.vaildData(this.permission.notice_edit, false)
+          // addBtn: this.vaildData(this.permission.goodsbox_add, false),
+          // viewBtn: this.vaildData(this.permission.goodsbox_view, false),
+          // delBtn: this.vaildData(this.permission.goodsbox_delete, false),
+          // editBtn: this.vaildData(this.permission.goodsbox_edit, false)
+          addBtn: true,
+          viewBtn: true,
+          delBtn: true,
+          editBtn: true
         };
       },
       ids() {
@@ -125,6 +134,38 @@
         });
         return ids.join(",");
       }
+    },
+    watch: {
+       'goodsType.chest':{
+          handler(val){
+            let goodsId = findObject(this.option.column,'goodsId');
+            goodsId.dicData = val;
+          },
+          immediate: true
+        },
+        'goodsType.supplies':{
+          handler(val){
+            let goodsId = findObject(this.option.column,'goodsChildId');
+            goodsId.dicData = val;
+          },
+          immediate: true
+        },
+    },
+    created () {
+      let this_ = this;
+       getGoodsList(this.page.currentPage, 100).then(res => {
+          const data = res.data.data.records;
+          data.map(v => {
+            let res = {};
+            res.label = v.goodsName;
+            res.value = v.id;
+            if (v.goodsType === 1) {
+              this_.goodsType.chest.push(res)
+            } else {
+              this_.goodsType.supplies.push(res)
+            }
+          });
+      });
     },
     methods: {
       rowSave(row, loading, done) {
@@ -170,17 +211,6 @@
             });
           });
       },
-      searchReset() {
-        this.query = {};
-        this.onLoad(this.page);
-      },
-      searchChange(params) {
-        this.query = params;
-        this.onLoad(this.page, params);
-      },
-      selectionChange(list) {
-        this.selectionList = list;
-      },
       handleDelete() {
         if (this.selectionList.length === 0) {
           this.$message.warning("请选择至少一条数据");
@@ -205,11 +235,26 @@
       },
       beforeOpen(done, type) {
         if (["edit", "view"].includes(type)) {
-          getNotice(this.form.id).then(res => {
+          getDetail(this.form.id).then(res => {
             this.form = res.data.data;
           });
         }
         done();
+      },
+      searchReset() {
+        this.query = {};
+        this.onLoad(this.page);
+      },
+      searchChange(params) {
+        this.query = params;
+        this.onLoad(this.page, params);
+      },
+      selectionChange(list) {
+        this.selectionList = list;
+      },
+      selectionClear() {
+        this.selectionList = [];
+        this.$refs.crud.toggleSelection();
       },
       currentChange(currentPage){
         this.page.currentPage = currentPage;
@@ -218,10 +263,13 @@
         this.page.pageSize = pageSize;
       },
       onLoad(page, params = {}) {
+        this.loading = true;
         getList(page.currentPage, page.pageSize, Object.assign(params, this.query)).then(res => {
           const data = res.data.data;
           this.page.total = data.total;
           this.data = data.records;
+          this.loading = false;
+          this.selectionClear();
         });
       }
     }

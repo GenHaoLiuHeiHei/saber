@@ -28,6 +28,12 @@ export default {
                   labelWidth: 120,
                   prop: 'pictureLink1',
                   span: 16,
+                  prepend:'http://',
+                  mock:{
+                    type:'url',
+                    header:false,
+                  },
+                  append:'com',
                   rules: [
                     {
                       required: true,
@@ -123,7 +129,13 @@ export default {
                       message: "请输入",
                       trigger: "blur"
                     }
-                  ]
+                  ],
+                   prepend:'http://',
+                    mock:{
+                      type:'url',
+                      header:false,
+                    },
+                    append:'com',
                 },{
                   prop: 'del',
                   span: 2,
@@ -208,7 +220,13 @@ export default {
                   message: "请输入",
                   trigger: "blur"
                 }
-              ]
+              ],
+              prepend:'http://',
+              mock:{
+                type:'url',
+                header:false,
+              },
+              append:'com',
             },{
               prop: 'del',
               span: 2,

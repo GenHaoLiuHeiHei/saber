@@ -9,7 +9,7 @@
             {{ $t('login.title') }}{{website.title}}
             <top-lang></top-lang>
           </h4>
-          <userLogin v-if="activeName==='user'"></userLogin>
+          <userLogin v-if="activeName =='user'"></userLogin>
           <codeLogin v-else-if="activeName==='code'"></codeLogin>
           <thirdLogin v-else-if="activeName==='third'"></thirdLogin>
           <div class="login-menu">

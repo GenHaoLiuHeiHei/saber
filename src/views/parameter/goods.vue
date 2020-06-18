@@ -17,24 +17,51 @@
                @current-change="currentChange"
                @size-change="sizeChange"
                @on-load="onLoad">
+        <template slot-scope="scope" slot="menu">
+          <el-button
+            type="button"
+            size="small"
+            class="el-button--text"
+            icon="el-icon-edit"
+            v-if="scope.row.goodsType === 1"
+            @click="showModalInfo(scope.row, 'parameterGoodsBox')"
+          >设置物品</el-button>
+      </template>
       <template slot="menuLeft">
         <el-button type="danger"
                    size="small"
                    icon="el-icon-delete"
                    plain
-                   v-if="permission.datasource_delete"
                    @click="handleDelete">删 除
         </el-button>
       </template>
     </avue-crud>
+    <el-dialog :title="title" :visible.sync="isShowDialog" :modal="false" :close-on-click-modal="false" @close="closeDialogAddgsVisible">
+       <infoModal 
+        :modalInfoType="modalInfoType" 
+        v-if="isShowDialog" 
+        :formDatas="formDatas" 
+        tofrom="user" 
+        :optionTabs="optionTabs"
+        :isOptionTab="isOptionTab"
+        :isShowSeach="isShowSeach"
+        @closeDialogAddgsVisible="closeDialogAddgsVisible">
+        </infoModal>
+    </el-dialog>
   </basic-container>
 </template>
 
 <script>
-  import {getList, getDetail, add, update, remove} from "@/api/tool/datasource";
+  import {getGoodsList, getDetail, add, update, remove} from "@/api/parameter/goods";
   import {mapGetters} from "vuex";
-
+  import { findObject } from '@/util/util';
+  import {modalMixin} from "@/mixins/modalMixin";
+  import infoModal from "@/components/infoModal/index";
   export default {
+    mixins: [modalMixin],
+    components: {
+      infoModal
+    },
     data() {
       return {
         form: {},
@@ -47,8 +74,6 @@
         },
         selectionList: [],
         option: {
-          dialogWidth: 400,
-          dialogHeight: 330,
           tip: false,
           align:'center',
           border: true,
@@ -57,89 +82,146 @@
           selection: true,
           column: [
             {
-              label: "名称",
-              prop: "name",
-              width: 120,
+              label: "道具名称",
+              prop: "goodsName",
               rules: [{
                 required: true,
-                message: "请输入数据源名称",
+                message: "请输入道具名称",
                 trigger: "blur"
-              }]
+              }],
+              span: 24,
+              labelWidth:120
             },
             {
-              label: "驱动类",
-              prop: "driverClass",
+              label: "描述",
+              prop: "description",
+              rules: [{
+                required: true,
+                message: "请输入描述",
+                trigger: "blur"
+              }],
+              span: 24,
+              labelWidth:120
+            },
+            {
+              label: "道具标签",
+              prop: "goodsTag",
               type: 'select',
-              dicData: [
-                {
-                  label: 'com.mysql.cj.jdbc.Driver',
-                  value: 'com.mysql.cj.jdbc.Driver',
-                }, {
-                  label: 'org.postgresql.Driver',
-                  value: 'org.postgresql.Driver',
-                }, {
-                  label: 'oracle.jdbc.OracleDriver',
-                  value: 'oracle.jdbc.OracleDriver',
-                }
-              ],
-              width: 200,
+              dicUrl: "/api/blade-system/dict/dictionary?code=bag_goods",
+              props: {
+                label: "dictValue",
+                value: "dictKey"
+              },
               rules: [{
                 required: true,
-                message: "请输入驱动类",
+                message: "请选择道具标签",
                 trigger: "blur"
-              }]
-            },
-            {
-              label: "用户名",
-              prop: "username",
-              width: 120,
-              rules: [{
-                required: true,
-                message: "请输入用户名",
-                trigger: "blur"
-              }]
-            },
-            {
-              label: "密码",
-              prop: "password",
-              hide: true,
-              rules: [{
-                required: true,
-                message: "请输入密码",
-                trigger: "blur"
-              }]
-            },
-            {
-              label: "连接地址",
-              prop: "url",
+              }],
               span: 24,
-              rules: [{
-                required: true,
-                message: "请输入连接地址",
-                trigger: "blur"
-              }]
+              labelWidth:120
             },
             {
-              label: "备注",
-              prop: "remark",
+              label: "物资类型",
+              prop: "goodsType",
+              type: 'select',
+              dicUrl: "/api/blade-system/dict/dictionary?code=goods_type",
+              props: {
+                label: "dictValue",
+                value: "dictKey"
+              },
+              rules: [{
+                required: true,
+                message: "请选择任务类型",
+                trigger: "blur"
+              }],
               span: 24,
-              minRows: 3,
-              hide: true,
-              type: "textarea"
+              labelWidth:120
             },
+            {
+              label: "计量单位",
+              prop: "goodsUnit",
+              type: 'number',
+              rules: [{
+                required: true,
+                message: "请输入计量单位，（每一次赠送多少个）",
+                trigger: "blur"
+              }],
+              span: 24,
+              labelWidth:120
+            },
+            {
+              label: "赠送获取贡献值",
+              prop: "goodsExperience",
+              type: 'number',
+              rules: [{
+                required: true,
+                message: "请输入赠送获取贡献值",
+                trigger: "blur"
+              }],
+              span: 24,
+              labelWidth:120
+            },
+            // {
+            //   label: "管理员密码",
+            //   prop: "password",
+            //   hide: true,
+            //   rules: [{
+            //     required: true,
+            //     message: "请输入管理员密码",
+            //     trigger: "blur"
+            //   }],
+            //   span: 24,
+            //   labelWidth:120
+            // },
           ]
         },
         data: []
       };
     },
+    watch: {
+       'form.goodsType':{
+          handler(val){
+            var goodsUnit = findObject(this.option.column,'goodsUnit');
+            var goodsExperience = findObject(this.option.column,'goodsExperience');
+            if(val !== 1){
+              goodsUnit.display = true;
+              goodsUnit.rules=[{
+                required: true,
+                message: "请输入计量单位，（每一次赠送多少个）",
+                trigger: "blur"
+              }]
+              goodsExperience.display = true;
+              goodsExperience.rules=[{
+                required: true,
+                message: "请输入赠送获取贡献值",
+                trigger: "blur"
+              }]
+              this.form.goodsUnit = 0;
+              this.form.goodsExperience = 0;
+            }else{
+              goodsUnit.display = false;
+              goodsUnit.rules = [];
+              goodsExperience.display = false;
+              goodsExperience.rules = [];
+              this.form.goodsUnit = 1;
+              this.form.goodsExperience = 0;
+            }
+          },
+          immediate: true
+      },
+    },
     computed: {
       ...mapGetters(["permission"]),
       permissionList() {
         return {
-          addBtn: this.vaildData(this.permission.datasource_add, false),
-          viewBtn: this.vaildData(this.permission.datasource_view, false),
-          delBtn: this.vaildData(this.permission.datasource_delete, false),
-          editBtn: this.vaildData(this.permission.datasource_edit, false)
+          // addBtn: this.vaildData(this.permission.goods_add, false),
+          // viewBtn: this.vaildData(this.permission.goods_view, false),
+          // delBtn: this.vaildData(this.permission.goods_delete, false),
+          // editBtn: this.vaildData(this.permission.goods_edit, false)
+          addBtn: true,
+          viewBtn: true,
+          delBtn: true,
+          editBtn: true
         };
       },
       ids() {
@@ -239,15 +321,15 @@
         this.selectionList = [];
         this.$refs.crud.toggleSelection();
       },
-      currentChange(currentPage) {
+      currentChange(currentPage){
         this.page.currentPage = currentPage;
       },
-      sizeChange(pageSize) {
+      sizeChange(pageSize){
         this.page.pageSize = pageSize;
       },
       onLoad(page, params = {}) {
         this.loading = true;
-        getList(page.currentPage, page.pageSize, Object.assign(params, this.query)).then(res => {
+        getGoodsList(page.currentPage, page.pageSize, Object.assign(params, this.query)).then(res => {
           const data = res.data.data;
           this.page.total = data.total;
           this.data = data.records;

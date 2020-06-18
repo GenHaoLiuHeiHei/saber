@@ -45,9 +45,10 @@
         selectionList: [],
         option: {
           tip: false,
+          align:'center',
           border: true,
-          index: true,
-          viewBtn: true,
+          index: false,
+          viewBtn: false,
           selection: true,
           column: [
             {

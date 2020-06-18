@@ -63,7 +63,7 @@
             },
             {
               label: "管理员",
-              prop: "updateUser",
+              prop: "updateName",
             },
             {
               label: "状态",

@@ -52,7 +52,7 @@
           index: false,
           viewBtn: true,
           selection: false,
-          addBtn: false,
+          addBtn: true,
           align: 'center',
           column: [
             {
@@ -81,7 +81,27 @@
               prop: "type",
               type: 'select',
               dicUrl: "/api/blade-system/dict/dictionary?code=exchangeRate",
-              disabled: true,
+              addDisplay: true,
+              editDisplay: false,
+              props: {
+                label: "dictValue",
+                value: "dictKey"
+              },
+              rules: [{
+                required: true,
+                message: "请选择类型",
+                trigger: "blur"
+              }],
+              span: 24,
+              labelWidth:120
+            },
+            {
+              label: "手机类型",
+              prop: "place",
+              type: 'select',
+              dicUrl: "/api/blade-system/dict/dictionary?code=phone_type",
+              addDisplay: true,
+              editDisplay: false,
               props: {
                 label: "dictValue",
                 value: "dictKey"
@@ -115,9 +135,9 @@
       ...mapGetters(["permission"]),
       permissionList() {
         return {
-          addBtn: this.vaildData(this.permission.exchangerate_add, false),
-          viewBtn: this.vaildData(this.permission.exchangerate_view, false),
-          delBtn: this.vaildData(this.permission.exchangerate_delete, false),
+          addBtn: true,
+          viewBtn: false,
+          delBtn: true,
           // editBtn: this.vaildData(this.permission.exchangerate_edit, false)
           editBtn: true
         };

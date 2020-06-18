@@ -173,6 +173,7 @@ export default {
   methods: {
     closeIsShowComment() {
       this.isShowComment = false;
+      this.checked = false;
       this.commentFormData = {
         violation: [],
         unfriendly: []

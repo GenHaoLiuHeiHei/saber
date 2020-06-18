@@ -1,14 +1,16 @@
 <template>
   <basic-container>
     <avue-crud :option="option"
+               :table-loading="loading"
                :data="data"
                :page="page"
-               @row-del="rowDel"
-               v-model="form"
                :permission="permissionList"
+               :before-open="beforeOpen"
+               v-model="form"
+               ref="crud"
                @row-update="rowUpdate"
                @row-save="rowSave"
-               :before-open="beforeOpen"
+               @row-del="rowDel"
                @search-change="searchChange"
                @search-reset="searchReset"
                @selection-change="selectionChange"
@@ -20,32 +22,32 @@
                    size="small"
                    icon="el-icon-delete"
                    plain
-                   v-if="permission.notice_delete"
+                   v-if="permission.customerboxmode_delete"
                    @click="handleDelete">删 除
         </el-button>
-      </template>
-      <template slot-scope="{row}"
-                slot="category">
-        <el-tag>{{row.categoryName}}</el-tag>
       </template>
     </avue-crud>
   </basic-container>
 </template>
 
 <script>
-  import {getList, remove, update, add, getNotice} from "@/api/dept/notice";
+  import {getList, getDetail, add, update, remove} from "@/api/parameter/customerboxmode";
+  import {getGoodsList} from "@/api/parameter/goods";
   import {mapGetters} from "vuex";
-
+  import { findObject } from '@/util/util';
   export default {
     data() {
       return {
+        goodsType: [],
         form: {},
         query: {},
+        loading: true,
         page: {
           pageSize: 10,
           currentPage: 1,
           total: 0
         },
+          
         selectionList: [],
         option: {
           tip: false,
@@ -56,66 +58,132 @@
           selection: true,
           column: [
             {
-              label: "通知标题",
+              label: "标题",
               prop: "title",
-              row: true,
-              search: true,
               rules: [{
                 required: true,
-                message: "请输入通知标题",
+                message: "请输入标题",
                 trigger: "blur"
-              }]
+              }],
+              span: 24,
+              labelWidth:120
             },
             {
-              label: "通知类型",
-              type: "select",
-              row: true,
-              dicUrl: "/api/blade-system/dict/dictionary?code=notice",
+              label: "描述",
+              prop: "summary",
+              rules: [{
+                required: true,
+                message: "请输入描述",
+                trigger: "blur"
+              }],
+              span: 24,
+              labelWidth:120
+            },
+            {
+              label: "任务类型",
+              prop: "modeType",
+              type: 'select',
+              dicUrl: "/api/blade-system/dict/dictionary?code=customer_box_mode",
               props: {
                 label: "dictValue",
                 value: "dictKey"
               },
-              slot: true,
-              prop: "category",
-              search: true,
               rules: [{
                 required: true,
-                message: "请输入通知类型",
+                message: "请选择任务类型",
                 trigger: "blur"
-              }]
-            },
-            {
-              label: "通知日期",
-              prop: "releaseTime",
-              type: "date",
-              format: "yyyy-MM-dd HH:mm:ss",
-              valueFormat: "yyyy-MM-dd HH:mm:ss",
-              rules: [{
-                required: true,
-                message: "请输入通知日期",
-                trigger: "blur"
-              }]
-            },
-            {
-              label: "通知内容",
-              prop: "content",
+              }],
               span: 24,
-              minRows: 6,
-              type: "textarea"
-            }
+              labelWidth:120
+            },
+            {
+              label: "任务奖励",
+              prop: "goodsId",
+              type: 'select',
+              dicData: [],
+              rules: [{
+                required: true,
+                message: "请选择任务奖励",
+                trigger: "blur"
+              }],
+              span: 24,
+              labelWidth:120
+            },
+            {
+              label: "奖励个数",
+              prop: "goodsNum",
+              type: 'number',
+              dicData: [],
+              rules: [{
+                required: true,
+                message: "请输入奖励个数",
+                trigger: "blur"
+              }],
+              span: 24,
+              labelWidth:120
+            },
+            {
+              label: "排序",
+              type: "number",
+              prop: "sortIndex",
+              rules: [{
+                required: true,
+                message: "请输入排序",
+                trigger: "blur"
+              }],
+              span: 24,
+              labelWidth:120
+            },
+            {
+              label: "每日完成数量",
+              prop: "dailyCount",
+              type: "number",
+              rules: [{
+                required: true,
+                message: "请输入每日完成数量",
+                trigger: "blur"
+              }],
+              span: 24,
+              labelWidth:120
+            },
+            // {
+            //   label: "管理员密码",
+            //   prop: "password",
+            //   hide: true,
+            //   rules: [{
+            //     required: true,
+            //     message: "请输入管理员密码",
+            //     trigger: "blur"
+            //   }],
+            //   span: 24,
+            //   labelWidth:120
+            // },
           ]
         },
         data: []
       };
     },
+    watch: {
+       'goodsType':{
+          handler(val){
+            var goodsId = findObject(this.option.column,'goodsId');
+            goodsId.dicData = val;
+          },
+          immediate: true
+      },
+    },
     computed: {
       ...mapGetters(["permission"]),
       permissionList() {
         return {
-          addBtn: this.vaildData(this.permission.notice_add, false),
-          viewBtn: this.vaildData(this.permission.notice_view, false),
-          delBtn: this.vaildData(this.permission.notice_delete, false),
-          editBtn: this.vaildData(this.permission.notice_edit, false)
+          // addBtn: this.vaildData(this.permission.customerboxmode_add, false),
+          // viewBtn: this.vaildData(this.permission.customerboxmode_view, false),
+          // delBtn: this.vaildData(this.permission.customerboxmode_delete, false),
+          // editBtn: this.vaildData(this.permission.customerboxmode_edit, false)
+          addBtn: true,
+          viewBtn: true,
+          delBtn: true,
+          editBtn: true
         };
       },
       ids() {
@@ -126,7 +194,19 @@
         return ids.join(",");
       }
     },
+    created () {
+      getGoodsList(this.page.currentPage, 100, {goodsType: 1}).then(res => {
+          const data = res.data.data.records;
+          this.goodsType = data.map(v => {
+            let res = {};
+            res.label = v.goodsName;
+            res.value = v.id;
+            return res
+          });
+      });
+    },
     methods: {
+      
       rowSave(row, loading, done) {
         add(row).then(() => {
           loading();
@@ -170,17 +250,6 @@
             });
           });
       },
-      searchReset() {
-        this.query = {};
-        this.onLoad(this.page);
-      },
-      searchChange(params) {
-        this.query = params;
-        this.onLoad(this.page, params);
-      },
-      selectionChange(list) {
-        this.selectionList = list;
-      },
       handleDelete() {
         if (this.selectionList.length === 0) {
           this.$message.warning("请选择至少一条数据");
@@ -205,11 +274,26 @@
       },
       beforeOpen(done, type) {
         if (["edit", "view"].includes(type)) {
-          getNotice(this.form.id).then(res => {
+          getDetail(this.form.id).then(res => {
             this.form = res.data.data;
           });
         }
         done();
+      },
+      searchReset() {
+        this.query = {};
+        this.onLoad(this.page);
+      },
+      searchChange(params) {
+        this.query = params;
+        this.onLoad(this.page, params);
+      },
+      selectionChange(list) {
+        this.selectionList = list;
+      },
+      selectionClear() {
+        this.selectionList = [];
+        this.$refs.crud.toggleSelection();
       },
       currentChange(currentPage){
         this.page.currentPage = currentPage;
@@ -218,10 +302,13 @@
         this.page.pageSize = pageSize;
       },
       onLoad(page, params = {}) {
+        this.loading = true;
         getList(page.currentPage, page.pageSize, Object.assign(params, this.query)).then(res => {
           const data = res.data.data;
           this.page.total = data.total;
           this.data = data.records;
+          this.loading = false;
+          this.selectionClear();
         });
       }
     }

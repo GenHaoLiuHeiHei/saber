@@ -24,7 +24,7 @@ export default {
             rules: [
               {
                 required: true,
-                message: "请选择",
+                message: "请选择广告定时",
                 trigger: "blur"
               }
             ],
@@ -32,17 +32,23 @@ export default {
             valueFormat: "yyyy-MM-dd HH:mm:ss",
           },
           {
-            label: "广告链接",
-            prop: "pictureLink",
-            span: 24,
-            rules: [
-              {
-                required: true,
-                message: "请输入",
-                trigger: "blur"
-              }
-            ]
-          },
+              label: "广告链接",
+              prop: "pictureLink",
+              prepend:'http://',
+              mock:{
+                type:'url',
+                header:false,
+              },
+              append:'com',
+              span: 24,
+              rules: [
+                {
+                  required: true,
+                  message: "请输入广告链接",
+                  trigger: "blur"
+                }
+              ]
+            },
           {
             label: "广告图片",
             prop: "pictureUrl",
@@ -62,7 +68,7 @@ export default {
             rules: [
               {
                 required: true,
-                message: "请上传封面图片",
+                message: "请上传广告图片",
                 trigger: "blur"
               }
             ]
@@ -105,7 +111,6 @@ export default {
       obj.pictureType = 1;
       obj.listAdvertisement = [];
       obj.listAdvertisement[0] = this.formData
-      console.log(obj);
       this.$refs[formName].validate(valid => {
         if (valid) {
           add(obj).then(res => {

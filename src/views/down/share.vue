@@ -68,11 +68,10 @@ export default {
       return browser;            
     },
     isBlackApp() {
-      return false
       var u = navigator.userAgent.toLowerCase();
       return (
         /micromessenger/i.test(u) ||
-        u.indexOf("uc") > -1 
+        u.indexOf("wx") > -1 
       );
     },
     getMsg () {
