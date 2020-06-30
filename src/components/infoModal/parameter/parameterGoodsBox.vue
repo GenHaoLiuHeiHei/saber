@@ -40,6 +40,13 @@
       }
     },
     data() {
+       var validatePass = (rule, value, callback) => {
+        if (value < 0 || value > 100) {
+          callback(new Error('请输入0-100的数字'));
+        } else {
+          callback();
+        }
+      };
       return {
         goodsType: {
           chest: [],
@@ -97,6 +104,25 @@
                 message: "请输入物品数量随机数最大",
                 trigger: "blur"
               }],
+              span: 24,
+              labelWidth:200
+            },
+            {
+              label: "物品获得的概率",
+              type: 'number',
+              prop: "odds",
+              rules: [
+                {
+                  required: true,
+                  message: "请输入物品获得的概率",
+                  trigger: "blur"
+                },
+                { 
+                  required: true,
+                  validator: validatePass, 
+                  trigger: 'blur' 
+                }
+              ],
               span: 24,
               labelWidth:200
             },

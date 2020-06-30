@@ -3,7 +3,7 @@
     <div v-if="isNeizhi" class="topic">
       <p>点击右上角按钮，然后在弹出的菜单中，点击在浏览器中打开，即可安装</p>
       <div class="topimg">
-        <img src="../../../public/img/down/alert-arrow.png" alt />
+        <img src="../../../public/img/appOther/alert-arrow.png" alt />
       </div>
     </div>
     <div class="contents">
@@ -11,7 +11,7 @@
       <div class="home">
         <div class="box">
           <div class="appicon-bg">
-            <img src="../../../public/img/down/120.png" class="appicon" />
+            <img src="../../../public/img/appOther/120.png" class="appicon" />
           </div>
           <!-- <el-tabs 
             v-model="active"
@@ -23,7 +23,7 @@
             />
           </el-tabs>-->
           <div style="height:3px;background:#f8f8f8" class="w100 m-b20"></div>
-          <h2>院子-{{info.name}}</h2>
+          <h2>奇妙谷-{{info.name}}</h2>
           <div class="breadcrumb">
             <li>版本：1.0</li>
             <li>大小：{{info.size}} MB</li>
@@ -71,24 +71,24 @@
                 </div>
                 <div>第1步：点击下载按钮，下载并安装App</div>
                 <div>
-                  <img src="../../../public/img/down/ios-h1.png" alt="">
+                  <img src="../../../public/img/appOther/ios-h1.png" alt="">
                 </div>
                 <div>
-                  <img src="../../../public/img/down/ios-h2.png" alt="">
+                  <img src="../../../public/img/appOther/ios-h2.png" alt="">
                 </div>
                 <div>第2步：稍等片刻等待App安装完成后，点击蓝色按钮前去设置信任（若还未安装完，需稍等片刻，请确保已安装应用）</div>
                 <div>
-                  <img src="../../../public/img/down/ios-h3.png" alt="">
+                  <img src="../../../public/img/appOther/ios-h3.png" alt="">
                 </div>
                 <div>
-                  <img src="../../../public/img/down/ios-h4.png" alt="">
+                  <img src="../../../public/img/appOther/ios-h4.png" alt="">
                 </div>
                 <div>第3步：找到设置应用对应的证书描述，并设置为信任，这样就完成了安装，可以使用啦~</div>
                 <div>
-                  <img src="../../../public/img/down/ios-h5.png" alt="">
+                  <img src="../../../public/img/appOther/ios-h5.png" alt="">
                 </div>
                 <div>
-                  <img src="../../../public/img/down/ios-h6.png" alt="">
+                  <img src="../../../public/img/appOther/ios-h6.png" alt="">
                 </div>
               </div>
             </div>
@@ -118,7 +118,7 @@ export default {
           size: 8.2,
           time: "12-13",
           link:
-            "itms-services://?action=download-manifest&url=https://levi.gitee.io/appdown/plist.xml"
+            "itms-services://?action=download-manifest&url=https://apps.apple.com/cn/app/id1520170264"
         },
         {
           name: "安卓App",
@@ -220,7 +220,7 @@ export default {
   }
 }
 .header {
-  background: url("../../../public/img/down/top_bg_mobile_ratio.png") no-repeat
+  background: url("../../../public/img/appOther/top_bg_mobile_ratio.png") no-repeat
     scroll top center;
   background-size: 150% auto;
   height: 200px;
@@ -270,7 +270,7 @@ export default {
   }
 }
 .appicon-bg {
-  background: url(../../../public/img/down/app_bg.png) no-repeat scroll top
+  background: url(../../../public/img/appOther/app_bg.png) no-repeat scroll top
     center;
   width: 160px;
   height: 160px;

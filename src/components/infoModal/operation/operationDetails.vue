@@ -100,7 +100,7 @@ export default {
               prop: "buyGold"
             },
             {
-              label: "收益金币",
+              label: "收益钻石",
               prop: "money"
             },
             

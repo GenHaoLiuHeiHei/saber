@@ -2,8 +2,8 @@
  * 全局配置文件
  */
 export default {
-  title: "院子后台",
-  indexTitle: '院子后台管理',
+  title: "奇妙谷后台",
+  indexTitle: '奇妙谷后台管理',
   clientId: 'saber', // 客户端id
   clientSecret: 'saber_secret', // 客户端密钥
   tenantMode: true, // 是否开启租户模式

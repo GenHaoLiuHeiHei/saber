@@ -91,7 +91,7 @@ export default {
 
           },
            {
-            label: "提现金币",
+            label: "提现钻石",
             prop: "extractGold"
           },
           {

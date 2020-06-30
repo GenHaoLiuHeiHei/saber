@@ -64,7 +64,7 @@
           // dialogClickModal: false,
           column: [
             {
-              label: "宝箱里面的物品",
+              label: "升级所需的物品",
               prop: "goodsChildId",
               type: 'select',
               dicData: [],

@@ -81,6 +81,7 @@ export const getRenderSort = (h, column, query, cb) => {
         ]),
     ])
 };
+
 export const findObject = (data, prop) => {
     let res = null
     data.map(v => {

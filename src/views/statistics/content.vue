@@ -1,62 +1,33 @@
 <template>
   <basic-container>
-    <div id="echarts" :style="{width: '300px', height: '300px'}"></div>
+    <el-tabs v-model="activeName" @tab-click="handleClick">
+        <el-tab-pane label="开屏" name="openScreen">
+          <DataClass title='浏览人次(UV)' :formDatas="{name:1}"></DataClass>
+        </el-tab-pane>
+        <el-tab-pane label="书库" name="book">
+          <DataClass title='浏览次数(PV)' :formDatas="{name:1}"></DataClass>
+        </el-tab-pane>
+    </el-tabs>
   </basic-container>
 </template>
 <script>
-require("echarts/lib/chart/bar");
+import DataClass from './components/dataClass';
 export default {
-  data() {
-    return {};
+  components: {
+    DataClass
   },
-  props: {
-    chartData: {
-      require: true,
-      type: Object
+  data() {
+    return {
+      activeName: 'openScreen'
+    };
+  },
+  methods: {
+    handleClick () {
+      console.log(0)
     }
   },
   mounted() {
-    var dom = document.getElementById("echarts");
-    var myChart = this.$echarts.init(dom);
-    // 绘制图表
-    myChart.setOption({
-      color: ["#3398DB"],
-      tooltip: {
-        trigger: "axis",
-        axisPointer: {
-          // 坐标轴指示器，坐标轴触发有效
-          type: "shadow" // 默认为直线，可选为：'line' | 'shadow'
-        }
-      },
-      grid: {
-        left: "3%",
-        right: "4%",
-        bottom: "3%",
-        containLabel: true
-      },
-      xAxis: [
-        {
-          type: "category",
-          data: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-          axisTick: {
-            alignWithLabel: true
-          }
-        }
-      ],
-      yAxis: [
-        {
-          type: "value"
-        }
-      ],
-      series: [
-        {
-          name: "直接访问",
-          type: "bar",
-          barWidth: "60%",
-          data: [10, 52, 200, 334, 390, 330, 220]
-        }
-      ]
-    });
+   
   }
 };
 </script>

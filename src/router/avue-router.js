@@ -3,7 +3,7 @@ let RouterPlugin = function () {
     this.$router = null;
     this.$store = null;
 };
-let isDelTitle = ['share', 'down']
+let isDelTitle = ['share', 'down', 'appAgreement']
 RouterPlugin.install = function (vue, router, store, i18n) {
     this.$router = router;
     this.$store = store;

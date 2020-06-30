@@ -24,8 +24,11 @@
                    @click="handleDelete">删 除
         </el-button>
       </template>
-      <template slot-scope="scope" slot="goldCount">
-        {{scope.row.goldCount}}金币
+     <template slot-scope="scope" slot="goldCount">
+        {{scope.row.goldCount}}钻石
+      </template> 
+      <template slot-scope="scope" slot="silverCount">
+        {{scope.row.silverCount || 0}}金币
       </template> 
       <template slot-scope="scope" slot="goldPrice">
         {{scope.row.goldPrice}}元
@@ -70,8 +73,32 @@
               }]
             },
             {
-              label: "金币数量",
+              label: "商品编号",
+              prop: "productNum",
+              span: 24,
+              labelWidth: 120,
+              rules: [{
+                required: true,
+                message: "请输入商品编号",
+                trigger: "blur"
+              }]
+            },
+            {
+              label: "钻石数量",
               prop: "goldCount",
+              type: 'number',
+              span: 24,
+              labelWidth: 120,
+              slot: true,
+              rules: [{
+                required: true,
+                message: "请输入金币数量",
+                trigger: "blur"
+              }]
+            },
+            {
+              label: "金币数量",
+              prop: "silverCount",
               type: 'number',
               span: 24,
               labelWidth: 120,

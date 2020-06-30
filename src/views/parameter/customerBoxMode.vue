@@ -195,7 +195,7 @@
       }
     },
     created () {
-      getGoodsList(this.page.currentPage, 100, {goodsType: 1}).then(res => {
+      getGoodsList(this.page.currentPage, 100).then(res => {
           const data = res.data.data.records;
           this.goodsType = data.map(v => {
             let res = {};

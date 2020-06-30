@@ -38,7 +38,7 @@
               labelWidth:120
             },
            {
-            label: "提现金币",
+            label: "提现钻石",
             prop: "extractGold",
             span: 12,
             disabled: true,

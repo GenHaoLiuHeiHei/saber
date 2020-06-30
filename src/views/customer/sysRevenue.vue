@@ -61,7 +61,7 @@
               prop: "customerNickName"
             },
             {
-              label: "购买金币",
+              label: "购钻石",
               prop: "money"
             },
             {
@@ -88,7 +88,7 @@
                 value: "dictKey"
               }
             },{
-              label: "收益金币",
+              label: "收益钻石",
               prop: "revenueGold"
             },{
               label: "昵称或者用户编号",

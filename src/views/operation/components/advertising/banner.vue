@@ -28,12 +28,10 @@ export default {
                   labelWidth: 120,
                   prop: 'pictureLink1',
                   span: 16,
-                  prepend:'http://',
                   mock:{
                     type:'url',
                     header:false,
                   },
-                  append:'com',
                   rules: [
                     {
                       required: true,
@@ -130,12 +128,10 @@ export default {
                       trigger: "blur"
                     }
                   ],
-                   prepend:'http://',
-                    mock:{
-                      type:'url',
-                      header:false,
-                    },
-                    append:'com',
+                  mock:{
+                    type:'url',
+                    header:false,
+                  },
                 },{
                   prop: 'del',
                   span: 2,
@@ -221,12 +217,10 @@ export default {
                   trigger: "blur"
                 }
               ],
-              prepend:'http://',
               mock:{
                 type:'url',
                 header:false,
               },
-              append:'com',
             },{
               prop: 'del',
               span: 2,

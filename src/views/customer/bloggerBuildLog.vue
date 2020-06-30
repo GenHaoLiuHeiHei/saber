@@ -33,10 +33,12 @@
 <script>
   import {getList, getDetail, add, update, remove} from "@/api/customer/bloggerbuildlog";
   import {mapGetters} from "vuex";
-
+  import {findObject} from '@/util/util';
+  import {getGoodsList} from "@/api/parameter/goods";
   export default {
     data() {
       return {
+        goodsType: [],
         form: {},
         query: {},
         loading: true,
@@ -52,61 +54,30 @@
           border: true,
           index: false,
           viewBtn: false,
-          selection: true,
+          selection: false,
+          menu: false,
           column: [
             {
-              label: "",
-              prop: "id",
-              rules: [{
-                required: true,
-                message: "请输入",
-                trigger: "blur"
-              }]
-            },
-            {
-              label: "博主ID",
-              prop: "bloggerId",
-              rules: [{
-                required: true,
-                message: "请输入博主ID",
-                trigger: "blur"
-              }]
+              label: "博主昵称",
+              prop: "customerName",
+              search: true
             },
             {
               label: "博主建筑等级",
               prop: "buildLevel",
-              rules: [{
-                required: true,
-                message: "请输入博主建筑等级",
-                trigger: "blur"
-              }]
             },
             {
-              label: "物资ID",
+              label: "物资名称",
               prop: "goodsId",
-              rules: [{
-                required: true,
-                message: "请输入物资ID",
-                trigger: "blur"
-              }]
+              dicData: []
             },
             {
               label: "升级物资数量",
               prop: "goodsNum",
-              rules: [{
-                required: true,
-                message: "请输入升级物资数量",
-                trigger: "blur"
-              }]
             },
             {
               label: "升级时间",
               prop: "createTime",
-              rules: [{
-                required: true,
-                message: "请输入升级时间",
-                trigger: "blur"
-              }]
             },
           ]
         },
@@ -130,6 +101,26 @@
         });
         return ids.join(",");
       }
+    },
+    watch: {
+       'goodsType':{
+          handler(val){
+            var goodsId = findObject(this.option.column,'goodsId');
+            goodsId.dicData = val;
+          },
+          immediate: true
+      },
+    },
+    created () {
+      getGoodsList(this.page.currentPage, 100).then(res => {
+          const data = res.data.data.records;
+          this.goodsType = data.map(v => {
+            let res = {};
+            res.label = v.goodsName;
+            res.value = v.id;
+            return res
+          });
+      });
     },
     methods: {
       rowSave(row, loading, done) {

@@ -1,6 +1,6 @@
 export default {
   tip: '提示',
-  title: '院子后台管理系统',
+  title: '奇妙谷后台管理系统',
   logoutTip: '退出系统, 是否继续?',
   submitText: '确定',
   cancelText: '取消',

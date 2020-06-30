@@ -34,12 +34,10 @@ export default {
           {
               label: "广告链接",
               prop: "pictureLink",
-              prepend:'http://',
               mock:{
                 type:'url',
                 header:false,
               },
-              append:'com',
               span: 24,
               rules: [
                 {

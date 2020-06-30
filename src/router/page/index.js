@@ -37,7 +37,7 @@ export default [{
     path: '/down',
     name: 'APP下载',
     component: () =>
-        import( /* webpackChunkName: "page" */ '@/views/down/index'),
+        import( /* webpackChunkName: "page" */ '@/views/appOther/index'),
     meta: {
         keepAlive: false,
         isTab: false,
@@ -48,7 +48,29 @@ export default [{
     path: '/share',
     name: 'APP分享',
     component: () =>
-        import( /* webpackChunkName: "page" */ '@/views/down/share'),
+        import( /* webpackChunkName: "page" */ '@/views/appOther/share'),
+    meta: {
+        keepAlive: false,
+        isTab: false,
+        isAuth: false
+    }
+},
+{
+    path: '/appAgreement',
+    name: 'APP用户协议',
+    component: () =>
+        import( /* webpackChunkName: "page" */ '@/views/appOther/appAgreement'),
+    meta: {
+        keepAlive: false,
+        isTab: false,
+        isAuth: false
+    }
+},
+{
+    path: '/rechargeAgreement',
+    name: 'APP用户充值协议',
+    component: () =>
+        import( /* webpackChunkName: "page" */ '@/views/appOther/rechargeAgreement'),
     meta: {
         keepAlive: false,
         isTab: false,

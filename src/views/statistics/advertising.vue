@@ -1,62 +1,54 @@
 <template>
   <basic-container>
-    <div id="echarts" :style="{width: '300px', height: '300px'}"></div>
+     <el-tabs v-model="activeName" @tab-click="handleClick">
+        <el-tab-pane label="开屏" name="openScreen">
+          <div v-for="(item, index) in dataList" :key="index" style="display: inline-block">
+            <DataClass :title='item.name' :formDatas="item"></DataClass>
+          </div>
+        </el-tab-pane>
+        <el-tab-pane label="书库" name="bookBanner">
+         <div v-for="(item, index) in dataList" :key="index" style="display: inline-block">
+            <DataClass :title='item.name' :formDatas="item"></DataClass>
+          </div>
+        </el-tab-pane>
+      </el-tabs>
   </basic-container>
 </template>
 <script>
-require("echarts/lib/chart/bar");
+import DataClass from './components/dataClass';
+import { getDetail } from "@/api/statistics/advertising";
 export default {
-  data() {
-    return {};
+  components: {
+    DataClass
   },
-  props: {
-    chartData: {
-      require: true,
-      type: Object
+  data() {
+    return {
+      activeName: 'openScreen',
+      dataList: [],
+      loading: true,
+    };
+  },
+ computed: {
+    isType() {
+      return this.activeName === 'openScreen' ? 1 : 2;
     }
   },
-  mounted() {
-    var dom = document.getElementById("echarts");
-    var myChart = this.$echarts.init(dom);
-    // 绘制图表
-    myChart.setOption({
-      color: ["#3398DB"],
-      tooltip: {
-        trigger: "axis",
-        axisPointer: {
-          // 坐标轴指示器，坐标轴触发有效
-          type: "shadow" // 默认为直线，可选为：'line' | 'shadow'
-        }
-      },
-      grid: {
-        left: "3%",
-        right: "4%",
-        bottom: "3%",
-        containLabel: true
-      },
-      xAxis: [
-        {
-          type: "category",
-          data: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-          axisTick: {
-            alignWithLabel: true
-          }
-        }
-      ],
-      yAxis: [
-        {
-          type: "value"
-        }
-      ],
-      series: [
-        {
-          name: "直接访问",
-          type: "bar",
-          barWidth: "60%",
-          data: [10, 52, 200, 334, 390, 330, 220]
-        }
-      ]
+  created () {
+    let this_ = this;
+    getDetail(this.isType).then(res => {
+      this_.dataList = res.data.data;
     });
+  },
+  methods: {
+    handleClick (e) {
+      let this_ = this;
+      if (!this_.loading) return
+      this_.loading = false;
+      getDetail(this.isType).then(res => {
+        this_.loading = true;
+        this_.dataList = res.data.data;
+      });
+    }
   }
 };
 </script>

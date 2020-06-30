@@ -63,17 +63,7 @@
               label: "道具数量",
               prop: "goodsNum",
               type: "number",
-            },
-            {
-              label: "来源类型",
-              prop: "reason",
-              type: 'select',
-              dicUrl: "/api/blade-system/dict/dictionary?code=customer_bag_form",
-              props: {
-                label: "dictValue",
-                value: "dictKey"
-              }
-            },
+            }
           ]
         },
         data: []

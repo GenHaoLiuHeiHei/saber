@@ -33,10 +33,12 @@
 <script>
   import {getList, getDetail, add, update, remove} from "@/api/customer/bloggergoodssum";
   import {mapGetters} from "vuex";
-
+  import {findObject} from '@/util/util';
+  import {getGoodsList} from "@/api/parameter/goods";
   export default {
     data() {
       return {
+        goodsType: [],
         form: {},
         query: {},
         loading: true,
@@ -52,43 +54,22 @@
           border: true,
           index: false,
           viewBtn: false,
-          selection: true,
+          selection: false,
+          menu: false,
           column: [
             {
-              label: "",
-              prop: "id",
-              rules: [{
-                required: true,
-                message: "请输入",
-                trigger: "blur"
-              }]
+              label: "博主昵称",
+              prop: "customerName",
+              search: true
             },
             {
-              label: "博主",
-              prop: "bloggerId",
-              rules: [{
-                required: true,
-                message: "请输入博主",
-                trigger: "blur"
-              }]
-            },
-            {
-              label: "物资数量",
+              label: "物资名称",
               prop: "goodsId",
-              rules: [{
-                required: true,
-                message: "请输入物资数量",
-                trigger: "blur"
-              }]
+              dicData: [],
             },
             {
               label: "物资总量",
-              prop: "goodsSum",
-              rules: [{
-                required: true,
-                message: "请输入物资总量",
-                trigger: "blur"
-              }]
+              prop: "goodsNum"
             },
           ]
         },
@@ -112,6 +93,26 @@
         });
         return ids.join(",");
       }
+    },
+    watch: {
+       'goodsType':{
+          handler(val){
+            var goodsId = findObject(this.option.column,'goodsId');
+            goodsId.dicData = val;
+          },
+          immediate: true
+      },
+    },
+    created () {
+      getGoodsList(this.page.currentPage, 100).then(res => {
+          const data = res.data.data.records;
+          this.goodsType = data.map(v => {
+            let res = {};
+            res.label = v.goodsName;
+            res.value = v.id;
+            return res
+          });
+      });
     },
     methods: {
       rowSave(row, loading, done) {

@@ -22,7 +22,7 @@
           align:'center',
           column: [
             {
-              label: "金币剩余(修改)",
+              label: "剩余钻石(修改)",
               span: 24,
               labelWidth: 120,
               prop: "realGold",

@@ -50,13 +50,20 @@
                 label: "dictValue",
                 value: "dictKey"
               },
-              prop: "isOver",span: 24,
+              prop: "isOver",
+              span: 24,
               labelWidth: 100,
               disabled: true
             },
             {
               label: "收费模式",
-              prop: "bookChapterSum",
+              type: "select",
+              dicUrl: "/api/blade-system/dict/dictionary?code=bookTollMode",
+              props: {
+                label: "dictValue",
+                value: "dictKey"
+              },
+              prop: "bookChargeType",
               span: 24,
               labelWidth: 100,
               disabled: true

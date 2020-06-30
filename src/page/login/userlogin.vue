@@ -79,14 +79,14 @@
       return {
         tenantMode: website.tenantMode,
         loginForm: {
-          //租户ID
-          tenantId: "000000",
-          //用户名
-          username: "admin",
-          //密码
-          password: "admin",
+          //租户ID 000000
+          tenantId: "",
+          //用户名 admin
+          username: "",
+          //密码 admin
+          password: "",
           //账户类型
-          type: "account",
+          type: "",
           //验证码的值
           code: "",
           //验证码的索引

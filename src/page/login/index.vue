@@ -7,7 +7,7 @@
         <div class="login-main">
           <h4 class="login-title">
             {{ $t('login.title') }}{{website.title}}
-            <top-lang></top-lang>
+            <!-- <top-lang></top-lang> -->
           </h4>
           <userLogin v-if="activeName =='user'"></userLogin>
           <codeLogin v-else-if="activeName==='code'"></codeLogin>

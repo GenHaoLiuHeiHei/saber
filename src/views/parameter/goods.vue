@@ -27,6 +27,14 @@
             @click="showModalInfo(scope.row, 'parameterGoodsBox')"
           >设置物品</el-button>
       </template>
+       <template slot-scope="scope" slot="silverCount">
+         <div v-if="scope.row.goodsType === 2">
+            {{scope.row.silverCount || 0}}金币
+         </div>
+         <div v-else>
+           暂无
+         </div>
+      </template> 
       <template slot="menuLeft">
         <el-button type="danger"
                    size="small"
@@ -138,6 +146,31 @@
               labelWidth:120
             },
             {
+              label: "价值",
+              prop: "silverCount",
+              type: 'number',
+              slot: true,
+              rules: [{
+                required: true,
+                message: "请输入物资对应的价值",
+                trigger: "blur"
+              }],
+              span: 24,
+              labelWidth:120
+            },
+            {
+              label: "排序",
+              prop: "sortIndex",
+              type: 'number',
+              rules: [{
+                required: true,
+                message: "请输入排序",
+                trigger: "blur"
+              }],
+              span: 24,
+              labelWidth:120
+            },
+            {
               label: "计量单位",
               prop: "goodsUnit",
               type: 'number',
@@ -179,35 +212,46 @@
       };
     },
     watch: {
-       'form.goodsType':{
-          handler(val){
-            var goodsUnit = findObject(this.option.column,'goodsUnit');
-            var goodsExperience = findObject(this.option.column,'goodsExperience');
-            if(val !== 1){
-              goodsUnit.display = true;
-              goodsUnit.rules=[{
-                required: true,
-                message: "请输入计量单位，（每一次赠送多少个）",
-                trigger: "blur"
+      'form.goodsType':{
+        handler(val){
+          var goodsUnit = findObject(this.option.column,'goodsUnit');
+          var goodsExperience = findObject(this.option.column,'goodsExperience');
+          var silverCount = findObject(this.option.column,'silverCount');
+          if(val !== 1){
+            goodsUnit.display = true;
+            goodsUnit.rules=[{
+              required: true,
+              message: "请输入计量单位，（每一次赠送多少个）",
+              trigger: "blur"
+            }]
+            goodsExperience.display = true;
+            goodsExperience.rules=[{
+              required: true,
+              message: "请输入赠送获取贡献值",
+              trigger: "blur"
+            }]
+            this.form.goodsUnit = 0;
+            this.form.goodsExperience = 0;
+            if (val === 2) {
+              silverCount.display = true;
+              silverCount.rules=[{
+                  required: true,
+                  message: "请输入物资对应的价值",
+                  trigger: "blur"
               }]
-              goodsExperience.display = true;
-              goodsExperience.rules=[{
-                required: true,
-                message: "请输入赠送获取贡献值",
-                trigger: "blur"
-              }]
-              this.form.goodsUnit = 0;
-              this.form.goodsExperience = 0;
-            }else{
-              goodsUnit.display = false;
-              goodsUnit.rules = [];
-              goodsExperience.display = false;
-              goodsExperience.rules = [];
-              this.form.goodsUnit = 1;
-              this.form.goodsExperience = 0;
             }
-          },
-          immediate: true
+          }else{
+            silverCount.display = false;
+            silverCount.rules = [];
+            goodsUnit.display = false;
+            goodsUnit.rules = [];
+            goodsExperience.display = false;
+            goodsExperience.rules = [];
+            this.form.goodsUnit = 1;
+            this.form.goodsExperience = 0;
+          }
+        },
+        immediate: true
       },
     },
     computed: {

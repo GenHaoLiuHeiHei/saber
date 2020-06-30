@@ -16,6 +16,13 @@
       },
     },
     data() {
+      var validatePass = (rule, value, callback) => {
+        if (value <= 0) {
+          callback(new Error('请输入大于0的数字'));
+        } else {
+          callback();
+        }
+      };
       return {
          option: {
           emptyBtn: false,
@@ -43,6 +50,10 @@
                 required: true,
                 message: "请输入坐标编号",
                 trigger: "blur"
+              }, { 
+                  required: true,
+                  validator: validatePass, 
+                  trigger: 'blur' 
               }],
               labelWidth: 120,
               span: 24,
@@ -54,10 +65,10 @@
               dicData:[
                 {
                   label:'区域一',
-                  value:1
+                  value: 1
                 },{
                   label:'区域二',
-                  value:2
+                  value: 2
                 }
               ],
               rules: [{

@@ -17,22 +17,32 @@
                @current-change="currentChange"
                @size-change="sizeChange"
                @on-load="onLoad">
-          <template slot="comment" slot-scope="scope">
-          <!-- 内容 -->
-          <div v-if="scope.row.comment && scope.row.comment.length > 0">{{scope.row.comment}}</div>
-          <div v-else>暂无内容</div>
-        </template>
+      <template slot="menuLeft">
+        <el-button type="danger"
+                   size="small"
+                   icon="el-icon-delete"
+                   plain
+                   @click="handleDelete">删 除
+        </el-button>
+      </template>
     </avue-crud>
   </basic-container>
 </template>
 
 <script>
-  import {getList, getDetail, add, update, remove} from "@/api/customer/customerboxlog";
+  import {getList, getDetail, add, update, remove} from "@/api/parameter/customersignconfig";
   import {mapGetters} from "vuex";
   import {findObject} from '@/util/util';
   import {getGoodsList} from "@/api/parameter/goods";
   export default {
     data() {
+        var validatePass = (rule, value, callback) => {
+            if (value <= 0) {
+            callback(new Error('请输入大于0的数字'));
+            } else {
+            callback();
+            }
+        };
       return {
         goodsType: [],
         form: {},
@@ -45,63 +55,94 @@
         },
         selectionList: [],
         option: {
-           tip: false,
-          align:'center',
+          tip: false,
           border: true,
           index: false,
           viewBtn: false,
-          selection: false,
-          menu: false,
+          selection: true,
+          align: 'center',
           column: [
             {
-              label: "任务类型",
-              prop: "modeType",
-              type: 'select',
-              dicUrl: "/api/blade-system/dict/dictionary?code=customer_box_mode",
-              props: {
-                label: "dictValue",
-                value: "dictKey"
-              }
+              label: "开始天数",
+              type: 'number',
+              prop: "beginDay",
+              rules: [
+                {
+                    required: true,
+                    message: "请输入开始天数",
+                    trigger: "blur"
+                },
+                {
+                    validator: validatePass, 
+                    required: true,
+                    trigger: "blur"
+                }
+              ],
+              span: 24,
+              labelWidth:120
             },
             {
-              label: "用户昵称",
-              prop: "customerName",
-              search: true,
+              label: "结束天数",
+              type: 'number',
+              prop: "endDay",
+              rules: [
+                {
+                    required: true,
+                    message: "请输入结束天数",
+                    trigger: "blur"
+                },
+                {
+                    validator: validatePass, 
+                    required: true,
+                    trigger: "blur"
+                }
+              ],
+              span: 24,
+              labelWidth:120
             },
-            // {
-            //   label: "用户ID",
-            //   prop: "customerId",
-            // },
-            // {
-            //   label: "博主用户ID",
-            //   prop: "bloggerId"
-            // },
             {
-              label: "道具名称",
+              label: "奖励物品",
               prop: "goodsId",
-              dicData: []
+              type: 'select',
+              dicData: [],
+              rules: [{
+                required: true,
+                message: "请输入奖励物品",
+                trigger: "blur"
+              }],
+              span: 24,
+              labelWidth:120
             },
             {
-              label: "获取时间",
-              prop: "createTime"
-            },
-            {
-              label: "关联对象内容(组装日志信息)",
-              prop: "comment"
+              label: "奖励数量",
+              prop: "goodsNum",
+              type: 'number',
+              rules: [{
+                required: true,
+                message: "请输入奖励数量",
+                trigger: "blur"
+              }],
+              span: 24,
+              labelWidth:120
             },
           ]
         },
         data: []
       };
     },
+    
     computed: {
       ...mapGetters(["permission"]),
       permissionList() {
         return {
-          addBtn: this.vaildData(this.permission.customerboxlog_add, false),
-          viewBtn: this.vaildData(this.permission.customerboxlog_view, false),
-          delBtn: this.vaildData(this.permission.customerboxlog_delete, false),
-          editBtn: this.vaildData(this.permission.customerboxlog_edit, false)
+        //   addBtn: this.vaildData(this.permission.customersignconfig_add, false),
+        //   viewBtn: this.vaildData(this.permission.customersignconfig_view, false),
+        //   delBtn: this.vaildData(this.permission.customersignconfig_delete, false),
+        //   editBtn: this.vaildData(this.permission.customersignconfig_edit, false)
+            addBtn: true,
+            viewBtn: true,
+            delBtn: true,
+            editBtn: true
         };
       },
       ids() {

@@ -59,6 +59,7 @@
             {
               label: "用户昵称",
               prop: "customerName",
+              search: true
             },
             {
               label: "道具名称",
@@ -72,6 +73,16 @@
             {
               label: "赠送时间",
               prop: "createTime",
+            },
+            {
+              label: "来源类型",
+              prop: "reason",
+              type: 'select',
+              dicUrl: "/api/blade-system/dict/dictionary?code=customer_bag_form",
+              props: {
+                label: "dictValue",
+                value: "dictKey"
+              }
             },
           ]
         },

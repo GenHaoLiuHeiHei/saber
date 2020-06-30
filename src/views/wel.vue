@@ -2,7 +2,7 @@
   <div>
     <basic-container>
       <h1 style="text-align: center;">
-        欢迎进入院子后台管理系统
+        欢迎进入奇妙谷后台管理系统
       </h1>
     </basic-container>
   </div>

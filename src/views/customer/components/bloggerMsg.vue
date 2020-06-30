@@ -207,6 +207,16 @@
               label: "注册时间",
               prop: "createTime"
             },
+             {
+              label: "博主类型",
+              prop: "isBlogger",
+              type: 'select',
+              dicUrl: "/api/blade-system/dict/dictionary?code=is_blogger",
+              props: {
+                label: "dictValue",
+                value: "dictKey"
+              },
+            },
             {
               label: "博文",
               prop: "blogArticleSum",
@@ -253,13 +263,29 @@
               slot: true
             },
             {
-              label: "余额",
+              label: "钻石余额",
               prop: "realGold",
               slot: true
             },
             {
+              label: "金币余额",
+              prop: "silverCoin",
+            },
+             {
+              label: "假币",
+              prop: "fakeGold",
+            },
+            {
               label: "历史充值",
               prop: "rechargeCount"
+            },
+            {
+              label: "坐标编号",
+              prop: "siteNum"
+            },
+            {
+              label: "区域编号",
+              prop: "areaNum"
             },
             {
               label: "关注",

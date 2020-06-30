@@ -23,7 +23,6 @@
                      :label="generateTitle(item)"
                      :name="item.value">
         </el-tab-pane>
-
       </el-tabs>
       <el-dropdown class="avue-tags__menu">
         <el-button type="primary"
@@ -52,7 +51,8 @@ export default {
       contextmenuFlag: false
     };
   },
-  created() {},
+  created() {
+  },
   mounted() {
     this.setActive();
   },
@@ -81,6 +81,8 @@ export default {
       );
     },
     watchContextmenu(event) {
+      console.log(this.$el.contains(event.target));
+      return
       if (!this.$el.contains(event.target) || event.button !== 0) {
         this.contextmenuFlag = false;
       }

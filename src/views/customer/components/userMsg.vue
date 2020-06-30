@@ -138,9 +138,17 @@
               slot: true
             },
             {
-              label: "余额",
+              label: "钻石余额",
               prop: "realGold",
               slot: true
+            },
+            {
+              label: "金币余额",
+              prop: "silverCoin",
+            },
+             {
+              label: "假币",
+              prop: "fakeGold",
             },
             {
               label: "历史充值",
@@ -227,6 +235,9 @@
         getList(page.currentPage, page.pageSize, Object.assign(params, this.query)).then(res => {
           const data = res.data.data;
           this.page.total = data.total;
+          data.records.map(v => {
+            v.areaNum = Number(v.areaNum)
+          })
           this.data = data.records;
           this.loading = false;
           this.selectionClear();
