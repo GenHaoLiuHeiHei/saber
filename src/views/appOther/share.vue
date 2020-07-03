@@ -24,7 +24,7 @@ export default {
       isIos: false,
       isAndroid: false,
       schemeUrl: "yyyard://h5/open",
-      downloadUrl: "",
+      downloadUrl: "https://b97f.t4m.cn",
       loading: ""
     };
   },
@@ -45,7 +45,7 @@ export default {
     }
     if (isIOS) {
       this.isIos = true;
-      this.schemeUrl = "https://apps.apple.com/cn/app/id1520170264";
+      this.schemeUrl = "https://b97f.t4m.cn";
       this.downloadUrl = "https://apps.apple.com/cn/app/id1520170264";
     }
   },

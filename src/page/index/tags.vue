@@ -81,8 +81,6 @@ export default {
       );
     },
     watchContextmenu(event) {
-      console.log(this.$el.contains(event.target));
-      return
       if (!this.$el.contains(event.target) || event.button !== 0) {
         this.contextmenuFlag = false;
       }

@@ -108,26 +108,26 @@ export default {
             ]
           },
           {
-            label: '权重',
-            prop: 'tagWeights',
-            type: 'select',
+            label: "权重",
+            prop: "tagWeights",
+            type: "select",
             labelWidth: 100,
             span: 13,
             dicData: [
               {
-                label: '100',
+                label: "100",
                 value: 100
               },
               {
-                label: '90',
+                label: "90",
                 value: 90
               },
               {
-                label: '80',
+                label: "80",
                 value: 80
               },
               {
-                label: '70',
+                label: "70",
                 value: 70
               }
             ],
@@ -234,24 +234,24 @@ export default {
   },
   methods: {
     changeUpdate(row, status) {
-        let msg = '确定将选择该标签启用'
-        this.$confirm(msg, {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
+      let msg = "确定将选择该标签启用";
+      this.$confirm(msg, {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          row.tagState = status;
+          return update(row);
         })
-          .then(() => {
-            row.tagState = status;
-            return update(row)
-          })
-          .then(() => {
-            this.onLoad(this.page);
-            this.$message({
-              type: "success",
-              message: "操作成功!"
-            });
+        .then(() => {
+          this.onLoad(this.page);
+          this.$message({
+            type: "success",
+            message: "操作成功!"
           });
-      },
+        });
+    },
     rowSave(row, loading, done) {
       add(row).then(
         () => {
