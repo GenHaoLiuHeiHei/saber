@@ -116,6 +116,7 @@
               type: 'number',
               span: 24,
               labelWidth: 120,
+              precision:2,
               rules: [{
                 required: true,
                 message: "请输入售价(元)",

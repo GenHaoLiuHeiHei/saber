@@ -40,12 +40,11 @@ export default {
     if (isAndroid) {
       this.isAndroid = true;
       this.schemeUrl = "yyyard://h5/open?" + strs;
-      this.downloadUrl =
-        "http://11download.oss-cn-hangzhou.aliyuncs.com/apk/yard_v1.0_20200624.apk";
+      this.downloadUrl = "http://11download.oss-cn-hangzhou.aliyuncs.com/apk/yard_v1.0_20200624.apk";
     }
     if (isIOS) {
       this.isIos = true;
-      this.schemeUrl = "https://b97f.t4m.cn";
+      this.schemeUrl = "https://b97f.t4m.cn?" + strs;
       this.downloadUrl = "https://apps.apple.com/cn/app/id1520170264";
     }
   },
@@ -137,11 +136,11 @@ export default {
         GetMobelType.versions.iPad
       ) {
         window.location.href = this_.schemeUrl; //唤起协议，由iOS小哥哥提供
-        timer = setTimeout(function() {
-          // 两遍
-          window.location.href = this_.downloadUrl;
-          window.location.href = this_.downloadUrl;
-        }, timeout);
+        // timer = setTimeout(function() {
+        //   // 两遍
+        //   window.location.href = this_.downloadUrl;
+        //   window.location.href = this_.downloadUrl;
+        // }, timeout);
       }
     }
   }

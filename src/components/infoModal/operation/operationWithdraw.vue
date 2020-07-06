@@ -93,18 +93,18 @@
               labelWidth:120,
               disabled: true,
             },
-          {
-            label: "管理员密码",
-            prop: "password",
-            rules: [{
-              required: true,
-              message: "请输入管理员密码",
-              trigger: "blur"
-            }],
-            span: 24,
-            // disabled: this.formDatas.isDetails ? true : false,
-            labelWidth:120
-          },
+          // {
+          //   label: "管理员密码",
+          //   prop: "password",
+          //   rules: [{
+          //     required: true,
+          //     message: "请输入管理员密码",
+          //     trigger: "blur"
+          //   }],
+          //   span: 24,
+          //   // disabled: this.formDatas.isDetails ? true : false,
+          //   labelWidth:120
+          // },
         ]
         },
         formData: {},
